@@ -7,18 +7,27 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 
 class MonthlyReportMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $user;
+    public $monthName;
+    public $year;
+    protected $pdfContent;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($user, $monthName, $year, $pdfContent)
     {
-        //
+        $this->user = $user;
+        $this->monthName = $monthName;
+        $this->year = $year;
+        $this->pdfContent = $pdfContent;
     }
 
     /**
@@ -27,7 +36,7 @@ class MonthlyReportMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Monthly Report Mail',
+            subject: 'Monatsbericht ' . $this->monthName . ' ' . $this->year,
         );
     }
 
@@ -37,7 +46,7 @@ class MonthlyReportMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.monthly_report',
         );
     }
 
@@ -48,6 +57,9 @@ class MonthlyReportMail extends Mailable
      */
     public function attachments(): array
     {
-        return [];
+        return [
+            Attachment::fromData(fn () => $this->pdfContent, "Monatsbericht_{$this->monthName}_{$this->year}.pdf")
+                ->withMime('application/pdf'),
+        ];
     }
 }
