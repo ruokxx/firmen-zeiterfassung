@@ -25,6 +25,8 @@ class AdminSettingsController extends Controller
             'mail_from_address' => 'required|email',
             'mail_from_name' => 'required|string',
             'boss_email' => 'nullable|email',
+            'monthly_report_subject' => 'nullable|string',
+            'monthly_report_body' => 'nullable|string',
         ]);
 
         foreach ($data as $key => $value) {

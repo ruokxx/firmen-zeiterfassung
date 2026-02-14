@@ -54,9 +54,15 @@ class AdminController extends Controller
         $user->is_active = true;
         $user->save();
 
-        // Optional: Send email to user (not requested but good practice)
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\AccountApprovedMail($user));
+            $message = "Nutzer {$user->name} wurde freigeschaltet und per E-Mail informiert.";
+        }
+        catch (\Exception $e) {
+            $message = "Nutzer {$user->name} wurde freigeschaltet, aber die E-Mail konnte nicht gesendet werden: " . $e->getMessage();
+        }
 
-        return back()->with('success', "Nutzer {$user->name} wurde freigeschaltet.");
+        return back()->with('success', $message);
     }
 
     public function destroy(\App\Models\User $user)

@@ -84,6 +84,25 @@
                                     <p class="text-sm text-gray-400 mt-1">An diese Adresse werden die Monatsberichte gesendet, wenn Mitarbeiter "An Chef senden" wählen.</p>
                                 </div>
                             </div>
+
+                            <!-- Monthly Report Email Settings -->
+                            <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                                <h4 class="text-md font-medium text-gray-200 mb-4">E-Mail Text für Monatsbericht</h4>
+                                 
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <x-input-label for="monthly_report_subject" :value="__('Betreff')" />
+                                        <x-text-input id="monthly_report_subject" class="block mt-1 w-full" type="text" name="monthly_report_subject" :value="old('monthly_report_subject', $settings->get('monthly_report_subject', 'Monatsbericht {month} {year}'))" />
+                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {month}, {year}, {name}</p>
+                                    </div>
+
+                                    <div>
+                                        <x-input-label for="monthly_report_body" :value="__('E-Mail Text')" />
+                                        <textarea id="monthly_report_body" name="monthly_report_body" rows="5" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-900 text-gray-300 border-gray-700">{{ old('monthly_report_body', $settings->get('monthly_report_body', "Hallo,\n\nanbei erhalten Sie den Monatsbericht von {name} für {month} {year}.\n\nMit freundlichen Grüßen,\n" . config('app.name'))) }}</textarea>
+                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {month}, {year}, {name}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex justify-end">
