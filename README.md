@@ -19,7 +19,14 @@ Folge diesen Schritten, um das Projekt auf deinem lokalen Rechner zu installiere
     npm run build
     ```
 
-3.  **Umgebungsvariablen konfigurieren:**
+3.  **Berechtigungen setzen (WICHTIG):**
+    Stelle sicher, dass der Webserver (z.B. `www-data`) Schreibrechte auf die Ordner `storage` und `bootstrap/cache` hat:
+    ```bash
+    sudo chown -R www-data:www-data /var/www/firmen-zeiterfassung
+    sudo chmod -R 775 storage bootstrap/cache
+    ```
+
+4.  **Umgebungsvariablen konfigurieren:**
     Kopiere die `.env.example` zu `.env`:
     ```bash
     cp .env.example .env
@@ -107,3 +114,55 @@ Auf einem Produktionsserver (z.B. Ubuntu mit Nginx) solltest du **Let's Encrypt*
 *   **Admin-Panel:** Verwaltung von Mitarbeitern und Freigabe von neuen Accounts.
 *   **Freigabeprozess:** Neue Registrierungen müssen vom Admin freigeschaltet werden.
 *   **Mehrsprachigkeit:** Profil und Interface auf Deutsch und Englisch verfügbar.
+
+## Fehlerbehebung (Troubleshooting)
+
+### Fehler: "Permission denied" (storage/logs/...)
+Wenn du einen Fehler erhältst, dass Logs nicht geschrieben werden können:
+```bash
+sudo chown -R www-data:www-data /var/www/firmen-zeiterfassung
+sudo chmod -R 775 storage bootstrap/cache
+```
+
+### Fehler: "Database Access denied" (SQL 1044/1045)
+Wenn der Fehler `Access denied for user ...` erscheint:
+
+1.  **Prüfe die `.env` Datei:**
+    Stelle sicher, dass `DB_DATABASE`, `DB_USERNAME` und `DB_PASSWORD` korrekt sind.
+
+2.  **Caches leeren:**
+    Nach Änderungen an der `.env` Datei *immer* den Cache leeren:
+    ```bash
+    php artisan optimize:clear
+    ```
+
+3.  **Datenbank-Rechte prüfen:**
+    Logge dich in MySQL ein und prüfe die Rechte:
+    ```sql
+    mysql -u root -p
+    -- In MySQL:
+    GRANT ALL PRIVILEGES ON firma.* TO 'smartscope_user'@'localhost';
+    FLUSH PRIVILEGES;
+    ```
+    (Ersetze `firma` und `smartscope_user` mit deinen Werten).
+
+### Fehler: 502 Bad Gateway
+Dies bedeutet meist, dass Nginx nicht mit PHP kommunizieren kann.
+Prüfe in der Nginx-Config (`/etc/nginx/sites-available/firmen-zeiterfassung`), ob die PHP-Version stimmt:
+`fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;` (oder php8.1, php8.3 usw.)
+
+### Fehler: "Unknown database" (SQL 1049)
+Die Datenbank, die in der `.env` Datei unter `DB_DATABASE` angegeben ist (z.B. `firma`), existiert nicht.
+
+**Lösung:**
+1.  Logge dich in MySQL ein:
+    ```bash
+    mysql -u root -p
+    ```
+2.  Erstelle die Datenbank:
+    ```sql
+    CREATE DATABASE firma;
+    EXIT;
+    ```
+    (Ersetze `firma` mit dem Namen aus deiner `.env` Datei).
+
