@@ -5,7 +5,13 @@
 </head>
 <body>
     <div style="font-family: sans-serif; line-height: 1.5;">
-        {!! nl2br(e($customBody)) !!}
+        @if(isset($customBody))
+            {!! nl2br(e($customBody)) !!}
+        @else
+            <p>Hallo,</p>
+            <p>anbei erhalten Sie den Monatsbericht.</p>
+            <p>Mit freundlichen Grüßen,<br>{{ config('app.name') }}</p>
+        @endif
     </div>
 </body>
 </html>
