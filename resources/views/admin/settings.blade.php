@@ -103,6 +103,25 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Account Approved Email Settings -->
+                            <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                                <h4 class="text-md font-medium text-gray-200 mb-4">E-Mail Text für Account Freischaltung</h4>
+                                 
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <x-input-label for="account_approved_subject" :value="__('Betreff')" />
+                                        <x-text-input id="account_approved_subject" class="block mt-1 w-full" type="text" name="account_approved_subject" :value="old('account_approved_subject', $settings->get('account_approved_subject', 'Dein Account wurde freigeschaltet'))" />
+                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {name}, {app_name}</p>
+                                    </div>
+
+                                    <div>
+                                        <x-input-label for="account_approved_body" :value="__('E-Mail Text')" />
+                                        <textarea id="account_approved_body" name="account_approved_body" rows="5" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-900 text-gray-300 border-gray-700">{{ old('account_approved_body', $settings->get('account_approved_body', "Hallo {name},\n\nDein Account wurde erfolgreich freigeschaltet.\nDu kannst dich nun einloggen und deine Arbeitszeiten erfassen.\n\nZum Login: {login_url}\n\nMit freundlichen Grüßen,\n{app_name}")) }}</textarea>
+                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {name}, {login_url}, {app_name}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex justify-end">
