@@ -20,12 +20,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         // Fetch available report months
-        $reports = WorkDay::where('user_id', $request->user()->id)
-            ->selectRaw('strftime("%Y", date) as year, strftime("%m", date) as month') // SQLite compatible for tests, works in MySQL too mostly or uses YEAR/MONTH
-            ->distinct()
-            ->orderBy('year', 'desc')
-            ->orderBy('month', 'desc')
-            ->get();
+
 
         // If the above SQL is too specific (SQLite vs MySQL), we can use a collection approach for safety if dataset isn't huge.
         // But for now, let's try a safer cross-driver approach or just fetch all and unique.

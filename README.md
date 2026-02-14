@@ -166,3 +166,10 @@ Die Datenbank, die in der `.env` Datei unter `DB_DATABASE` angegeben ist (z.B. `
     ```
     (Ersetze `firma` mit dem Namen aus deiner `.env` Datei).
 
+### Fehler: "fatal: detected dubious ownership" (Git)
+Wenn Git sich beschwert, dass der Ordner einem anderen User gehört:
+```bash
+git config --global --add safe.directory /var/www/firmen-zeiterfassung
+```
+Danach kannst du `git pull` ausführen.
+
