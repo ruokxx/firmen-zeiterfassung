@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin', [\App\Http\Controllers\AdminController::class , 'index'])->name('admin.dashboard');
     Route::post('/admin/users/{user}/toggle-admin', [\App\Http\Controllers\AdminController::class , 'toggleAdmin'])->name('admin.users.toggle');
     Route::post('/admin/users/{user}/approve', [\App\Http\Controllers\AdminController::class , 'approve'])->name('admin.users.approve');
-    Route::delete('/admin/users/{user}', [\App\Http\Controllers\AdminController::class , 'destroy'])->name('admin.users.delete');
+    Route::delete('/admin/users/{user}', [\App\Http\Controllers\AdminController::class , 'destroy'])->name('admin.users.delete'); // Soft delete or hard delete
 
     // Admin Settings
     Route::get('/admin/settings', [\App\Http\Controllers\AdminSettingsController::class , 'index'])->name('admin.settings');
