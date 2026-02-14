@@ -58,12 +58,22 @@
                                     @endif
                                     
                                     @if($user->id !== auth()->id())
-                                        <form method="POST" action="{{ route('admin.users.toggle', $user) }}" class="mt-2" @click.stop>
-                                            @csrf
-                                            <button type="submit" class="text-xs font-semibold px-2 py-1 rounded border transition {{ $user->is_admin ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' }}">
-                                                {{ $user->is_admin ? 'Admin-Rechte entziehen' : 'Zum Admin befördern' }}
-                                            </button>
-                                        </form>
+                                        <div class="flex space-x-2 mt-2" @click.stop>
+                                            <form method="POST" action="{{ route('admin.users.toggle', $user) }}">
+                                                @csrf
+                                                <button type="submit" class="text-xs font-semibold px-2 py-1 rounded border transition {{ $user->is_admin ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' }}">
+                                                    {{ $user->is_admin ? 'Admin-Rechte entziehen' : 'Zum Admin befördern' }}
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="{{ route('admin.users.delete', $user) }}" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Daten (Arbeitszeiten, Berichte) werden unwiderruflich gelöscht.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-xs font-semibold px-2 py-1 rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition">
+                                                    Löschen
+                                                </button>
+                                            </form>
+                                        </div>
                                     @endif
                                 </div>
                                 <div class="flex items-center">
