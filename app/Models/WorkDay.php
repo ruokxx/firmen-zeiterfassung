@@ -18,4 +18,9 @@ class WorkDay extends Model
     {
         return $this->hasMany(TimeEntry::class);
     }
+
+    public function getTotalHoursAttribute()
+    {
+        return $this->timeEntries->sum('hours');
+    }
 }

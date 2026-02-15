@@ -48,6 +48,12 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
+        // Notify admins
+        $admins = User::where('is_admin', true)->get();
+        foreach ($admins as $admin) {
+            \Illuminate\Support\Facades\Mail::to($admin)->send(new \App\Mail\NewUserRegistered($user));
+        }
+
         // Auth::login($user); // Do not auto-login
 
         return redirect('/')->with('status', 'verification-pending');

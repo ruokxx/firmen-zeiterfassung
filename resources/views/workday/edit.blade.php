@@ -23,7 +23,11 @@
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div>
+                            <x-input-label for="date" :value="__('Datum')" />
+                            <x-text-input id="date" class="block mt-1 w-full bg-gray-100 text-gray-500 cursor-not-allowed" type="date" name="date" :value="$workDay->date" disabled readonly />
+                        </div>
                         <div>
                             <x-input-label for="start_time" :value="__('Startzeit')" />
                             <x-text-input id="start_time" class="block mt-1 w-full" type="time" name="start_time" :value="old('start_time', $workDay->start_time)" required />
