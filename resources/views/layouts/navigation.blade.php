@@ -20,6 +20,11 @@
                             class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.settings') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                             {{ __('Einstellungen') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" 
+                            class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.documents.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            {{ __('Dokumente') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>

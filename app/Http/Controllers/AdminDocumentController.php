@@ -15,10 +15,11 @@ class AdminDocumentController extends Controller
         return view('admin.documents.index', compact('documents'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $users = User::where('is_active', true)->orderBy('name')->get();
-        return view('admin.documents.create', compact('users'));
+        $selectedUser = $request->query('user_id');
+        return view('admin.documents.create', compact('users', 'selectedUser'));
     }
 
     public function store(Request $request)

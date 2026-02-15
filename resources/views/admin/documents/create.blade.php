@@ -42,7 +42,9 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto border p-4 rounded">
                                 @foreach($users as $user)
                                     <div class="flex items-center">
-                                        <input type="checkbox" id="user_{{ $user->id }}" name="user_ids[]" value="{{ $user->id }}" class="user-checkbox rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                        <input type="checkbox" id="user_{{ $user->id }}" name="user_ids[]" value="{{ $user->id }}" 
+                                            class="user-checkbox rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                            {{ (isset($selectedUser) && $selectedUser == $user->id) ? 'checked' : '' }}>
                                         <label for="user_{{ $user->id }}" class="ml-2 text-sm text-gray-600">{{ $user->name }}</label>
                                     </div>
                                 @endforeach
