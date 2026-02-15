@@ -31,6 +31,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/settings', [\App\Http\Controllers\AdminSettingsController::class , 'index'])->name('admin.settings');
     Route::post('/admin/settings', [\App\Http\Controllers\AdminSettingsController::class , 'update'])->name('admin.settings.update');
 
+    // Admin Documents
+    Route::get('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'index'])->name('admin.documents.index');
+    Route::get('/admin/documents/create', [\App\Http\Controllers\AdminDocumentController::class , 'create'])->name('admin.documents.create');
+    Route::post('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'store'])->name('admin.documents.store');
+
+    // User Documents
+    Route::patch('/profile/documents/{document}', [\App\Http\Controllers\UserDocumentController::class , 'update'])->name('user.documents.update');
+    Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\UserDocumentController::class , 'download'])->name('user.documents.download');
+    Route::get('/profile/documents/{document}/download-response', [\App\Http\Controllers\UserDocumentController::class , 'downloadResponse'])->name('user.documents.download-response');
+
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');

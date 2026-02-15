@@ -59,6 +59,12 @@
 
             <div class="p-4 sm:p-8 bg-gray-800 shadow sm:rounded-lg border border-gray-700">
                 <div class="max-w-xl">
+                    @include('profile.partials.user-documents-list')
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-8 bg-gray-800 shadow sm:rounded-lg border border-gray-700">
+                <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
