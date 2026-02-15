@@ -109,11 +109,29 @@ Auf einem Produktionsserver (z.B. Ubuntu mit Nginx) solltest du **Let's Encrypt*
 
 ## Funktionen
 
-*   **Zeiterfassung:** Mitarbeiter können ihre Arbeitszeiten erfassen.
-*   **Monatsberichte:** PDF-Export der Arbeitszeiten.
-*   **Admin-Panel:** Verwaltung von Mitarbeitern und Freigabe von neuen Accounts.
-*   **Freigabeprozess:** Neue Registrierungen müssen vom Admin freigeschaltet werden.
-*   **Mehrsprachigkeit:** Profil und Interface auf Deutsch und Englisch verfügbar.
+### Zeiterfassung & Berichte
+*   **Arbeitszeiterfassung:** Einfaches Starten und Stoppen der Arbeitszeit, inkl. Pausenerfassung.
+*   **Monatsübersicht:** Detaillierte Ansicht der Arbeitsstunden pro Monat mit automatischer Berechnung der Gesamtstunden.
+*   **PDF-Export:** Generierung von professionellen PDF-Berichten für jeden Monat.
+*   **Berichtversand:** Mitarbeiter können ihre Monatsberichte direkt per E-Mail an den Vorgesetzten senden.
+
+### Dokumentenverwaltung (Neu)
+*   **Dokumente verteilen:** Admins können Dateien (z.B. Verträge, Anweisungen) an einzelne oder alle Mitarbeiter verteilen.
+*   **Status-Tracking:** Verfolgung, ob ein Dokument bearbeitet wurde (Offen / Erledigt).
+*   **Rückmeldung:** Mitarbeiter können bearbeitete Dokumente (z.B. unterschrieben) wieder hochladen.
+*   **Download:** Einfacher Download von Original- und Antwortdateien.
+
+### Benutzerverwaltung (Admin)
+*   **Dashboard:** Übersicht über alle registrierten Mitarbeiter und deren Status.
+*   **Freigabeprozess:** Neue Registrierungen müssen durch einen Admin genehmigt werden. Admins erhalten eine E-Mail-Benachrichtigung bei neuen Registrierungen.
+*   **Mitarbeiter-Details:** Einsicht in Kontaktdaten (Adresse, Telefon) und Arbeitsstunden der Mitarbeiter.
+*   **Rollenverwaltung:** Beförderung von Mitarbeitern zu Admins und Entzug von Rechten.
+*   **Account-Management:** Löschen und Deaktivieren von Benutzerkonten.
+
+### Sonstiges
+*   **Benutzerprofil:** Mitarbeiter können ihre persönlichen Daten und Spracheinstellungen verwalten.
+*   **Mehrsprachigkeit:** Benutzeroberfläche verfügbar in Deutsch und Englisch.
+*   **Responsive Design:** Optimiert für Desktop und mobile Endgeräte (Dark/Light Mode Unterstützung).
 
 ## Fehlerbehebung (Troubleshooting)
 
