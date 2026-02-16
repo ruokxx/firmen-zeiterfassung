@@ -1,0 +1,21 @@
+Testing rotation for 2026-2
+Today is: 2026-02-16
+Start of month: 2026-02-01
+Rotation applied.
+First day in list: 2026-02-16
+Last day in list: 2026-02-15
+--------------------------------------------------
+Testing rotation for 2025-1
+Today is: 2026-02-16
+Start of month: 2025-01-01
+No rotation needed.
+First day in list: 2025-01-01
+Last day in list: 2025-01-31
+--------------------------------------------------
+Testing rotation for 2028-1
+Today is: 2026-02-16
+Start of month: 2028-01-01
+No rotation needed.
+First day in list: 2028-01-01
+Last day in list: 2028-01-31
+--------------------------------------------------

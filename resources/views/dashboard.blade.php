@@ -5,6 +5,11 @@
                 {{ __('Jahresübersicht') }}
             </h2>
             <div class="flex items-center space-x-4">
+                <span class="text-gray-400 text-sm">Gesamt:</span>
+                <span class="text-xl font-bold text-orange-500">{{ number_format($yearlyTotal, 1) }} h</span>
+            </div>
+
+            <div class="flex items-center space-x-4">
                 <a href="{{ route('dashboard', ['year' => $year - 1]) }}" class="px-2 py-1 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition">&larr;</a>
                 <span class="text-md font-bold text-orange-500">{{ $year }}</span>
                 <a href="{{ route('dashboard', ['year' => $year + 1]) }}" class="px-2 py-1 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition">&rarr;</a>
@@ -14,6 +19,7 @@
 
     <div class="py-2">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> <!-- Standard width for margins -->
+
             
             @if(auth()->user()->google_calendar_url)
                 <div x-data="{ open: false }" class="mb-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-w-xl mx-auto overflow-hidden">
@@ -71,7 +77,7 @@
                         <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-700">
                             <h3 class="font-bold text-lg text-gray-100 group-hover:text-orange-400 transition">{{ $data['date']->locale('de')->isoFormat('MMMM') }}</h3>
                             <div class="text-xs font-bold px-2 py-1 rounded-full {{ $data['total_hours'] > 0 ? 'bg-orange-600 text-white shadow-sm' : 'bg-gray-700 text-gray-400' }}">
-                                {{ number_format($data['total_hours'], 1) }} h
+                                {{ number_format($data['total_hours'], 1) }} / {{ number_format($data['target_hours'], 0) }} h
                             </div>
                         </div>
 
@@ -115,7 +121,6 @@
                 @endforeach
             </div>
 
-                <span class="text-xl font-bold text-orange-500 ml-2">{{ number_format($yearlyTotal, 1) }} h</span>
             </div>
 
 

@@ -27,13 +27,67 @@ class ReportController extends Controller
             ->whereYear('date', $year)
             ->whereMonth('date', $month)
             ->with(['timeEntries.constructionSite'])
-            ->orderBy('date')
+            ->get(); // Fixed missing semicolon here or after ->with if get was missing
+
+        $targetHoursMonth = 0;
+        $daysInMonth = $startOfMonth->daysInMonth;
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $date = \Carbon\Carbon::createFromDate($year, $month, $d);
+            $dateString = $date->format('Y-m-d');
+
+            $dayEntry = $workDays->first(function ($day) use ($dateString) {
+                return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+            });
+
+            if (!$date->isWeekend()) {
+                $targetHoursMonth += 8;
+            }
+        }
+
+        // This variable is needed for the footer calculation in blade if we want to be consistent,
+        // but the blade currently only uses $previousMonthBalance. 
+        // Checks show blade uses $totalHoursMonth + $previousMonthBalance. 
+        // It doesn't display "Target Current" in footer, but for correctness of "Overtime" calculation if added later.
+
+        $previousMonthDate = $startOfMonth->copy()->subMonth();
+        $prevYear = $previousMonthDate->year;
+        $prevMonth = $previousMonthDate->month;
+
+        // Calculate Previous Month Balance
+        // 1. Get Actual Hours
+        $prevMonthWorkDays = $user->workDays()
+            ->whereYear('date', $prevYear)
+            ->whereMonth('date', $prevMonth)
+            ->with('timeEntries')
             ->get();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month'));
+        $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
+            return $day->timeEntries->sum('hours');
+        });
+
+        // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
+        $prevTargetHours = 0;
+        $daysInPrevMonth = $previousMonthDate->daysInMonth;
+        for ($d = 1; $d <= $daysInPrevMonth; $d++) {
+            $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
+            $dateString = $date->format('Y-m-d');
+
+            $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
+                return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+            });
+
+            if (!$date->isWeekend()) {
+                $prevTargetHours += 8;
+            }
+        }
+
+        $previousMonthBalance = $prevActualHours - $prevTargetHours;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance'));
 
         return $pdf->download("Monatsbericht_{$user->name}_{$month}_{$year}.pdf");
     }
+
     public function sendEmail(Request $request)
     {
         $year = (int)$request->input('year', date('Y'));
@@ -56,7 +110,41 @@ class ReportController extends Controller
             ->orderBy('date')
             ->get();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month'));
+        $previousMonthDate = $startOfMonth->copy()->subMonth();
+        $prevYear = $previousMonthDate->year;
+        $prevMonth = $previousMonthDate->month;
+
+        // Calculate Previous Month Balance
+        // 1. Get Actual Hours
+        $prevMonthWorkDays = $user->workDays()
+            ->whereYear('date', $prevYear)
+            ->whereMonth('date', $prevMonth)
+            ->with('timeEntries')
+            ->get();
+
+        $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
+            return $day->timeEntries->sum('hours');
+        });
+
+        // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
+        $prevTargetHours = 0;
+        $daysInPrevMonth = $previousMonthDate->daysInMonth;
+        for ($d = 1; $d <= $daysInPrevMonth; $d++) {
+            $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
+            $dateString = $date->format('Y-m-d');
+
+            $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
+                return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+            });
+
+            if (!$date->isWeekend()) {
+                $prevTargetHours += 8;
+            }
+        }
+
+        $previousMonthBalance = $prevActualHours - $prevTargetHours;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance'));
         $pdfContent = $pdf->output();
 
         try {

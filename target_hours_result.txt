@@ -1,0 +1,8 @@
+Calculating target hours for 2026-2
+Days in month: 28
+Target Hours: 160
+-----------------------------
+Calculating target hours for 2026-1
+Days in month: 31
+Target Hours: 176
+-----------------------------

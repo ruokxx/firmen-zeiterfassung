@@ -30,9 +30,9 @@
             @endif
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-2">
-                @for ($day = 1; $day <= $daysInMonth; $day++)
+                @foreach ($calendarDays as $currentDate)
                     @php
-                        $currentDate = $startOfMonth->copy()->addDays($day - 1);
+                        // $currentDate is already a Carbon instance from the controller
                         $dateString = $currentDate->format('Y-m-d');
                         $hasEntry = isset($workDays[$dateString]);
                         $workDay = $hasEntry ? $workDays[$dateString] : null;
@@ -96,7 +96,7 @@
                             {{ $hasEntry ? 'Bearbeiten' : 'Erfassen' }}
                         </a>
                     </div>
-                @endfor
+                @endforeach
             </div>
 
         </div>

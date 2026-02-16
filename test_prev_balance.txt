@@ -1,0 +1,21 @@
+Calculating previous month balance for report of 2026-2
+Previous Month: 2026-1
+Previous Month Target Hours: 176
+Mock Actual Hours: 170
+Calculated Balance: -6
+Status: DEFICIT (Red)
+-----------------------------
+Calculating previous month balance for report of 2026-3
+Previous Month: 2026-2
+Previous Month Target Hours: 160
+Mock Actual Hours: 170
+Calculated Balance: 10
+Status: OVERTIME (Green)
+-----------------------------
+Calculating previous month balance for report of 2026-1
+Previous Month: 2025-12
+Previous Month Target Hours: 184
+Mock Actual Hours: 170
+Calculated Balance: -14
+Status: DEFICIT (Red)
+-----------------------------
