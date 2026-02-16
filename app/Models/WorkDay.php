@@ -21,6 +21,14 @@ class WorkDay extends Model
 
     public function getTotalHoursAttribute()
     {
-        return $this->timeEntries->sum('hours');
+        if ($this->timeEntries->count() > 0) {
+            return $this->timeEntries->sum('hours');
+        }
+
+        $startTime = \Carbon\Carbon::parse($this->start_time);
+        $endTime = \Carbon\Carbon::parse($this->end_time);
+        $durationInMinutes = $endTime->diffInMinutes($startTime) - $this->break_duration;
+
+        return max(0, $durationInMinutes / 60);
     }
 }

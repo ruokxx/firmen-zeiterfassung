@@ -25,50 +25,196 @@ class WorkDayController extends Controller
         return view('workday.edit', compact('workDay', 'sites'));
     }
 
-    public function update(Request $request, \App\Models\WorkDay $workDay)
+    public function setStatus(Request $request, $date)
     {
-        if ($workDay->user_id !== auth()->id()) {
-            abort(403);
+        $status = $request->input('status'); // 'Krank' or 'Urlaub'
+        if (!in_array($status, ['Krank', 'Urlaub'])) {
+            return back()->with('error', 'Ungültiger Status.');
         }
 
-        $validated = $request->validate([
-            'start_time' => 'required',
-            'end_time' => 'required',
-            'break_duration' => 'required|integer',
-            'entries' => 'array',
-            'entries.*.construction_site_name' => 'required|string',
-            'entries.*.hours' => 'required|numeric|min:0.5',
-        ]);
+        $user = auth()->user();
 
-        $workDay->update([
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'break_duration' => $validated['break_duration'],
-        ]);
+        // Find or create WorkDay with standard 8h times
+        $workDay = $user->workDays()->updateOrCreate(
+        ['date' => $date],
+        [
+            'start_time' => '08:00',
+            'end_time' => '16:00',
+            'break_duration' => 0
+        ]
+        );
 
-        // Sync entries
+        // Clear existing entries
         $workDay->timeEntries()->delete();
 
-        if (!empty($validated['entries'])) {
-            foreach ($validated['entries'] as $entry) {
-                if ($entry['hours'] > 0 && !empty($entry['construction_site_name'])) {
+        // Create specific "Site"
+        $site = \App\Models\ConstructionSite::firstOrCreate(
+        ['name' => $status],
+        ['status' => 'active']
+        );
 
-                    $site = \App\Models\ConstructionSite::firstOrCreate(
-                    ['name' => $entry['construction_site_name']],
-                    ['status' => 'active']
-                    );
+        // Add 8h entry
+        $workDay->timeEntries()->create([
+            'construction_site_id' => $site->id,
+            'hours' => 8
+        ]);
 
-                    $workDay->timeEntries()->create([
-                        'construction_site_id' => $site->id,
-                        'hours' => $entry['hours'],
-                    ]);
+        return back()->with('success', "$status für $date wurde eingetragen.");
+    }
+
+    public function saveAjax(Request $request)
+    {
+        try {
+            $user = auth()->user();
+
+            // Validate basic inputs
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'date' => 'required|date',
+                'start_time' => 'required',
+                'end_time' => 'required',
+                'break_duration' => 'required|integer',
+                'entries' => 'array',
+                'entries.*.construction_site_name' => 'nullable|string',
+                'entries.*.hours' => 'nullable|numeric|min:0.5',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validierungsfehler',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $validated = $validator->validated();
+
+            // Find or create WorkDay
+            $workDay = $user->workDays()->firstOrCreate(
+            ['date' => $validated['date']],
+            [
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'break_duration' => $validated['break_duration']
+            ]
+            );
+
+            // Update WorkDay details
+            $workDay->update([
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'break_duration' => $validated['break_duration']
+            ]);
+
+            // Sync Entries
+            $workDay->timeEntries()->delete();
+
+            if (!empty($validated['entries'])) {
+                foreach ($validated['entries'] as $entry) {
+                    if (isset($entry['hours']) && $entry['hours'] > 0 && !empty($entry['construction_site_name'])) {
+                        $site = \App\Models\ConstructionSite::firstOrCreate(
+                        ['name' => $entry['construction_site_name']],
+                        ['status' => 'active']
+                        );
+
+                        $workDay->timeEntries()->create([
+                            'construction_site_id' => $site->id,
+                            'hours' => $entry['hours'],
+                        ]);
+                    }
                 }
             }
-        }
 
-        return redirect()->route('month.show', [
-            'year' => \Carbon\Carbon::parse($workDay->date)->year,
-            'month' => \Carbon\Carbon::parse($workDay->date)->month
-        ])->with('success', 'Gespeichert!');
+            return response()->json(['success' => true, 'message' => 'Gespeichert!']);
+
+        }
+        catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Ajax Save Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Fehler: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, \App\Models\WorkDay $workDay)
+    {
+        try {
+            if ($workDay->user_id !== auth()->id()) {
+                abort(403);
+            }
+
+            $data = $request->all();
+
+            $validator = \Illuminate\Support\Facades\Validator::make($data, [
+                'start_time' => 'required',
+                'end_time' => 'required',
+                'break_duration' => 'required|integer',
+                'entries' => 'array',
+                'entries.*.construction_site_name' => 'nullable|string',
+                'entries.*.hours' => 'nullable|numeric|min:0.5',
+            ]);
+
+            if ($validator->fails()) {
+                if ($this->isAjax($request)) {
+                    return response()->json(['success' => false, 'message' => 'Validierungsfehler', 'errors' => $validator->errors()], 422);
+                }
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
+            $validated = $validator->validated();
+
+            $workDay->update([
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'break_duration' => $validated['break_duration'],
+            ]);
+
+            // Sync entries
+            $workDay->timeEntries()->delete();
+
+            if (!empty($validated['entries'])) {
+                foreach ($validated['entries'] as $entry) {
+                    if ($entry['hours'] > 0 && !empty($entry['construction_site_name'])) {
+
+                        $site = \App\Models\ConstructionSite::firstOrCreate(
+                        ['name' => $entry['construction_site_name']],
+                        ['status' => 'active']
+                        );
+
+                        $workDay->timeEntries()->create([
+                            'construction_site_id' => $site->id,
+                            'hours' => $entry['hours'],
+                        ]);
+                    }
+                }
+            }
+
+            if ($this->isAjax($request)) {
+                return response()->json(['success' => true, 'message' => 'Gespeichert!']);
+            }
+
+            return redirect()->route('month.show', [
+                'year' => \Carbon\Carbon::parse($workDay->date)->year,
+                'month' => \Carbon\Carbon::parse($workDay->date)->month
+            ])->with('success', 'Gespeichert!');
+
+        }
+        catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Workday update error: ' . $e->getMessage());
+
+            if ($this->isAjax($request)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fehler: ' . $e->getMessage()
+                ], 500);
+            }
+
+            throw $e;
+        }
+    }
+
+    private function isAjax(Request $request)
+    {
+        return $request->wantsJson() || $request->ajax() || $request->has('is_ajax');
     }
 }

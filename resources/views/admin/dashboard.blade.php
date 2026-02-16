@@ -41,6 +41,35 @@
                     </div>
                 @endif
 
+                <div class="mb-8 border-b pb-6">
+                    <h3 class="text-lg font-bold mb-4">Datenbank Backup & Restore</h3>
+                    <div class="flex flex-col md:flex-row gap-4 items-start">
+                        <!-- Download -->
+                        <div class="bg-gray-50 p-4 rounded border border-gray-200 w-full md:w-1/2">
+                            <h4 class="font-semibold mb-2">Backup herunterladen</h4>
+                            <p class="text-sm text-gray-600 mb-3">Laden Sie die aktuelle Datenbank-Datei herunter.</p>
+                            <a href="{{ route('admin.backup.download') }}" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded text-sm inline-block transition">
+                                Backup herunterladen
+                            </a>
+                        </div>
+                        
+                        <!-- Upload -->
+                        <div class="bg-gray-50 p-4 rounded border border-gray-200 w-full md:w-1/2">
+                            <h4 class="font-semibold mb-2">Backup wiederherstellen</h4>
+                            <p class="text-sm text-gray-600 mb-3">Laden Sie eine Sicherungsdatei hoch, um die Datenbank wiederherzustellen. <strong class="text-red-600">Achtung: Dies überschreibt alle aktuellen Daten!</strong></p>
+                            <form method="POST" action="{{ route('admin.backup.restore') }}" enctype="multipart/form-data" onsubmit="return confirm('SIND SIE SICHER? Dies wird die aktuelle Datenbank unwiderruflich überschreiben!');">
+                                @csrf
+                                <div class="flex gap-2 items-center">
+                                    <input type="file" name="backup_file" required class="text-sm border border-gray-300 rounded p-1 w-full">
+                                    <button type="submit" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded text-sm transition whitespace-nowrap">
+                                        Wiederherstellen
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 <h3 class="text-lg font-bold mb-4">Mitarbeiter Übersicht</h3>
                 
                 <div class="space-y-6">

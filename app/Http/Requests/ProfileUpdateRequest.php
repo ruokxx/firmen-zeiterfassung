@@ -18,9 +18,11 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
-            'address' => ['nullable', 'string', 'max:1000'],
-            'mobile_number' => ['nullable', 'string', 'max:20'],
+            'address' => ['required', 'string', 'max:1000'],
+            'mobile_number' => ['required', 'string', 'max:20'],
             'language' => ['required', 'string', 'in:de,en'],
+            'google_calendar_url' => ['nullable', 'url', 'active_url'],
+            'trello_url' => ['nullable', 'url', 'active_url'],
         ];
     }
 }

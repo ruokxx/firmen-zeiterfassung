@@ -16,7 +16,10 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         Registered::class => [
-            SendEmailVerificationNotification::class,
+            SendEmailVerificationNotification::class ,
+        ],
+        \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+            \SocialiteProviders\Trello\TrelloExtendSocialite::class . '@handle',
         ],
     ];
 
@@ -25,7 +28,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+    //
     }
 
     /**

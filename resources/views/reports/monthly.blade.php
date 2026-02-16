@@ -16,6 +16,8 @@
     <div class="header">
         <h1>Monatsbericht</h1>
         <p><strong>Mitarbeiter:</strong> {{ $user->name }}</p>
+        <p><strong>E-Mail:</strong> {{ $user->email }}</p>
+        <p><strong>Adresse:</strong> {{ $user->address }}</p>
         <p><strong>Monat:</strong> {{ $startOfMonth->locale('de')->isoFormat('MMMM YYYY') }}</p>
         <p><strong>Erstellt am:</strong> {{ date('d.m.Y H:i') }}</p>
     </div>
@@ -36,16 +38,13 @@
             @endphp
             @foreach($workDays as $day)
                 @php
-                    $startTime = \Carbon\Carbon::parse($day->start_time);
-                    $endTime = \Carbon\Carbon::parse($day->end_time);
-                    // Calculate duration in hours minus break
-                    $duration = $endTime->diffInMinutes($startTime) - $day->break_duration;
-                    $hours = $duration / 60;
+                    // Calculate duration based on model logic
+                    $hours = $day->total_hours;
                     $totalHoursMonth += $hours;
                 @endphp
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($day->date)->format('d.m.Y') }}</td>
-                    <td>{{ $startTime->format('H:i') }} - {{ $endTime->format('H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($day->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($day->end_time)->format('H:i') }}</td>
                     <td>{{ $day->break_duration }} Min</td>
                     <td>{{ number_format($hours, 1) }} h</td>
                     <td>

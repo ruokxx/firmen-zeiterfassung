@@ -29,6 +29,11 @@ class User extends Authenticatable
         'mobile_number',
         'language',
         'must_change_password',
+        'google_calendar_url',
+        'trello_url',
+        'trello_id',
+        'trello_token',
+        'trello_token_secret',
     ];
 
     /**

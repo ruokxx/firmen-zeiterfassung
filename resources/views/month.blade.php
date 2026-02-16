@@ -48,7 +48,7 @@
                         <div class="flex justify-between items-start mb-2">
                             <div>
                                 <div class="text-lg font-bold {{ $isWeekend ? 'text-red-400' : 'text-gray-100' }}">
-                                    {{ $currentDate->format('d.') }} {{ $currentDate->locale('de')->isoFormat('dd') }}
+                                    {{ $currentDate->format('d.m.Y') }}
                                 </div>
                                 <div class="text-xs text-gray-500 uppercase tracking-wider">
                                     {{ $currentDate->locale('de')->isoFormat('dddd') }}
@@ -57,6 +57,19 @@
                             @if($hasEntry)
                                 <div class="bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm">
                                     {{ number_format($workDay->total_hours, 1) }} h
+                                </div>
+                            @else
+                                <div class="flex gap-1">
+                                    <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
+                                        @csrf
+                                        <input type="hidden" name="status" value="Krank">
+                                        <button type="submit" class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-red-500" title="Krank">K</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
+                                        @csrf
+                                        <input type="hidden" name="status" value="Urlaub">
+                                        <button type="submit" class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-blue-500" title="Urlaub">U</button>
+                                    </form>
                                 </div>
                             @endif
                         </div>

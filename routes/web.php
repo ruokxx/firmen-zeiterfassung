@@ -14,6 +14,8 @@ Route::get('/month/{year}/{month}', [\App\Http\Controllers\MonthController::clas
 
 Route::middleware('auth')->group(function () {
     Route::get('/workday/{date}', [\App\Http\Controllers\WorkDayController::class , 'edit'])->name('workday.edit');
+    Route::post('/workday/ajax-save', [\App\Http\Controllers\WorkDayController::class , 'saveAjax'])->name('workday.save-ajax');
+    Route::post('/workday/{date}/status', [\App\Http\Controllers\WorkDayController::class , 'setStatus'])->name('workday.set-status');
     Route::put('/workday/{workDay}', [\App\Http\Controllers\WorkDayController::class , 'update'])->name('workday.update');
     Route::get('/report/download', [\App\Http\Controllers\ReportController::class , 'download'])->name('report.download');
     Route::post('/report/send', [\App\Http\Controllers\ReportController::class , 'sendEmail'])->name('report.send');
@@ -36,6 +38,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/documents/create', [\App\Http\Controllers\AdminDocumentController::class , 'create'])->name('admin.documents.create');
     Route::post('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'store'])->name('admin.documents.store');
 
+    // Database Backup
+    Route::get('/admin/backup/download', [\App\Http\Controllers\AdminController::class , 'downloadBackup'])->name('admin.backup.download');
+    Route::post('/admin/backup/restore', [\App\Http\Controllers\AdminController::class , 'restoreBackup'])->name('admin.backup.restore');
+
+    // Trello OAuth
+    Route::get('/auth/trello/redirect', [\App\Http\Controllers\TrelloController::class , 'redirect'])->name('auth.trello.redirect');
+    Route::get('/auth/trello/callback', [\App\Http\Controllers\TrelloController::class , 'callback'])->name('auth.trello.callback');
+
     // User Documents
     Route::patch('/profile/documents/{document}', [\App\Http\Controllers\UserDocumentController::class , 'update'])->name('user.documents.update');
     Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\UserDocumentController::class , 'download'])->name('user.documents.download');
@@ -44,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/month', [ProfileController::class , 'clearMonth'])->name('profile.clear-month');
 });
 
 require __DIR__ . '/auth.php';

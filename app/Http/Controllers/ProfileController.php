@@ -41,9 +41,29 @@ class ProfileController extends Controller
         })
             ->values();
 
+        // Fetch Trello boards if connected
+        $trelloBoards = [];
+        if ($request->user()->trello_token) {
+            try {
+                $response = \Illuminate\Support\Facades\Http::get('https://api.trello.com/1/members/me/boards', [
+                    'key' => config('services.trello.client_id'), // Ensure this is set in services.php
+                    'token' => $request->user()->trello_token,
+                    'fields' => 'name,url,shortUrl,prefs',
+                ]);
+
+                if ($response->successful()) {
+                    $trelloBoards = $response->json();
+                }
+            }
+            catch (\Exception $e) {
+            // Ignore
+            }
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
             'reports' => $reports,
+            'trelloBoards' => $trelloBoards,
         ]);
     }
 
@@ -69,5 +89,26 @@ class ProfileController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         abort(403, 'Account deletion is disabled for users.');
+    }
+    /**
+     * Delete all work entries for a specific month.
+     */
+    public function clearMonth(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'year' => 'required|integer',
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        $deleted = WorkDay::where('user_id', $request->user()->id)
+            ->whereYear('date', $request->year)
+            ->whereMonth('date', $request->month)
+            ->delete();
+
+        if ($deleted) {
+            return Redirect::back()->with('success', 'Monat wurde erfolgreich geleert.');
+        }
+
+        return Redirect::back()->with('error', 'Keine Einträge für diesen Monat gefunden.');
     }
 }

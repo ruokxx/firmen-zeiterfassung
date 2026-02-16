@@ -15,6 +15,54 @@
     <div class="py-2">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> <!-- Standard width for margins -->
             
+            @if(auth()->user()->google_calendar_url)
+                <div x-data="{ open: false }" class="mb-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-w-xl mx-auto overflow-hidden">
+                    <button @click="open = !open" class="w-full flex justify-between items-center p-4 bg-gray-750 hover:bg-gray-700 transition focus:outline-none">
+                        <span class="text-lg font-bold text-gray-100 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Mein Kalender
+                        </span>
+                        <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        </svg>
+                    </button>
+                    <div x-show="open" x-transition class="border-t border-gray-700">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <iframe src="{{ auth()->user()->google_calendar_url }}" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if(auth()->user()->trello_url)
+                <div x-data="{ open: false }" class="mb-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-w-xl mx-auto overflow-hidden">
+                    <button @click="open = !open" class="w-full flex justify-between items-center p-4 bg-gray-750 hover:bg-gray-700 transition focus:outline-none">
+                        <span class="text-lg font-bold text-gray-100 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                            Mein Trello
+                        </span>
+                        <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        </svg>
+                    </button>
+                    <div x-show="open" x-transition class="border-t border-gray-700">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <iframe src="{{ str_replace('trello.com/b/', 'trello.com/b/', auth()->user()->trello_url) . '.html' }}" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 @foreach($months as $monthNum => $data)
                     <a href="{{ route('month.show', ['year' => $year, 'month' => $monthNum]) }}" 
@@ -67,10 +115,10 @@
                 @endforeach
             </div>
 
-            <div class="mt-3 bg-gray-800 border border-gray-700 rounded-lg p-3 text-center shadow-sm max-w-sm mx-auto">
-                <span class="text-gray-400 font-medium text-sm">Gesamt {{ $year }}:</span>
                 <span class="text-xl font-bold text-orange-500 ml-2">{{ number_format($yearlyTotal, 1) }} h</span>
             </div>
+
+
 
         </div>
     </div>
