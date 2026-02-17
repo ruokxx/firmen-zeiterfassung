@@ -49,41 +49,48 @@ class ReportController extends Controller
         // Checks show blade uses $totalHoursMonth + $previousMonthBalance. 
         // It doesn't display "Target Current" in footer, but for correctness of "Overtime" calculation if added later.
 
-        $previousMonthDate = $startOfMonth->copy()->subMonth();
-        $prevYear = $previousMonthDate->year;
-        $prevMonth = $previousMonthDate->month;
+        // Check if carryover should be included (default: true)
+        // Explicitly cast to boolean to be safe (though '0' is false, filter_var is clearer)
+        $includeCarryover = filter_var($request->input('include_carryover', 'true'), FILTER_VALIDATE_BOOLEAN);
+        $previousMonthBalance = 0;
 
-        // Calculate Previous Month Balance
-        // 1. Get Actual Hours
-        $prevMonthWorkDays = $user->workDays()
-            ->whereYear('date', $prevYear)
-            ->whereMonth('date', $prevMonth)
-            ->with('timeEntries')
-            ->get();
+        if ($includeCarryover) {
+            $previousMonthDate = $startOfMonth->copy()->subMonth();
+            $prevYear = $previousMonthDate->year;
+            $prevMonth = $previousMonthDate->month;
 
-        $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
-            return $day->timeEntries->sum('hours');
-        });
+            // Calculate Previous Month Balance
+            // 1. Get Actual Hours
+            $prevMonthWorkDays = $user->workDays()
+                ->whereYear('date', $prevYear)
+                ->whereMonth('date', $prevMonth)
+                ->with('timeEntries')
+                ->get();
 
-        // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
-        $prevTargetHours = 0;
-        $daysInPrevMonth = $previousMonthDate->daysInMonth;
-        for ($d = 1; $d <= $daysInPrevMonth; $d++) {
-            $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
-            $dateString = $date->format('Y-m-d');
-
-            $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
-                return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+            $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
+                return $day->timeEntries->sum('hours');
             });
 
-            if (!$date->isWeekend()) {
-                $prevTargetHours += 8;
+            // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
+            $prevTargetHours = 0;
+            $daysInPrevMonth = $previousMonthDate->daysInMonth;
+            for ($d = 1; $d <= $daysInPrevMonth; $d++) {
+                $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
+                $dateString = $date->format('Y-m-d');
+
+                $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
+                    return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+                });
+
+                if (!$date->isWeekend()) {
+                    $prevTargetHours += 8;
+                }
             }
+
+            $previousMonthBalance = $prevActualHours - $prevTargetHours;
         }
 
-        $previousMonthBalance = $prevActualHours - $prevTargetHours;
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover'));
 
         return $pdf->download("Monatsbericht_{$user->name}_{$month}_{$year}.pdf");
     }
@@ -110,41 +117,60 @@ class ReportController extends Controller
             ->orderBy('date')
             ->get();
 
-        $previousMonthDate = $startOfMonth->copy()->subMonth();
-        $prevYear = $previousMonthDate->year;
-        $prevMonth = $previousMonthDate->month;
+        // Check if carryover should be included (default: false if unchecked, true if checked - assuming checkbox sends 1)
+        // Checkboxes only send value if checked. We set value="1".
+        // If not present, input() returns null. We want default true? 
+        // In the view I put `checked`, so it sends '1'. If user unchecks, it sends nothing.
+        // So default should be false if key is missing? Or I use `has`.
+        // Actually for checkboxes: if unchecked, strictly nothing is sent.
+        // So $request->input('include_carryover', 0) would work if I rely on the fact that if it's sending, it's '1'.
+        // But wait, the user request "mit oder ohne". 
+        // Let's use boolean validation.
+        $includeCarryover = $request->boolean('include_carryover');
+        // Note: boolean() returns true for "1", "true", "on", "yes". False otherwise.
+        // If unchecked, it's missing, so boolean() returns false? Laravel docs say 'missing' is false.
+        // But I want it checked by default in UI. If user unchecks, sending nothing -> false. Correct.
 
-        // Calculate Previous Month Balance
-        // 1. Get Actual Hours
-        $prevMonthWorkDays = $user->workDays()
-            ->whereYear('date', $prevYear)
-            ->whereMonth('date', $prevMonth)
-            ->with('timeEntries')
-            ->get();
-
-        $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
-            return $day->timeEntries->sum('hours');
-        });
-
-        // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
+        $prevActualHours = 0;
         $prevTargetHours = 0;
-        $daysInPrevMonth = $previousMonthDate->daysInMonth;
-        for ($d = 1; $d <= $daysInPrevMonth; $d++) {
-            $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
-            $dateString = $date->format('Y-m-d');
+        $previousMonthBalance = 0;
 
-            $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
-                return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+        if ($includeCarryover) {
+            $previousMonthDate = $startOfMonth->copy()->subMonth();
+            $prevYear = $previousMonthDate->year;
+            $prevMonth = $previousMonthDate->month;
+
+            // Calculate Previous Month Balance
+            // 1. Get Actual Hours
+            $prevMonthWorkDays = $user->workDays()
+                ->whereYear('date', $prevYear)
+                ->whereMonth('date', $prevMonth)
+                ->with('timeEntries')
+                ->get();
+
+            $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
+                return $day->timeEntries->sum('hours');
             });
 
-            if (!$date->isWeekend()) {
-                $prevTargetHours += 8;
+            // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
+            $daysInPrevMonth = $previousMonthDate->daysInMonth;
+            for ($d = 1; $d <= $daysInPrevMonth; $d++) {
+                $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
+                $dateString = $date->format('Y-m-d');
+
+                $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
+                    return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+                });
+
+                if (!$date->isWeekend()) {
+                    $prevTargetHours += 8;
+                }
             }
+
+            $previousMonthBalance = $prevActualHours - $prevTargetHours;
         }
 
-        $previousMonthBalance = $prevActualHours - $prevTargetHours;
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover'));
         $pdfContent = $pdf->output();
 
         try {

@@ -12,9 +12,9 @@ class WorkDayController extends Controller
         $workDay = $user->workDays()->firstOrCreate(
         ['date' => $date],
         [
-            'start_time' => '08:00',
-            'end_time' => '16:30',
-            'break_duration' => 30
+            'start_time' => null,
+            'end_time' => null,
+            'break_duration' => null
         ]
         );
 
@@ -67,15 +67,21 @@ class WorkDayController extends Controller
         try {
             $user = auth()->user();
 
-            // Validate basic inputs
-            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            $input = $request->all();
+            // Convert empty strings to null
+            $input['start_time'] = $input['start_time'] ?: null;
+            $input['end_time'] = $input['end_time'] ?: null;
+            $input['break_duration'] = ($input['break_duration'] === '' || $input['break_duration'] === null) ? null : $input['break_duration'];
+
+            // Validate basic inputs (use $input instead of $request->all())
+            $validator = \Illuminate\Support\Facades\Validator::make($input, [
                 'date' => 'required|date',
-                'start_time' => 'required',
-                'end_time' => 'required',
-                'break_duration' => 'required|integer',
+                'start_time' => 'nullable',
+                'end_time' => 'nullable',
+                'break_duration' => 'nullable|integer|min:0',
                 'entries' => 'array',
                 'entries.*.construction_site_name' => 'nullable|string',
-                'entries.*.hours' => 'nullable|numeric|min:0.5',
+                'entries.*.hours' => 'nullable|numeric|min:0',
             ]);
 
             if ($validator->fails()) {
@@ -92,17 +98,17 @@ class WorkDayController extends Controller
             $workDay = $user->workDays()->firstOrCreate(
             ['date' => $validated['date']],
             [
-                'start_time' => $validated['start_time'],
-                'end_time' => $validated['end_time'],
-                'break_duration' => $validated['break_duration']
+                'start_time' => $validated['start_time'] ?? null,
+                'end_time' => $validated['end_time'] ?? null,
+                'break_duration' => $validated['break_duration'] ?? null
             ]
             );
 
             // Update WorkDay details
             $workDay->update([
-                'start_time' => $validated['start_time'],
-                'end_time' => $validated['end_time'],
-                'break_duration' => $validated['break_duration']
+                'start_time' => $validated['start_time'] ?? null,
+                'end_time' => $validated['end_time'] ?? null,
+                'break_duration' => $validated['break_duration'] ?? null
             ]);
 
             // Sync Entries
@@ -146,12 +152,12 @@ class WorkDayController extends Controller
             $data = $request->all();
 
             $validator = \Illuminate\Support\Facades\Validator::make($data, [
-                'start_time' => 'required',
-                'end_time' => 'required',
-                'break_duration' => 'required|integer',
+                'start_time' => 'nullable',
+                'end_time' => 'nullable',
+                'break_duration' => 'nullable|integer|min:0',
                 'entries' => 'array',
                 'entries.*.construction_site_name' => 'nullable|string',
-                'entries.*.hours' => 'nullable|numeric|min:0.5',
+                'entries.*.hours' => 'nullable|numeric|min:0',
             ]);
 
             if ($validator->fails()) {

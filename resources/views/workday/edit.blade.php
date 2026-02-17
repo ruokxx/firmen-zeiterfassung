@@ -30,16 +30,31 @@
                         </div>
                         <div>
                             <x-input-label for="start_time" :value="__('Startzeit')" />
-                            <x-text-input id="start_time" class="block mt-1 w-full" type="time" name="start_time" :value="old('start_time', $workDay->start_time)" required />
+                            <x-text-input id="start_time" class="block mt-1 w-full" type="time" name="start_time" :value="old('start_time', $workDay->start_time)" />
                         </div>
                         <div>
                             <x-input-label for="end_time" :value="__('Endzeit')" />
-                            <x-text-input id="end_time" class="block mt-1 w-full" type="time" name="end_time" :value="old('end_time', $workDay->end_time)" required />
+                            <x-text-input id="end_time" class="block mt-1 w-full" type="time" name="end_time" :value="old('end_time', $workDay->end_time)" />
                         </div>
-                        <div>
-                            <x-input-label for="break_duration" :value="__('Pause (Minuten)')" />
-                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" :value="old('break_duration', $workDay->break_duration)" required />
+                        <div x-data="{ noBreak: {{ ($workDay->break_duration === 0 || $workDay->break_duration === '0') ? 'true' : 'false' }} }">
+                            <div class="flex justify-between items-center mb-1">
+                                <x-input-label for="break_duration" :value="__('Pause (Minuten)')" />
+                                <div class="flex items-center">
+                                    <input id="no_break" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2" x-model="noBreak" @change="if(noBreak) { document.getElementById('break_duration').value = 0; $dispatch('input'); calculateEndTime(); } else { document.getElementById('break_duration').value = 30; $dispatch('input'); calculateEndTime(); }">
+                                    <label for="no_break" class="text-xs text-gray-600 cursor-pointer select-none">Keine Pause</label>
+                                </div>
+                            </div>
+                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" :value="old('break_duration', $workDay->break_duration ?? 30)" ::readonly="noBreak" ::class="noBreak ? 'bg-gray-100 text-gray-500' : ''" @input="calculateEndTime()" />
                         </div>
+                    </div>
+                    
+                    <div class="mb-6 flex gap-4">
+                        <button type="button" @click="fillStandardHours()" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            Standardzeit (8h) einfügen
+                        </button>
+                        <button type="button" @click="clearHours()" class="inline-flex items-center px-4 py-2 bg-red-100 border border-transparent rounded-md font-semibold text-xs text-red-700 uppercase tracking-widest hover:bg-red-200 focus:bg-red-200 active:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            Zeiten zurücksetzen
+                        </button>
                     </div>
 
                     <hr class="my-6">
@@ -61,7 +76,7 @@
                                 <div class="w-32">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Stunden</label>
                                     <select :name="'entries['+index+'][hours]'" x-model="entry.hours" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full">
-                                        @for ($i = 0.5; $i <= 12; $i += 0.5)
+                                        @for ($i = 0; $i <= 12; $i += 0.5)
                                             <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }} h</option>
                                         @endfor
                                     </select>
@@ -99,6 +114,10 @@
                             </div>
                         </template>
                     </div>
+                    
+                    <div class="mt-4 p-4 bg-blue-50 rounded border border-blue-100 text-blue-800 font-semibold text-right" x-effect="calculateEndTime()">
+                        Gesamtstunden: <span x-text="totalHours"></span> h
+                    </div>
 
                     <div class="mt-4">
                         <button type="button" @click="addEntry()" class="flex items-center text-blue-600 hover:text-blue-800 font-semibold">
@@ -127,17 +146,71 @@
             Alpine.data('workDayForm', (initialEntries) => ({
                 entries: initialEntries.length > 0 ? initialEntries.map(e => ({
                     ...e,
-                    construction_site_name: e.construction_site ? e.construction_site.name : ''
-                })) : [{ construction_site_name: '', hours: '0.5' }],
+                    construction_site_name: e.construction_site ? e.construction_site.name : '',
+                    hours: parseFloat(e.hours).toFixed(1)
+                })) : [{ construction_site_name: '', hours: '0.0' }],
                 saving: false,
                 saveSuccess: false,
                 
                 addEntry() {
-                    this.entries.push({ construction_site_name: '', hours: '0.5' });
+                    this.entries.push({ construction_site_name: '', hours: '0.0' });
+                    this.calculateEndTime();
                 },
                 
+                fillStandardHours() {
+                    document.getElementById('start_time').value = '08:00';
+                    document.getElementById('end_time').value = '16:30';
+                    document.getElementById('break_duration').value = '30';
+                    
+                    const noBreakCheckbox = document.getElementById('no_break');
+                    if (noBreakCheckbox && noBreakCheckbox.checked) {
+                        noBreakCheckbox.click(); 
+                    }
+                    this.noBreak = false;
+                },
+
+                clearHours() {
+                    document.getElementById('start_time').value = '';
+                    document.getElementById('end_time').value = '';
+                    document.getElementById('break_duration').value = '';
+                    
+                    const noBreakCheckbox = document.getElementById('no_break');
+                    if (noBreakCheckbox && noBreakCheckbox.checked) {
+                        noBreakCheckbox.click(); 
+                    }
+                     this.noBreak = false;
+                },
+
                 removeEntry(index) {
                     this.entries.splice(index, 1);
+                    this.calculateEndTime();
+                },
+                
+                get totalHours() {
+                    return this.entries.reduce((sum, entry) => sum + parseFloat(entry.hours || 0), 0).toFixed(1);
+                },
+
+                calculateEndTime() {
+                    // Start at 08:00
+                    let startMinutes = 8 * 60;
+                    
+                    // Add Site Hours
+                    let workMinutes = this.entries.reduce((sum, entry) => sum + parseFloat(entry.hours || 0), 0) * 60;
+                    
+                    // Add Break
+                    let breakVal = parseInt(document.getElementById('break_duration').value) || 0;
+                    if (this.noBreak) breakVal = 0;
+
+                    let totalMinutes = startMinutes + workMinutes + breakVal;
+                    
+                    let hours = Math.floor(totalMinutes / 60);
+                    let minutes = Math.round(totalMinutes % 60);
+                    
+                    // Format HH:mm
+                    let formatted = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+                    
+                    document.getElementById('end_time').value = formatted;
+                    document.getElementById('start_time').value = '08:00'; // Ensure start time is 08:00 as requested
                 },
 
                 async save() {
@@ -155,6 +228,9 @@
                     const formData = new FormData(form);
                     formData.delete('_method'); // Prevent Laravel from seeing this as a PUT request
                     formData.append('is_ajax', '1');
+                    
+                    // DEBUG: Log what we are sending
+                    // for (var pair of formData.entries()) { console.log(pair[0]+ ', ' + pair[1]); }
                     
                     try {
                         // Use dedicated AJAX route
