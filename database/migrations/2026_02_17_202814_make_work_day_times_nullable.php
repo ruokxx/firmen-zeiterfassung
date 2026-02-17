@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // 0. Drop Foreign Key on time_entries
+        Schema::table('time_entries', function (Blueprint $table) {
+            $table->dropForeign(['work_day_id']); // or 'time_entries_work_day_id_foreign'
+        });
+
         // 1. Create new table with nullable columns
         Schema::create('work_days_v2', function (Blueprint $table) {
             $table->id();
@@ -31,6 +36,11 @@ return new class extends Migration
 
         // 4. Rename new table
         Schema::rename('work_days_v2', 'work_days');
+
+        // 5. Restore Foreign Key
+        Schema::table('time_entries', function (Blueprint $table) {
+            $table->foreign('work_day_id')->references('id')->on('work_days')->cascadeOnDelete();
+        });
     }
 
     /**
@@ -38,6 +48,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // 0. Drop Foreign Key
+        Schema::table('time_entries', function (Blueprint $table) {
+            $table->dropForeign(['work_day_id']);
+        });
+
         // 1. Create original table
         Schema::create('work_days_v2', function (Blueprint $table) {
             $table->id();
@@ -49,8 +64,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Copy data (might fail if nulls exist, but acceptable for down migration in this context)
-        // We coalesce nulls to defaults to prevent errors
+        // 2. Copy data
         DB::statement("INSERT INTO work_days_v2 (id, user_id, date, start_time, end_time, break_duration, created_at, updated_at) 
                        SELECT id, user_id, date, COALESCE(start_time, '08:00'), COALESCE(end_time, '16:30'), COALESCE(break_duration, 30), created_at, updated_at FROM work_days");
 
@@ -59,5 +73,10 @@ return new class extends Migration
 
         // 4. Rename
         Schema::rename('work_days_v2', 'work_days');
+
+        // 5. Restore Foreign Key
+        Schema::table('time_entries', function (Blueprint $table) {
+            $table->foreign('work_day_id')->references('id')->on('work_days')->cascadeOnDelete();
+        });
     }
 };
