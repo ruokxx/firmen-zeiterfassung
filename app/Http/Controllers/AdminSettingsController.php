@@ -74,19 +74,46 @@ class AdminSettingsController extends Controller
             abort(403);
         }
 
-        $sourcePath = database_path('database.sqlite');
+        // Check compatibility
+        $connection = \Illuminate\Support\Facades\DB::connection();
+        if ($connection->getDriverName() !== 'sqlite') {
+            return back()->with('error', 'Backup-Funktion ist derzeit nur für SQLite-Datenbanken verfügbar.');
+        }
+
+        // Get active database path dynamically
+        $sourcePath = $connection->getDatabaseName();
+        \Illuminate\Support\Facades\Log::info('Backup Process Started. Source: ' . $sourcePath);
+
         if (!file_exists($sourcePath)) {
-            return back()->with('error', 'Quelldatenbank nicht gefunden.');
+            \Illuminate\Support\Facades\Log::error('Backup Failed: Source file not found at ' . $sourcePath);
+            return back()->with('error', 'Quelldatenbank nicht gefunden: ' . $sourcePath);
         }
 
         $filename = 'backup_' . date('Y-m-d_H-i-s') . '.sqlite';
+        \Illuminate\Support\Facades\Log::info('Backup Target Filename: ' . $filename);
 
         // Use Storage facade to put file
         try {
-            Storage::put('backups/' . $filename, file_get_contents($sourcePath));
+            // Create backup using file copy logic
+            $content = file_get_contents($sourcePath);
+            if ($content === false) {
+                \Illuminate\Support\Facades\Log::error('Backup Failed: Could not read source file.');
+                throw new \Exception('Could not read source file.');
+            }
+
+            Storage::put('backups/' . $filename, $content);
+
+            if (Storage::exists('backups/' . $filename)) {
+                \Illuminate\Support\Facades\Log::info('Backup Success: File exists in storage.');
+            }
+            else {
+                \Illuminate\Support\Facades\Log::error('Backup Failed: File does not exist after put.');
+            }
+
             return back()->with('success', 'Backup erfolgreich erstellt: ' . $filename);
         }
         catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Backup Exception: ' . $e->getMessage());
             return back()->with('error', 'Fehler beim Erstellen des Backups: ' . $e->getMessage());
         }
     }
