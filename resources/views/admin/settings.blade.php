@@ -135,6 +135,99 @@
         </div>
     </div>
 
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-700 p-6 text-gray-100">
+                <h3 class="text-lg font-bold mb-4">Datenbank Backup & Restore</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    
+                    <!-- Manage Backups -->
+                    <div class="space-y-6">
+                        <!-- Generate -->
+                        <div class="bg-gray-700 p-4 rounded border border-gray-600">
+                            <h4 class="font-semibold mb-2">Neues Backup erstellen</h4>
+                            <p class="text-sm text-gray-300 mb-3">Erstellt eine Sicherungskopie der aktuellen Datenbank und speichert sie auf dem Server.</p>
+                            <form method="POST" action="{{ route('admin.backup.generate') }}">
+                                @csrf
+                                <button type="submit" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded text-sm transition">
+                                    Backup generieren
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- List -->
+                        <div class="bg-gray-700 p-4 rounded border border-gray-600">
+                            <h4 class="font-semibold mb-2">Verfügbare Backups</h4>
+                            @if(isset($backups) && count($backups) > 0)
+                                <ul class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                    @foreach($backups as $backup)
+                                        <li class="flex justify-between items-center bg-gray-800 p-2 rounded border border-gray-600">
+                                            <div class="overflow-hidden">
+                                                <span class="block text-xs text-gray-400">{{ \Carbon\Carbon::createFromTimestamp($backup['last_modified'])->format('d.m.Y H:i') }}</span>
+                                                <span class="block text-sm font-medium truncate" title="{{ $backup['filename'] }}">
+                                                    {{ $backup['filename'] }}
+                                                    <span class="text-xs text-gray-500">({{ round($backup['size'] / 1024, 2) }} KB)</span>
+                                                </span>
+                                            </div>
+                                            <div class="flex space-x-1 flex-shrink-0 ml-2">
+                                                <a href="{{ route('admin.backup.download', $backup['filename']) }}" class="text-blue-400 hover:text-blue-300 p-1" title="Download">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                </a>
+                                                <form method="POST" action="{{ route('admin.backup.delete', $backup['filename']) }}" onsubmit="return confirm('Backup wirklich löschen?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-400 hover:text-red-300 p-1" title="Löschen">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-sm text-gray-500 italic">Keine Backups vorhanden.</p>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- Restore -->
+                    <div class="bg-gray-700 p-4 rounded border border-gray-600">
+                        <h4 class="font-semibold mb-2">Backup wiederherstellen</h4>
+                        <p class="text-sm text-gray-300 mb-3">Laden Sie eine Sicherungsdatei hoch, um die Datenbank wiederherzustellen.</p>
+                        
+                        <div class="bg-red-900/30 border border-red-800 p-3 rounded mb-4">
+                            <strong class="text-red-400 block mb-1">WARNUNG:</strong>
+                            <p class="text-sm text-red-200">
+                                Dies überschreibt die <strong>gesamte Datenbank</strong> unwiderruflich! 
+                                Alle seit dem Backup erstellten Daten gehen verloren.
+                            </p>
+                        </div>
+
+                        <form method="POST" action="{{ route('admin.backup.restore') }}" enctype="multipart/form-data" onsubmit="return confirm('SIND SIE TOTAL SICHER? Die aktuelle Datenbank wird ÜBERSCHRIEBEN!');">
+                            @csrf
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-1">Backup-Datei (.sqlite)</label>
+                                    <input type="file" name="backup_file" required class="block w-full text-sm text-gray-300
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-full file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-blue-600 file:text-white
+                                      file:hover:bg-blue-700
+                                      cursor-pointer bg-gray-800 border border-gray-600 rounded">
+                                </div>
+                                <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded text-sm transition">
+                                    Datenbank wiederherstellen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function loadAllInklDefaults() {
             document.getElementById('mail_mailer').value = 'smtp';

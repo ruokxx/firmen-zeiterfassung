@@ -79,45 +79,5 @@ class AdminController extends Controller
         return back()->with('success', "Nutzer {$user->name} wurde gelöscht.");
     }
 
-    public function downloadBackup()
-    {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
 
-        $path = database_path('database.sqlite');
-        if (file_exists($path)) {
-            return response()->download($path, 'backup_' . date('Y-m-d_H-i-s') . '.sqlite');
-        }
-
-        return back()->with('error', 'Datenbankdatei nicht gefunden.');
-    }
-
-    public function restoreBackup(Request $request)
-    {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
-        $request->validate([
-            'backup_file' => 'required|file'
-        ]);
-
-        $file = $request->file('backup_file');
-        $path = database_path('database.sqlite');
-
-        // Create a safety backup of existing DB before overwriting
-        if (file_exists($path)) {
-            copy($path, database_path('database_pre_restore_' . date('Y-m-d_H-i-s') . '.sqlite'));
-        }
-
-        // Overwrite
-        try {
-            copy($file->getRealPath(), $path);
-            return back()->with('success', 'Datenbank wurde erfolgreich wiederhergestellt!');
-        }
-        catch (\Exception $e) {
-            return back()->with('error', 'Fehler beim Wiederherstellen: ' . $e->getMessage());
-        }
-    }
 }

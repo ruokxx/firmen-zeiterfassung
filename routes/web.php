@@ -40,8 +40,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'store'])->name('admin.documents.store');
 
     // Database Backup
-    Route::get('/admin/backup/download', [\App\Http\Controllers\AdminController::class , 'downloadBackup'])->name('admin.backup.download');
-    Route::post('/admin/backup/restore', [\App\Http\Controllers\AdminController::class , 'restoreBackup'])->name('admin.backup.restore');
+    // Database Backup
+    Route::post('/admin/backup/generate', [\App\Http\Controllers\AdminSettingsController::class , 'generateBackup'])->name('admin.backup.generate');
+    Route::get('/admin/backup/download/{filename}', [\App\Http\Controllers\AdminSettingsController::class , 'downloadBackup'])->name('admin.backup.download');
+    Route::post('/admin/backup/restore', [\App\Http\Controllers\AdminSettingsController::class , 'restoreBackup'])->name('admin.backup.restore');
+    Route::delete('/admin/backup/{filename}', [\App\Http\Controllers\AdminSettingsController::class , 'deleteBackup'])->name('admin.backup.delete');
 
     // Trello OAuth
     Route::get('/auth/trello/redirect', [\App\Http\Controllers\TrelloController::class , 'redirect'])->name('auth.trello.redirect');
