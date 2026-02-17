@@ -23,6 +23,12 @@
                         </div>
                     @endif
 
+                    @if(session('error'))
+                        <div class="bg-red-900/50 border border-red-600 text-red-200 px-4 py-3 rounded relative mb-6" role="alert">
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{ route('admin.settings.update') }}" class="space-y-6">
                         @csrf
 
