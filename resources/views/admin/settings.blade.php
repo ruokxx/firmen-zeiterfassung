@@ -148,9 +148,12 @@
                         <div class="bg-gray-700 p-4 rounded border border-gray-600">
                             <h4 class="font-semibold mb-2">Neues Backup erstellen</h4>
                             <p class="text-sm text-gray-300 mb-3">Erstellt eine Sicherungskopie der aktuellen Datenbank und speichert sie auf dem Server.</p>
-                            <a href="{{ route('admin.backup.generate') }}" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded text-sm transition inline-block">
-                                Backup generieren (GET Test)
-                            </a>
+                            <form method="POST" action="{{ route('admin.backup.generate') }}">
+                                @csrf
+                                <button type="submit" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded text-sm transition">
+                                    Backup generieren
+                                </button>
+                            </form>
                         </div>
 
                         <!-- List -->

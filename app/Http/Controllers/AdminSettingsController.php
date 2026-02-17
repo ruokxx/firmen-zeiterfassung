@@ -70,7 +70,6 @@ class AdminSettingsController extends Controller
 
     public function generateBackup()
     {
-        dd('Generierung gestartet'); // Debugging
         if (!auth()->user()->is_admin) {
             abort(403);
         }

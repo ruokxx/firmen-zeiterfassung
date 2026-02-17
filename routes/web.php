@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
 
     // Database Backup
     // Database Backup
-    Route::get('/admin/backup/generate', [\App\Http\Controllers\AdminSettingsController::class , 'generateBackup'])->name('admin.backup.generate');
+    Route::post('/admin/backup/generate', [\App\Http\Controllers\AdminSettingsController::class , 'generateBackup'])->name('admin.backup.generate');
     Route::get('/admin/backup/download/{filename}', [\App\Http\Controllers\AdminSettingsController::class , 'downloadBackup'])->name('admin.backup.download');
     Route::post('/admin/backup/restore', [\App\Http\Controllers\AdminSettingsController::class , 'restoreBackup'])->name('admin.backup.restore');
     Route::delete('/admin/backup/{filename}', [\App\Http\Controllers\AdminSettingsController::class , 'deleteBackup'])->name('admin.backup.delete');
