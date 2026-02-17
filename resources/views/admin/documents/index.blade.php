@@ -23,7 +23,7 @@
                         </div>
                     @endif
 
-                    <!-- Mobile View (Accordion) -->
+                    <!-- Mobile View (Accordion Grouped by Document) -->
                     <div class="md:hidden space-y-3">
                         @forelse ($documents as $document)
                             <div x-data="{ open: false }" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -41,33 +41,43 @@
                                         </div>
                                     </div>
                                     <div>
-                                        @if($document->is_completed)
-                                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Erledigt</span>
-                                        @else
-                                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Offen</span>
-                                        @endif
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            {{ $assignments[$document->file_path]->count() }} Empfänger
+                                        </span>
                                     </div>
                                 </div>
 
-                                {{-- Accordion Body --}}
-                                <div x-show="open" x-collapse class="border-t border-gray-200 p-4 bg-gray-50">
-                                    <div class="text-sm text-gray-600 space-y-2">
-                                        <p><strong>Empfänger:</strong> {{ $document->user->name }}</p>
-                                        <p><strong>Erstellt am:</strong> {{ $document->created_at->format('d.m.Y H:i') }}</p>
-                                        @if($document->description)
-                                            <p class="bg-gray-100 p-2 rounded"><em>{{ $document->description }}</em></p>
-                                        @endif
-                                    </div>
-                                    <div class="mt-3 pt-3 border-t border-gray-200 flex justify-end">
-                                        @if($document->response_file_path)
-                                            <a href="{{ route('user.documents.download-response', $document) }}" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                                Download Antwort
-                                            </a>
-                                        @else
-                                            <span class="text-gray-400 text-sm italic">Keine Antwort vorhanden</span>
-                                        @endif
-                                    </div>
+                                {{-- Accordion Body (List of Users) --}}
+                                <div x-show="open" x-collapse class="border-t border-gray-200 bg-gray-50 divide-y divide-gray-200">
+                                    @foreach($assignments[$document->file_path] as $assignment)
+                                        <div class="p-4 hover:bg-gray-100 transition">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <span class="font-semibold text-gray-700">{{ $assignment->user->name }}</span>
+                                                @if($assignment->is_completed)
+                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Erledigt</span>
+                                                @else
+                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Offen</span>
+                                                @endif
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center mt-2">
+                                                @if($assignment->response_file_path)
+                                                    <a href="{{ route('user.documents.download-response', $assignment) }}" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium flex items-center">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                        Antwort
+                                                    </a>
+                                                @else
+                                                     <span class="text-gray-400 text-xs italic">Keine Antwort</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    
+                                    @if($document->description)
+                                        <div class="p-4 bg-gray-100 text-sm text-gray-600 border-t border-gray-200">
+                                            <strong>Beschreibung:</strong> {{ $document->description }}
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @empty
@@ -75,44 +85,51 @@
                         @endforelse
                     </div>
 
-                    <!-- Desktop View (Table) -->
+                    <!-- Desktop View (Table Grouped) -->
                     <div class="hidden md:block overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titel</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empfänger</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Erstellt am</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Antwort</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empfänger (Status)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse ($documents as $document)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $document->title }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $document->user->name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ $document->title }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $document->created_at->format('d.m.Y H:i') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($document->is_completed)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Erledigt</span>
-                                            @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Offen</span>
-                                            @endif
+                                        <td class="px-6 py-4">
+                                            <div class="flex flex-col space-y-1">
+                                                @foreach($assignments[$document->file_path] as $assignment)
+                                                    <div class="flex items-center justify-between text-sm">
+                                                        <span class="text-gray-600 mr-2">{{ $assignment->user->name }}</span>
+                                                        <div class="flex items-center space-x-2">
+                                                            @if($assignment->is_completed)
+                                                                <span class="text-xs text-green-600 font-bold">✓</span>
+                                                            @else
+                                                                <span class="text-xs text-yellow-600">○</span>
+                                                            @endif
+                                                            
+                                                            @if($assignment->response_file_path)
+                                                                <a href="{{ route('user.documents.download-response', $assignment) }}" class="text-indigo-600 hover:text-indigo-900" title="Antwort herunterladen">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($document->response_file_path)
-                                                <a href="{{ route('user.documents.download-response', $document) }}" class="text-indigo-600 hover:text-indigo-900">
-                                                    Download
-                                                </a>
-                                            @else
-                                                <span class="text-gray-400">-</span>
-                                            @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                             {{-- Actions if needed --}}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Keine Dokumente gefunden.</td>
+                                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Keine Dokumente gefunden.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

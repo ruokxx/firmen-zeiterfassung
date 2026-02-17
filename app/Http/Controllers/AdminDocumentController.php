@@ -11,8 +11,21 @@ class AdminDocumentController extends Controller
 {
     public function index()
     {
-        $documents = UserDocument::with(['user', 'creator'])->latest()->paginate(20);
-        return view('admin.documents.index', compact('documents'));
+        // 1. Get unique documents (paginated) based on file_path
+        // Using distinct IDs might be better if we had a Document model, but here unique upload = unique file_path
+        $documents = UserDocument::select('file_path', 'title', 'created_at', 'description')
+            ->groupBy('file_path', 'title', 'created_at', 'description')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        // 2. Fetch assignments for these documents
+        $paths = $documents->pluck('file_path');
+        $assignments = UserDocument::whereIn('file_path', $paths)
+            ->with(['user', 'creator'])
+            ->get()
+            ->groupBy('file_path');
+
+        return view('admin.documents.index', compact('documents', 'assignments'));
     }
 
     public function create(Request $request)
