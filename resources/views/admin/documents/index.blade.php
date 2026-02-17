@@ -23,7 +23,39 @@
                         </div>
                     @endif
 
-                    <div class="overflow-x-auto">
+                    <!-- Mobile View (Cards) -->
+                    <div class="md:hidden space-y-4">
+                        @forelse ($documents as $document)
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-bold text-gray-800">{{ $document->title }}</h3>
+                                    @if($document->is_completed)
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Erledigt</span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Offen</span>
+                                    @endif
+                                </div>
+                                <div class="text-sm text-gray-600 mb-2">
+                                    <p><strong>Empfänger:</strong> {{ $document->user->name }}</p>
+                                    <p><strong>Erstellt:</strong> {{ $document->created_at->format('d.m.Y H:i') }}</p>
+                                </div>
+                                <div class="mt-2 text-right">
+                                    @if($document->response_file_path)
+                                        <a href="{{ route('user.documents.download-response', $document) }}" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                                            Download Antwort
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400 text-sm italic">Keine Antwort</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-gray-500 text-center italic">Keine Dokumente gefunden.</p>
+                        @endforelse
+                    </div>
+
+                    <!-- Desktop View (Table) -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
