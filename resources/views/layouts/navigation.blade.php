@@ -17,7 +17,8 @@
                         </x-nav-link>
 
                         <x-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" 
-                            class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.settings') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.settings') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}"
+                            onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
                             {{ __('Einstellungen') }}
                         </x-nav-link>
 
@@ -81,6 +82,21 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-gray-300 hover:text-white hover:bg-gray-800">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @if(auth()->user()->is_admin)
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                    {{ __('Admin') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" class="text-gray-300 hover:text-white hover:bg-gray-800"
+                    onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
+                    {{ __('Einstellungen') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                    {{ __('Dokumente') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

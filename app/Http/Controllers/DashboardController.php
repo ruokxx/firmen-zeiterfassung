@@ -61,8 +61,59 @@ class DashboardController extends Controller
             ];
         }
 
+
         $yearlyTotal = collect($months)->sum('total_hours');
 
-        return view('dashboard', compact('year', 'months', 'yearlyTotal'));
+        // Calculate Yearly Progress
+        $holidays = $this->getHolidaysNI($year);
+        $totalWorkingDays = 0;
+        $startDate = \Carbon\Carbon::createFromDate($year, 1, 1);
+        $endDate = \Carbon\Carbon::createFromDate($year, 12, 31);
+
+        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+            if ($date->isWeekday()) {
+                $isHoliday = false;
+                foreach ($holidays as $h) {
+                    if ($h->isSameDay($date)) {
+                        $isHoliday = true;
+                        break;
+                    }
+                }
+
+                if (!$isHoliday) {
+                    $totalWorkingDays++;
+                }
+            }
+        }
+
+        $daysWorked = $workDays->filter(function ($day) {
+            return $day->timeEntries->sum('hours') > 0;
+        })->count();
+
+        $progressPercentage = $totalWorkingDays > 0 ? ($daysWorked / $totalWorkingDays) * 100 : 0;
+
+        return view('dashboard', compact('year', 'months', 'yearlyTotal', 'daysWorked', 'totalWorkingDays', 'progressPercentage'));
+    }
+
+    private function getHolidaysNI($year)
+    {
+        // Use easter_days to avoid timezone issues with easter_date
+        $daysSinceMarch21 = easter_days($year);
+        $easter = \Carbon\Carbon::createFromDate($year, 3, 21)->addDays($daysSinceMarch21);
+
+        $holidays = [
+            'Neujahr' => \Carbon\Carbon::createFromDate($year, 1, 1),
+            'Karfreitag' => $easter->copy()->subDays(2),
+            'Ostermontag' => $easter->copy()->addDays(1),
+            'Tag der Arbeit' => \Carbon\Carbon::createFromDate($year, 5, 1),
+            'Christi Himmelfahrt' => $easter->copy()->addDays(39),
+            'Pfingstmontag' => $easter->copy()->addDays(50),
+            'Tag der Deutschen Einheit' => \Carbon\Carbon::createFromDate($year, 10, 3),
+            'Reformationstag' => \Carbon\Carbon::createFromDate($year, 10, 31),
+            '1. Weihnachtstag' => \Carbon\Carbon::createFromDate($year, 12, 25),
+            '2. Weihnachtstag' => \Carbon\Carbon::createFromDate($year, 12, 26),
+        ];
+
+        return $holidays;
     }
 }

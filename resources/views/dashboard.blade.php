@@ -75,6 +75,17 @@
                 </div>
             @endif
 
+            {{-- Yearly Progress Bar --}}
+            <div class="mb-6 bg-gray-800 border border-gray-700 rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-medium text-gray-300">Arbeitstage: {{ $daysWorked }} / {{ $totalWorkingDays }}</span>
+                    <span class="text-xs font-medium text-gray-400">{{ number_format($progressPercentage, 1) }}%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div class="bg-orange-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ $progressPercentage }}%"></div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 @foreach($months as $monthNum => $data)
                     <a href="{{ route('month.show', ['year' => $year, 'month' => $monthNum]) }}" 
