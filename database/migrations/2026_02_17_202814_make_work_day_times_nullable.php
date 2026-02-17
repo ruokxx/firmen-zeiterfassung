@@ -17,6 +17,9 @@ return new class extends Migration
             $table->dropForeign(['work_day_id']); // or 'time_entries_work_day_id_foreign'
         });
 
+        // 0a. Drop work_days_v2 if it exists (cleanup from failed migration)
+        Schema::dropIfExists('work_days_v2');
+
         // 1. Create new table with nullable columns
         Schema::create('work_days_v2', function (Blueprint $table) {
             $table->id();
@@ -52,6 +55,9 @@ return new class extends Migration
         Schema::table('time_entries', function (Blueprint $table) {
             $table->dropForeign(['work_day_id']);
         });
+
+        // 0a. Cleanup
+        Schema::dropIfExists('work_days_v2');
 
         // 1. Create original table
         Schema::create('work_days_v2', function (Blueprint $table) {
