@@ -13,9 +13,14 @@ return new class extends Migration
     public function up(): void
     {
         // 0. Drop Foreign Key on time_entries
-        Schema::table('time_entries', function (Blueprint $table) {
-            $table->dropForeign(['work_day_id']); // or 'time_entries_work_day_id_foreign'
-        });
+        try {
+            Schema::table('time_entries', function (Blueprint $table) {
+                $table->dropForeign(['work_day_id']);
+            });
+        }
+        catch (\Exception $e) {
+        // Ignore if FK doesn't exist (likely from previous failed run)
+        }
 
         // 0a. Drop work_days_v2 if it exists (cleanup from failed migration)
         Schema::dropIfExists('work_days_v2');
