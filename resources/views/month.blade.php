@@ -20,6 +20,16 @@
                 </a>
                 
                 <div class="flex items-center gap-4 bg-gray-800 p-2 rounded-lg border border-gray-700">
+                    {{-- Holiday Import --}}
+                    <form action="{{ route('month.import-holidays') }}" method="POST" class="flex items-center" onsubmit="return confirm('Möchten Sie wirklich Feiertage (NI) für {{ $startOfMonth->year }} importieren? Bereits existierende Einträge werden nicht überschrieben.');">
+                        @csrf
+                        <input type="hidden" name="year" value="{{ $startOfMonth->year }}">
+                        <input type="hidden" name="month" value="{{ $startOfMonth->month }}">
+                        <button type="submit" class="text-xs bg-indigo-700 text-indigo-100 px-2 py-1.5 rounded hover:bg-indigo-600 transition border border-indigo-600 mr-4" title="Feiertage für Niedersachsen importieren">
+                            Feiertage (NI)
+                        </button>
+                    </form>
+
                     <label class="inline-flex items-center cursor-pointer">
                         <input type="checkbox" x-model="includeCarryover" class="rounded border-gray-600 bg-gray-700 text-orange-500 shadow-sm focus:ring-orange-500 focus:ring-offset-gray-800">
                         <span class="ml-2 text-sm text-gray-300">Übertrag Vormonat</span>

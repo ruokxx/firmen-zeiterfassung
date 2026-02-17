@@ -139,7 +139,7 @@
                                                 <div class="font-semibold text-center mb-2">{{ $dateObj->locale('de')->isoFormat('MMMM YYYY') }}</div>
                                                 <div class="text-center text-2xl font-bold text-blue-600">{{ number_format($totalHours, 1) }} h</div>
                                                 <div class="text-center mt-2">
-                                                    <a href="{{ route('report.download', ['year' => $dateObj->year, 'month' => $dateObj->month, 'user_id' => $user->id]) }}" 
+                                                    <a href="{{ route('report.download', ['year' => $dateObj->year, 'month' => $dateObj->month, 'user_id' => $user->id, 'include_carryover' => 0]) }}" 
                                                        class="text-xs bg-gray-800 text-white px-2 py-1 rounded hover:bg-gray-700">
                                                         PDF Download
                                                     </a>

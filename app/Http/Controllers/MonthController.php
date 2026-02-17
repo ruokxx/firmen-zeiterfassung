@@ -38,4 +38,84 @@ class MonthController extends Controller
 
         return view('month', compact('year', 'month', 'startOfMonth', 'daysInMonth', 'workDays', 'calendarDays'));
     }
+
+    public function importHolidays(Request $request)
+    {
+        $year = $request->input('year');
+        $month = $request->input('month');
+
+        if (!$year || !$month) {
+            return back()->with('error', 'Ungültiges Datum.');
+        }
+
+        // Calculate Holidays for Niedersachsen (NI)
+        $holidays = $this->getHolidaysNI($year);
+
+        $user = auth()->user();
+        $count = 0;
+
+        foreach ($holidays as $name => $date) {
+            // $date is Carbon object
+
+            // Check if holiday is in the requested month
+            if ($date->year == $year && $date->month == $month) {
+
+                // Check if it's a weekday (Monday - Friday)
+                if ($date->isWeekday()) {
+                    $dateString = $date->format('Y-m-d');
+
+                    // Check if entry already exists for this user and date
+                    $exists = $user->workDays()->where('date', $dateString)->exists();
+
+                    if (!$exists) {
+                        // Create WorkDay
+                        $workDay = $user->workDays()->create([
+                            'date' => $dateString,
+                            'start_time' => '08:00',
+                            'end_time' => '16:00',
+                            'break_duration' => 0
+                        ]);
+
+                        // Create/Find "Feiertag" Site
+                        $site = \App\Models\ConstructionSite::firstOrCreate(
+                        ['name' => "Feiertag: $name"],
+                        ['status' => 'active']
+                        );
+
+                        // Add Entry
+                        $workDay->timeEntries()->create([
+                            'construction_site_id' => $site->id,
+                            'hours' => 8
+                        ]);
+
+                        $count++;
+                    }
+                }
+            }
+        }
+
+        return back()->with('success', "$count Feiertage wurden importiert.");
+    }
+
+    private function getHolidaysNI($year)
+    {
+        // Use easter_days to avoid timezone issues with easter_date
+        $daysSinceMarch21 = easter_days($year);
+        $easter = \Carbon\Carbon::createFromDate($year, 3, 21)->addDays($daysSinceMarch21);
+
+        $holidays = [
+            'Neujahr' => \Carbon\Carbon::createFromDate($year, 1, 1),
+            'Karfreitag' => $easter->copy()->subDays(2),
+            'Ostermontag' => $easter->copy()->addDays(1),
+            'Tag der Arbeit' => \Carbon\Carbon::createFromDate($year, 5, 1),
+            'Christi Himmelfahrt' => $easter->copy()->addDays(39),
+            'Pfingstmontag' => $easter->copy()->addDays(50),
+            'Tag der Deutschen Einheit' => \Carbon\Carbon::createFromDate($year, 10, 3),
+            'Reformationstag' => \Carbon\Carbon::createFromDate($year, 10, 31),
+            '1. Weihnachtstag' => \Carbon\Carbon::createFromDate($year, 12, 25),
+            '2. Weihnachtstag' => \Carbon\Carbon::createFromDate($year, 12, 26),
+        ];
+
+        return $holidays;
+    }
 }

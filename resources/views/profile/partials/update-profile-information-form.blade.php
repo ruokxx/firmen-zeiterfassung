@@ -64,7 +64,7 @@
             <x-text-input id="google_calendar_url" name="google_calendar_url" type="url" class="mt-1 block w-full" :value="old('google_calendar_url', $user->google_calendar_url)" placeholder="https://calendar.google.com/calendar/embed?src=..." />
             <x-input-error class="mt-2" :messages="$errors->get('google_calendar_url')" />
             <p class="mt-1 text-sm text-gray-400">
-                {{ __('Fügen Sie hier die "Öffentliche URL zu diesem Kalender" oder die Embed-URL ein. Diese finden Sie in den Google Kalender Einstellungen unter "Integrieren".') }}
+                {{ __('Fügen Sie hier die "Öffentliche URL zu diesem Kalender" oder die Embed-URL ein. WICHTIG: Damit der Kalender auf Mobilgeräten funktionert, muss er "Öffentlich" sein. Nutzen Sie am besten die URL aus dem Feld "Code einbetten" (nur der src-Teil: https://calendar.google.com/calendar/embed?src=...).') }}
             </p>
         </div>
 

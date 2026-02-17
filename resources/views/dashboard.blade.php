@@ -1,15 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center py-2">
+        <div class="flex flex-col md:flex-row justify-between items-center py-2 gap-4 md:gap-0">
             <h2 class="font-semibold text-lg text-gray-100 leading-tight">
                 {{ __('Jahresübersicht') }}
             </h2>
-            <div class="flex items-center space-x-4">
+            
+            <div class="flex items-center space-x-4 order-3 md:order-2">
                 <span class="text-gray-400 text-sm">Gesamt:</span>
                 <span class="text-xl font-bold text-orange-500">{{ number_format($yearlyTotal, 1) }} h</span>
             </div>
 
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-4 order-2 md:order-3">
                 <a href="{{ route('dashboard', ['year' => $year - 1]) }}" class="px-2 py-1 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition">&larr;</a>
                 <span class="text-md font-bold text-orange-500">{{ $year }}</span>
                 <a href="{{ route('dashboard', ['year' => $year + 1]) }}" class="px-2 py-1 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition">&rarr;</a>
@@ -40,6 +41,11 @@
                     <div x-show="open" x-transition class="border-t border-gray-700">
                         <div class="aspect-w-16 aspect-h-9">
                             <iframe src="{{ auth()->user()->google_calendar_url }}" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+                        </div>
+                        <div class="p-2 text-center bg-gray-750 border-t border-gray-700">
+                            <a href="{{ auth()->user()->google_calendar_url }}" target="_blank" class="text-xs text-blue-400 hover:text-blue-300 underline">
+                                Kalender in neuem Fenster öffnen (falls Anzeige nicht funktionert)
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -11,6 +11,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class , 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/month/{year}/{month}', [\App\Http\Controllers\MonthController::class , 'show'])->middleware(['auth', 'verified'])->name('month.show');
+Route::post('/month/import-holidays', [\App\Http\Controllers\MonthController::class , 'importHolidays'])->middleware(['auth', 'verified'])->name('month.import-holidays');
 
 Route::middleware('auth')->group(function () {
     Route::get('/workday/{date}', [\App\Http\Controllers\WorkDayController::class , 'edit'])->name('workday.edit');
