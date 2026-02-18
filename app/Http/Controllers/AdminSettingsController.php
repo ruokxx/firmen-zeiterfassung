@@ -63,7 +63,20 @@ class AdminSettingsController extends Controller
             'monthly_report_body' => 'nullable|string',
             'account_approved_subject' => 'nullable|string',
             'account_approved_body' => 'nullable|string',
+            'auto_backup_enabled' => 'nullable|boolean',
+            'backup_retention_count' => 'nullable|integer|min:1',
         ]);
+
+        // Handle checkbox (if unchecked, it's missing from request, so we must set it to false if not present? 
+        // Actually, updateOrCreate works per key. If we submit the form, we want to update it.
+        // For checkboxes, standard HTML behavior: unchecked = not sent.
+        // We should handle 'auto_backup_enabled' explicitly if it's missing but we expected it.
+        // However, the loop below only updates what's in $data.
+        // So we need to ensure they are in $data.
+
+        if (!$request->has('auto_backup_enabled')) {
+            $data['auto_backup_enabled'] = '0';
+        }
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
@@ -80,88 +93,10 @@ class AdminSettingsController extends Controller
             abort(403);
         }
 
-        $connection = DB::connection();
-        $driver = $connection->getDriverName();
-        $filename = 'backup_' . date('Y-m-d_H-i-s');
-
-        Log::info("Backup Process Started. Driver: " . $driver);
-
         try {
-            if ($driver === 'sqlite') {
-                $filename .= '.sqlite';
-                $sourcePath = $connection->getDatabaseName();
-
-                if (!file_exists($sourcePath)) {
-                    throw new \Exception("Quelldatenbank nicht gefunden: " . $sourcePath);
-                }
-
-                $content = file_get_contents($sourcePath);
-                if ($content === false) {
-                    throw new \Exception("Konnte Quelldatenbank nicht lesen.");
-                }
-
-                Storage::put('backups/' . $filename, $content);
-
-            }
-            elseif ($driver === 'mysql') {
-                $filename .= '.sql';
-
-                $username = config('database.connections.mysql.username');
-                $password = config('database.connections.mysql.password');
-                $host = config('database.connections.mysql.host');
-                $database = config('database.connections.mysql.database');
-                $port = config('database.connections.mysql.port');
-
-                // Create a temporary file
-                $tempFile = tempnam(sys_get_temp_dir(), 'backup_');
-
-                // Build mysqldump command
-                // Note: Using --no-tablespaces to avoid permission issues without SUPER privilege
-                $command = sprintf(
-                    'mysqldump --user=%s --password=%s --host=%s --port=%s --no-tablespaces %s > %s',
-                    escapeshellarg($username),
-                    escapeshellarg($password),
-                    escapeshellarg($host),
-                    escapeshellarg($port),
-                    escapeshellarg($database),
-                    escapeshellarg($tempFile)
-                );
-
-                Log::info("Executing mysqldump");
-
-                $output = [];
-                $returnVar = 0;
-                exec($command, $output, $returnVar);
-
-                if ($returnVar !== 0) {
-                    // Try to capture stderr if possible or just log failure
-                    Log::error("mysqldump failed with return code $returnVar");
-                    if (file_exists($tempFile))
-                        unlink($tempFile);
-                    throw new \Exception("Datenbank-Dump fehlgeschlagen (Code $returnVar).");
-                }
-
-                $content = file_get_contents($tempFile);
-                Storage::put('backups/' . $filename, $content);
-
-                // Cleanup
-                if (file_exists($tempFile))
-                    unlink($tempFile);
-
-            }
-            else {
-                return back()->with('error', "Datenbanktreiber '$driver' wird nicht unterstützt.");
-            }
-
-            // Verify success
-            if (Storage::exists('backups/' . $filename)) {
-                Log::info('Backup Success: File created.');
-                return back()->with('success', 'Backup erfolgreich erstellt: ' . $filename);
-            }
-            else {
-                throw new \Exception("Datei wurde nach dem Erstellen nicht im Speicher gefunden.");
-            }
-
+            $service = new \App\Services\BackupService();
+            $filename = $service->createBackup();
+            return back()->with('success', 'Backup erfolgreich erstellt: ' . $filename);
         }
         catch (\Exception $e) {
             Log::error('Backup Exception: ' . $e->getMessage());

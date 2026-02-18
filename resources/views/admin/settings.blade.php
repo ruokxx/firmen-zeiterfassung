@@ -130,6 +130,23 @@
                             </div>
                         </div>
 
+                        <!-- Auto Backup Settings -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Automatische Backups</h4>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="auto_backup_enabled" id="auto_backup_enabled" value="1" {{ ($settings->get('auto_backup_enabled', '0') == '1') ? 'checked' : '' }} class="rounded bg-gray-900 border-gray-600 text-blue-600 shadow-sm focus:ring-blue-500">
+                                    <label for="auto_backup_enabled" class="ml-2 block text-sm font-medium text-gray-300">Tägliches Backup aktivieren (um 22:00 Uhr)</label>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="backup_retention_count" :value="__('Anzahl zu behaltender Backups')" />
+                                    <x-text-input id="backup_retention_count" class="block mt-1 w-full" type="number" name="backup_retention_count" :value="old('backup_retention_count', $settings->get('backup_retention_count', 5))" min="1" />
+                                    <p class="text-sm text-gray-400 mt-1">Ältere Backups werden automatisch gelöscht, wenn diese Anzahl überschritten wird.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end">
                             <x-primary-button>
                                 {{ __('Speichern') }}
