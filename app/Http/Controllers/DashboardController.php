@@ -27,8 +27,9 @@ class DashboardController extends Controller
             });
 
             // Calculate total hours
+            // Calculate total hours using the model accessor (handles both entries and start/end times)
             $totalHours = $monthWorkDays->sum(function ($day) {
-                return $day->timeEntries->sum('hours');
+                return $day->total_hours;
             });
 
             // Calculate target hours (8 hours per weekday, adapting to actual if > 8)
@@ -87,7 +88,7 @@ class DashboardController extends Controller
         }
 
         $daysWorked = $workDays->filter(function ($day) {
-            return $day->timeEntries->sum('hours') > 0;
+            return $day->total_hours > 0;
         })->count();
 
         $progressPercentage = $totalWorkingDays > 0 ? ($daysWorked / $totalWorkingDays) * 100 : 0;

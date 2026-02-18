@@ -62,7 +62,7 @@
                         $isToday = $currentDate->isToday();
                     @endphp
 
-                    <div class="relative flex flex-col justify-between rounded-lg border p-4 shadow-sm transition hover:shadow-md
+                    <div class="relative flex flex-col justify-between rounded-lg border p-4 shadow-sm transition hover:shadow-md group cursor-pointer
                         {{ $isToday ? 'bg-gray-800 border-orange-500 ring-1 ring-orange-500' : 'bg-gray-800 border-gray-700' }}
                         {{ $isWeekend ? 'opacity-70' : '' }}
                     ">
@@ -81,7 +81,7 @@
                                     {{ number_format($workDay->total_hours, 1) }} h
                                 </div>
                             @else
-                                <div class="flex gap-1">
+                                <div class="flex gap-1 relative z-10">
                                     <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
                                         @csrf
                                         <input type="hidden" name="status" value="Krank">
@@ -112,7 +112,7 @@
 
                         {{-- Footer: Action --}}
                         <a href="{{ route('workday.edit', $dateString) }}" 
-                           class="block w-full text-center py-2 rounded text-sm font-semibold transition
+                           class="block w-full text-center py-2 rounded text-sm font-semibold transition after:absolute after:inset-0
                            {{ $hasEntry ? 'bg-gray-700 text-gray-100 hover:bg-gray-600' : 'bg-gray-900 text-orange-500 hover:text-orange-300 hover:bg-gray-950 border border-gray-700' }}
                         ">
                             {{ $hasEntry ? 'Bearbeiten' : 'Erfassen' }}

@@ -88,15 +88,14 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 @foreach($months as $monthNum => $data)
-                    <a href="{{ route('month.show', ['year' => $year, 'month' => $monthNum]) }}" 
-                       class="block bg-gray-800 border border-gray-700 rounded-lg shadow-md hover:shadow-xl transition p-4 transform hover:scale-105 duration-200 group"> <!-- Expanded Industrial Card -->
+                    <div class="block bg-gray-800 border border-gray-700 rounded-lg shadow-md hover:shadow-xl transition p-4 transform hover:scale-105 duration-200 group relative"> <!-- Expanded Industrial Card -->
                         
-                        <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-700">
+                        <a href="{{ route('month.show', ['year' => $year, 'month' => $monthNum]) }}" class="flex justify-between items-center mb-3 pb-2 border-b border-gray-700 hover:bg-gray-750 -mx-4 px-4 -mt-2 pt-2 rounded-t-lg transition">
                             <h3 class="font-bold text-lg text-gray-100 group-hover:text-orange-400 transition">{{ $data['date']->locale('de')->isoFormat('MMMM') }}</h3>
                             <div class="text-xs font-bold px-2 py-1 rounded-full {{ $data['total_hours'] > 0 ? 'bg-orange-600 text-white shadow-sm' : 'bg-gray-700 text-gray-400' }}">
                                 {{ number_format($data['total_hours'], 1) }} / {{ number_format($data['target_hours'], 0) }} h
                             </div>
-                        </div>
+                        </a>
 
                         {{-- Micro Calendar Visual --}}
                         <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;" class="text-center text-xs leading-tight">
@@ -125,16 +124,17 @@
                                     $currentDayOfWeek = ($d + $firstDayOfWeek - 2) % 7 + 1;
                                     $isWeekend = $currentDayOfWeek >= 6;
                                     $hasEntry = in_array($d, $data['worked_days']);
+                                    $currentDateStr = $data['date']->copy()->day($d)->format('Y-m-d');
                                 @endphp
                                 
-                                <div class="aspect-square flex items-center justify-center rounded-sm text-sm
-                                    {{ $hasEntry ? 'bg-orange-600 text-white font-bold shadow-sm' : ($isWeekend ? 'text-red-400 font-bold bg-gray-900/50' : 'text-gray-300 bg-gray-900 hover:bg-gray-700 transition') }}
+                                <a href="{{ route('workday.edit', $currentDateStr) }}" class="aspect-square flex items-center justify-center rounded-sm text-sm cursor-pointer
+                                    {{ $hasEntry ? 'bg-orange-600 text-white font-bold shadow-sm hover:bg-orange-500' : ($isWeekend ? 'text-red-400 font-bold bg-gray-900/50 hover:bg-gray-800' : 'text-gray-300 bg-gray-900 hover:bg-gray-700 transition') }}
                                 ">
                                     {{ $d }}
-                                </div>
+                                </a>
                             @endfor
                         </div>
-                    </a>
+                    </div>
                 @endforeach
             </div>
 
