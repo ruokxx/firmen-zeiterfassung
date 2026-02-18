@@ -7,7 +7,7 @@
 
     <div class="py-12" x-data='workDayForm({!! $workDay->timeEntries->load("constructionSite")->toJson() !!})'>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-700">
                 
                 @if ($errors->any())
                     <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -26,7 +26,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                         <div>
                             <x-input-label for="date" :value="__('Datum')" />
-                            <x-text-input id="date" class="block mt-1 w-full bg-gray-100 text-gray-500 cursor-not-allowed" type="date" name="date" :value="$workDay->date" readonly />
+                            <x-text-input id="date" class="block mt-1 w-full bg-gray-700 text-gray-500 cursor-not-allowed" type="date" name="date" :value="$workDay->date" readonly />
                         </div>
                         <div>
                             <x-input-label for="start_time" :value="__('Startzeit')" />
@@ -41,32 +41,32 @@
                                 <x-input-label for="break_duration" :value="__('Pause (Minuten)')" />
                                 <div class="flex items-center">
                                     <input id="no_break" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2" x-model="noBreak" @change="if(noBreak) { document.getElementById('break_duration').value = 0; $dispatch('input'); calculateEndTime(); } else { document.getElementById('break_duration').value = 30; $dispatch('input'); calculateEndTime(); }">
-                                    <label for="no_break" class="text-xs text-gray-600 cursor-pointer select-none">Keine Pause</label>
+                                    <label for="no_break" class="text-xs text-gray-400 cursor-pointer select-none">Keine Pause</label>
                                 </div>
                             </div>
-                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" :value="old('break_duration', $workDay->break_duration ?? 30)" ::readonly="noBreak" ::class="noBreak ? 'bg-gray-100 text-gray-500' : ''" @input="calculateEndTime()" />
+                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" :value="old('break_duration', $workDay->break_duration ?? 30)" ::readonly="noBreak" ::class="noBreak ? 'bg-gray-700 text-gray-500' : ''" @input="calculateEndTime()" />
                         </div>
                     </div>
                     
                     <div class="mb-6 flex gap-4">
-                        <button type="button" @click="fillStandardHours()" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="button" @click="fillStandardHours()" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-gray-200 uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 border border-gray-600">
                             Standardzeit (8h) einfügen
                         </button>
-                        <button type="button" @click="clearHours()" class="inline-flex items-center px-4 py-2 bg-red-100 border border-transparent rounded-md font-semibold text-xs text-red-700 uppercase tracking-widest hover:bg-red-200 focus:bg-red-200 active:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="button" @click="clearHours()" class="inline-flex items-center px-4 py-2 bg-red-900/30 border border-red-800 rounded-md font-semibold text-xs text-red-400 uppercase tracking-widest hover:bg-red-900/50 focus:bg-red-900/50 active:bg-red-900/50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             Zeiten zurücksetzen
                         </button>
                     </div>
 
-                    <hr class="my-6">
+                    <hr class="my-6 border-gray-700">
                     
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Baustellen & Zeiten</h3>
+                    <h3 class="text-lg font-medium text-gray-100 mb-4">Baustellen & Zeiten</h3>
                     
                     <div class="space-y-4">
                         <template x-for="(entry, index) in entries" :key="index">
-                            <div class="flex items-center gap-4 bg-gray-50 p-4 rounded border border-gray-200">
+                            <div class="flex items-center gap-4 bg-gray-900 p-4 rounded border border-gray-700">
                                 <div class="flex-grow">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Baustelle</label>
-                                    <input type="text" list="sites-list" :name="'entries['+index+'][construction_site_name]'" x-model="entry.construction_site_name" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full" placeholder="Baustelle eingeben oder wählen...">
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Baustelle</label>
+                                    <input type="text" list="sites-list" :name="'entries['+index+'][construction_site_name]'" x-model="entry.construction_site_name" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full placeholder-gray-400" placeholder="Baustelle eingeben oder wählen...">
                                     <datalist id="sites-list">
                                         @foreach($sites as $site)
                                             <option value="{{ $site->name }}">
@@ -74,8 +74,8 @@
                                     </datalist>
                                 </div>
                                 <div class="w-32">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Stunden</label>
-                                    <select :name="'entries['+index+'][hours]'" x-model="entry.hours" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full">
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Stunden</label>
+                                    <select :name="'entries['+index+'][hours]'" x-model="entry.hours" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full">
                                         @for ($i = 0; $i <= 12; $i += 0.5)
                                             <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }} h</option>
                                         @endfor
@@ -115,12 +115,12 @@
                         </template>
                     </div>
                     
-                    <div class="mt-4 p-4 bg-blue-50 rounded border border-blue-100 text-blue-800 font-semibold text-right" x-effect="calculateEndTime()">
+                    <div class="mt-4 p-4 bg-blue-900/30 rounded border border-blue-800 text-blue-200 font-semibold text-right" x-effect="calculateEndTime()">
                         Gesamtstunden: <span x-text="totalHours"></span> h
                     </div>
 
                     <div class="mt-4">
-                        <button type="button" @click="addEntry()" class="flex items-center text-blue-600 hover:text-blue-800 font-semibold">
+                        <button type="button" @click="addEntry()" class="flex items-center text-blue-400 hover:text-blue-300 font-semibold transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                               <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                             </svg>
@@ -128,11 +128,11 @@
                         </button>
                     </div>
 
-                    <div class="mt-8 flex justify-end gap-4 p-4 bg-gray-50 rounded-lg">
-                        <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                    <div class="mt-8 flex justify-end gap-4 p-4 bg-gray-900 rounded-lg border border-gray-700">
+                        <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-gray-600 rounded-md font-semibold text-xs text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                             Abbrechen
                         </a>
-                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-500 focus:bg-orange-500 active:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             Fertig
                         </button>
                     </div>
