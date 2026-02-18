@@ -80,4 +80,45 @@ class AdminController extends Controller
     }
 
 
+    public function email(\App\Models\User $user)
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+        return view('admin.users.email', compact('user'));
+    }
+
+    public function sendEmail(Request $request, \App\Models\User $user)
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+            'attachment' => 'nullable|file|max:10240', // Max 10MB
+        ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('temp_attachments');
+        }
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\AdminMessageMail($request->subject, $request->message, $attachmentPath ? storage_path('app/' . $attachmentPath) : null));
+
+            if ($attachmentPath) {
+                \Illuminate\Support\Facades\Storage::delete($attachmentPath);
+            }
+
+            return redirect()->route('admin.dashboard')->with('success', "Email an {$user->name} wurde gesendet.");
+        }
+        catch (\Exception $e) {
+            if ($attachmentPath) {
+                \Illuminate\Support\Facades\Storage::delete($attachmentPath);
+            }
+            return back()->with('error', "Fehler beim Senden der Email: " . $e->getMessage())->withInput();
+        }
+    }
 }

@@ -10,10 +10,15 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" 
+                        class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('material-orders.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                        {{ __('Material Bestellungen') }}
+                    </x-nav-link>
+
                     @if(auth()->user()->is_admin)
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" 
                             class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
-                            {{ __('Admin') }}
+                            {{ __('Chef Bereich') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" 
@@ -24,7 +29,7 @@
 
                         <x-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" 
                             class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.documents.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
-                            {{ __('Dokumente') }}
+                            {{ __('Dokument an alle senden') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -83,9 +88,13 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
+            <x-responsive-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                {{ __('Material Bestellungen') }}
+            </x-responsive-nav-link>
+
             @if(auth()->user()->is_admin)
                 <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-gray-300 hover:text-white hover:bg-gray-800">
-                    {{ __('Admin') }}
+                    {{ __('Chef Bereich') }}
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" class="text-gray-300 hover:text-white hover:bg-gray-800"
@@ -94,7 +103,7 @@
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">
-                    {{ __('Dokumente') }}
+                    {{ __('Dokument an alle senden') }}
                 </x-responsive-nav-link>
             @endif
         </div>

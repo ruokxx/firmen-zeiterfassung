@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin', [\App\Http\Controllers\AdminController::class , 'index'])->name('admin.dashboard');
     Route::post('/admin/users/{user}/toggle-admin', [\App\Http\Controllers\AdminController::class , 'toggleAdmin'])->name('admin.users.toggle');
+    Route::get('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'email'])->name('admin.users.email');
+    Route::post('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'sendEmail'])->name('admin.users.email.send');
     Route::post('/admin/users/{user}/approve', [\App\Http\Controllers\AdminController::class , 'approve'])->name('admin.users.approve');
     Route::delete('/admin/users/{user}', [\App\Http\Controllers\AdminController::class , 'destroy'])->name('admin.users.delete'); // Soft delete or hard delete
 
@@ -37,7 +39,17 @@ Route::middleware('auth')->group(function () {
     // Admin Documents
     Route::get('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'index'])->name('admin.documents.index');
     Route::get('/admin/documents/create', [\App\Http\Controllers\AdminDocumentController::class , 'create'])->name('admin.documents.create');
+    Route::get('/admin/documents/create', [\App\Http\Controllers\AdminDocumentController::class , 'create'])->name('admin.documents.create');
     Route::post('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'store'])->name('admin.documents.store');
+
+    // Admin Materials
+    Route::get('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'index'])->name('admin.materials.index');
+    Route::post('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'store'])->name('admin.materials.store');
+    Route::post('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'store'])->name('admin.materials.store');
+    Route::delete('/admin/materials/{material}', [\App\Http\Controllers\AdminMaterialController::class , 'destroy'])->name('admin.materials.destroy');
+
+    // Admin Construction Site Search
+    Route::get('/admin/construction-sites', [\App\Http\Controllers\AdminConstructionSiteController::class , 'index'])->name('admin.construction-sites.index');
 
     // Database Backup
     // Database Backup
@@ -59,6 +71,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
     Route::delete('/profile/month', [ProfileController::class , 'clearMonth'])->name('profile.clear-month');
+
+    // Material Orders
+    Route::get('/material-orders', [\App\Http\Controllers\MaterialOrderController::class , 'index'])->name('material-orders.index');
+    Route::post('/material-orders', [\App\Http\Controllers\MaterialOrderController::class , 'store'])->name('material-orders.store');
+    Route::patch('/material-orders/{order}/toggle', [\App\Http\Controllers\MaterialOrderController::class , 'toggle'])->name('material-orders.toggle');
+    Route::patch('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'update'])->name('material-orders.update');
+    Route::delete('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'destroy'])->name('material-orders.destroy');
 });
 
 require __DIR__ . '/auth.php';
