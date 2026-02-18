@@ -28,21 +28,29 @@ class AdminController extends Controller
 
         return view('admin.dashboard', compact('users', 'pendingUsers'));
     }
-    public function toggleAdmin(\App\Models\User $user)
+    public function updateRole(Request $request, \App\Models\User $user)
     {
         if (!auth()->user()->is_admin) {
             abort(403);
         }
 
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'Du kannst dir selbst nicht die Admin-Rechte entziehen.');
+            return back()->with('error', 'Du kannst deine eigene Rolle nicht ändern.');
         }
 
-        $user->is_admin = !$user->is_admin;
+        $request->validate([
+            'role' => 'required|in:employee,chef,admin',
+        ]);
+
+        // Only Super Admins can make other Admins
+        if ($request->role === 'admin' && !auth()->user()->is_super_admin) {
+            return back()->with('error', 'Nur Super-Admins können Datenbank-Admins ernennen.');
+        }
+
+        $user->role = $request->role;
         $user->save();
 
-        $status = $user->is_admin ? 'zum Admin befördert' : 'Admin-Rechte entzogen';
-        return back()->with('success', "Nutzer {$user->name} wurde {$status}.");
+        return back()->with('success', "Rolle von {$user->name} wurde auf {$request->role} geändert.");
     }
 
     public function approve(\App\Models\User $user)

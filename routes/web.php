@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/setup-account', [\App\Http\Controllers\SetupAccountController::class , 'store'])->name('admin.setup.store');
 
     Route::get('/admin', [\App\Http\Controllers\AdminController::class , 'index'])->name('admin.dashboard');
-    Route::post('/admin/users/{user}/toggle-admin', [\App\Http\Controllers\AdminController::class , 'toggleAdmin'])->name('admin.users.toggle');
+    Route::post('/admin/users/{user}/role', [\App\Http\Controllers\AdminController::class , 'updateRole'])->name('admin.users.update-role');
     Route::get('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'email'])->name('admin.users.email');
     Route::post('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'sendEmail'])->name('admin.users.email.send');
     Route::post('/admin/users/{user}/approve', [\App\Http\Controllers\AdminController::class , 'approve'])->name('admin.users.approve');

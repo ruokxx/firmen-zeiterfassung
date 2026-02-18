@@ -93,7 +93,12 @@ class DashboardController extends Controller
 
         $progressPercentage = $totalWorkingDays > 0 ? ($daysWorked / $totalWorkingDays) * 100 : 0;
 
-        return view('dashboard', compact('year', 'months', 'yearlyTotal', 'daysWorked', 'totalWorkingDays', 'progressPercentage'));
+        $progressPercentage = $totalWorkingDays > 0 ? ($daysWorked / $totalWorkingDays) * 100 : 0;
+
+        // Fetch Team List
+        $team = \App\Models\User::orderBy('name')->where('is_active', true)->get();
+
+        return view('dashboard', compact('year', 'months', 'yearlyTotal', 'daysWorked', 'totalWorkingDays', 'progressPercentage', 'team'));
     }
 
     private function getHolidaysNI($year)

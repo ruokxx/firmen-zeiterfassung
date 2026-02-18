@@ -138,10 +138,36 @@
                 @endforeach
             </div>
 
+            {{-- Team List --}}
+            <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-700 p-6 mt-8">
+                <h3 class="text-xl font-bold text-orange-500 mb-6 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    Das Team
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($team as $member)
+                        <div class="flex items-center p-4 bg-gray-750 rounded-lg border border-gray-700">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center text-orange-500 font-bold text-lg">
+                                {{ substr($member->name, 0, 1) }}
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-200">{{ $member->name }}</div>
+                                <div class="text-xs text-gray-400">
+                                    @if($member->role === 'admin')
+                                        <span class="text-orange-500 font-bold">Admin</span>
+                                    @elseif($member->role === 'chef')
+                                        <span class="text-yellow-500 font-bold">Chef</span>
+                                    @else
+                                        Mitarbeiter
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
-
-
-
         </div>
     </div>
 </x-app-layout>

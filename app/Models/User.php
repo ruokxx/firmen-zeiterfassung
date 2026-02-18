@@ -24,7 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_active',
-        'is_admin',
+        'role',
         'address',
         'mobile_number',
         'language',
@@ -53,12 +53,22 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_admin' => 'boolean',
     ];
 
+    public function getIsAdminAttribute(): bool
+    {
+        return in_array($this->role, ['admin', 'chef']);
+    }
+
+    public function getIsSuperAdminAttribute(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    // Keep existing method for compatibility, but check for both roles
     public function isAdmin(): bool
     {
-        return $this->is_admin;
+        return $this->is_admin; // Uses the accessor above
     }
 
     public function workDays()

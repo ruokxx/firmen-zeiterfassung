@@ -77,12 +77,27 @@
                                     
                                     @if($user->id !== auth()->id())
                                         <div class="flex space-x-2 mt-2" @click.stop>
-                                            <form method="POST" action="{{ route('admin.users.toggle', $user) }}">
-                                                @csrf
-                                                <button type="submit" class="text-xs font-semibold px-2 py-1 rounded border transition {{ $user->is_admin ? 'bg-red-900/30 text-red-400 border-red-800 hover:bg-red-900/50' : 'bg-green-900/30 text-green-400 border-green-800 hover:bg-green-900/50' }}">
-                                                    {{ $user->is_admin ? 'Admin-Rechte entziehen' : 'Zum Admin befördern' }}
-                                                </button>
-                                            </form>
+                                    @php
+                                        // $user->role is available? NO, we need to ensure it's available or use the attribute if we cast/access it correctly.
+                                        // We added 'role' to the model.
+                                    @endphp
+                                    <div class="mt-4 border-t border-gray-700 pt-2" @click.stop>
+                                         <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex items-center gap-2">
+                                            @csrf
+                                            <select name="role" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500">
+                                                <option value="employee" {{ $user->role === 'employee' ? 'selected' : '' }}>Mitarbeiter</option>
+                                                <option value="chef" {{ $user->role === 'chef' ? 'selected' : '' }}>Chef</option>
+                                                @if(auth()->user()->is_super_admin)
+                                                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                                @elseif($user->role === 'admin')
+                                                    <option value="admin" selected disabled>Admin</option>
+                                                @endif
+                                            </select>
+                                            <button type="submit" class="text-xs font-semibold px-2 py-1 rounded bg-orange-700 text-white hover:bg-orange-600 transition">
+                                                Speichern
+                                            </button>
+                                        </form>
+                                    </div>
 
                                             <form method="POST" action="{{ route('admin.users.delete', $user) }}" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Daten (Arbeitszeiten, Berichte) werden unwiderruflich gelöscht.');">
                                                 @csrf

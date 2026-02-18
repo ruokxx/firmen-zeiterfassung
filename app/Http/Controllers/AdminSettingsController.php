@@ -12,6 +12,10 @@ class AdminSettingsController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->is_super_admin) {
+            abort(403);
+        }
+
         $settings = Setting::all()->pluck('value', 'key');
 
         // List Backups

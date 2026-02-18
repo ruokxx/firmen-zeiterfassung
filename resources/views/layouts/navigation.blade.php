@@ -21,11 +21,13 @@
                             {{ __('Chef Bereich') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" 
-                            class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.settings') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}"
-                            onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
-                            {{ __('Einstellungen') }}
-                        </x-nav-link>
+                        @if(auth()->user()->is_super_admin)
+                            <x-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" 
+                                class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.settings') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}"
+                                onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
+                                {{ __('Einstellungen') }}
+                            </x-nav-link>
+                        @endif
 
                         <x-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" 
                             class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.documents.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
@@ -97,10 +99,12 @@
                     {{ __('Chef Bereich') }}
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" class="text-gray-300 hover:text-white hover:bg-gray-800"
-                    onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
-                    {{ __('Einstellungen') }}
-                </x-responsive-nav-link>
+                @if(auth()->user()->is_super_admin)
+                    <x-responsive-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" class="text-gray-300 hover:text-white hover:bg-gray-800"
+                        onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
+                        {{ __('Einstellungen') }}
+                    </x-responsive-nav-link>
+                @endif
 
                 <x-responsive-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">
                     {{ __('Dokument an alle senden') }}
