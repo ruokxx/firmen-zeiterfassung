@@ -12,12 +12,14 @@ Route::get('/', function () {
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class , 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/month/{year}/{month}', [\App\Http\Controllers\MonthController::class , 'show'])->middleware(['auth', 'verified'])->name('month.show');
 Route::post('/month/import-holidays', [\App\Http\Controllers\MonthController::class , 'importHolidays'])->middleware(['auth', 'verified'])->name('month.import-holidays');
+Route::view('/help', 'help')->middleware(['auth', 'verified'])->name('help');
 
 Route::middleware('auth')->group(function () {
     Route::get('/workday/{date}', [\App\Http\Controllers\WorkDayController::class , 'edit'])->name('workday.edit');
     Route::post('/workday/ajax-save', [\App\Http\Controllers\WorkDayController::class , 'saveAjax'])->name('workday.save-ajax');
     Route::post('/workday/{date}/status', [\App\Http\Controllers\WorkDayController::class , 'setStatus'])->name('workday.set-status');
     Route::put('/workday/{workDay}', [\App\Http\Controllers\WorkDayController::class , 'update'])->name('workday.update');
+    Route::delete('/workday/{date}/reset', [\App\Http\Controllers\WorkDayController::class , 'destroy'])->name('workday.reset');
     Route::get('/report/download', [\App\Http\Controllers\ReportController::class , 'download'])->name('report.download');
     Route::post('/report/send', [\App\Http\Controllers\ReportController::class , 'sendEmail'])->name('report.send');
 
@@ -35,6 +37,7 @@ Route::middleware('auth')->group(function () {
     // Admin Settings
     Route::get('/admin/settings', [\App\Http\Controllers\AdminSettingsController::class , 'index'])->name('admin.settings');
     Route::post('/admin/settings', [\App\Http\Controllers\AdminSettingsController::class , 'update'])->name('admin.settings.update');
+    Route::post('/admin/settings/vacation', [\App\Http\Controllers\AdminSettingsController::class , 'updateVacation'])->name('admin.settings.update-vacation');
 
     // Admin Documents
     Route::get('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'index'])->name('admin.documents.index');

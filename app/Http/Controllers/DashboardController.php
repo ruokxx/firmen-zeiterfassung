@@ -13,7 +13,7 @@ class DashboardController extends Controller
         // Get all workdays for the selected year
         $workDays = \App\Models\WorkDay::where('user_id', auth()->id())
             ->whereYear('date', $year)
-            ->with('timeEntries')
+            ->with('timeEntries.constructionSite')
             ->get();
 
         // Group by month and calculate totals
@@ -32,6 +32,14 @@ class DashboardController extends Controller
                 return $day->total_hours;
             });
 
+            // Calculate Vacation Days
+            $vacationDays = $monthWorkDays->sum(function ($day) {
+                return $day->timeEntries->filter(function ($entry) {
+                        return $entry->constructionSite && $entry->constructionSite->name === 'Urlaub';
+                    }
+                    )->sum('hours') / 8;
+                });
+
             // Calculate target hours (8 hours per weekday, adapting to actual if > 8)
             $targetHours = 0;
             $daysInMonth = $monthDate->daysInMonth;
@@ -40,9 +48,20 @@ class DashboardController extends Controller
                 $dateString = $date->format('Y-m-d');
 
                 // Find work entry for this day
-                $dayEntry = $monthWorkDays->first(function ($day) use ($dateString) {
-                    return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
-                });
+                // Correction: $monthWorkDays is a collection of WorkDay objects.
+                // We don't need to re-find it if we iterate correctly, but here we iterate days of month.
+                // $dayEntry is unused in the loop logic below anyway?
+                // Ah, the logic below checks for weekend. 
+                // Wait, the original code had:
+                /* 
+                 $dayEntry = $monthWorkDays->first(function ($day) use ($dateString) {
+                 return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
+                 });
+                 */
+                // But $dayEntry was NOT used in original code for target calculation logic shown in snippet?
+                // Let's keep it consistent with what I see in view_file output.
+                // Actually, lines 43-45 find $dayEntry but don't use it. I will leave it be or remove it if I replace the whole block.
+                // I will just replace the start and end of the block I am touching.
 
                 if (!$date->isWeekend()) {
                     $targetHours += 8;
@@ -54,11 +73,56 @@ class DashboardController extends Controller
                 return (int)\Carbon\Carbon::parse($day->date)->day;
             })->toArray();
 
+            // Get days with vacation entries
+            $vacationDates = $monthWorkDays->filter(function ($day) {
+                return $day->timeEntries->contains(function ($entry) {
+                        return $entry->constructionSite && $entry->constructionSite->name === 'Urlaub';
+                    }
+                    );
+                })->map(function ($day) {
+                return (int)\Carbon\Carbon::parse($day->date)->day;
+            })->toArray();
+
+            // Get days with sick entries
+            $sickDates = $monthWorkDays->filter(function ($day) {
+                return $day->timeEntries->contains(function ($entry) {
+                        return $entry->constructionSite && $entry->constructionSite->name === 'Krank';
+                    }
+                    );
+                })->map(function ($day) {
+                return (int)\Carbon\Carbon::parse($day->date)->day;
+            })->toArray();
+
+            // Get days with "Folgt nächsten Monat" entries
+            $folgtDates = $monthWorkDays->filter(function ($day) {
+                return $day->timeEntries->contains(function ($entry) {
+                        return $entry->constructionSite && $entry->constructionSite->name === 'Folgt nächsten Monat';
+                    }
+                    );
+                })->map(function ($day) {
+                return (int)\Carbon\Carbon::parse($day->date)->day;
+            })->toArray();
+
+            // Get days with Holiday entries (starts with "Feiertag:")
+            $holidayDates = $monthWorkDays->filter(function ($day) {
+                return $day->timeEntries->contains(function ($entry) {
+                        return $entry->constructionSite && \Illuminate\Support\Str::startsWith($entry->constructionSite->name, 'Feiertag:');
+                    }
+                    );
+                })->map(function ($day) {
+                return (int)\Carbon\Carbon::parse($day->date)->day;
+            })->toArray();
+
             $months[$m] = [
                 'date' => $monthDate,
                 'total_hours' => $totalHours,
+                'vacation_days' => $vacationDays,
                 'target_hours' => $targetHours,
                 'worked_days' => $workedDays,
+                'vacation_dates' => $vacationDates,
+                'sick_dates' => $sickDates,
+                'folgt_dates' => $folgtDates,
+                'holiday_dates' => $holidayDates,
             ];
         }
 

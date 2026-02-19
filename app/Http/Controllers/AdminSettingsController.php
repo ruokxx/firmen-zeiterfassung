@@ -65,6 +65,7 @@ class AdminSettingsController extends Controller
             'account_approved_body' => 'nullable|string',
             'auto_backup_enabled' => 'nullable|boolean',
             'backup_retention_count' => 'nullable|integer|min:1',
+            'vacation_days_per_year' => 'nullable|integer|min:0',
         ]);
 
         // Handle checkbox (if unchecked, it's missing from request, so we must set it to false if not present? 
@@ -83,6 +84,21 @@ class AdminSettingsController extends Controller
         }
 
         return back()->with('success', 'E-Mail Einstellungen erfolgreich gespeichert.');
+    }
+
+    public function updateVacation(Request $request)
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'vacation_days_per_year' => 'required|integer|min:0',
+        ]);
+
+        Setting::updateOrCreate(['key' => 'vacation_days_per_year'], ['value' => $data['vacation_days_per_year']]);
+
+        return back()->with('success', 'Urlaubstage erfolgreich gespeichert.');
     }
 
     // --- Backup Methods ---

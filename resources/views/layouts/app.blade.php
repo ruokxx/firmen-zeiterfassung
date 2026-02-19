@@ -13,6 +13,17 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <style>
+            @keyframes germany-blink {
+                0%, 32% { background-color: #000000; color: white; border-color: #000000; }
+                33%, 65% { background-color: #DD0000; color: white; border-color: #DD0000; }
+                66%, 100% { background-color: #FFCE00; color: black; border-color: #FFCE00; }
+            }
+            .animate-germany-blink {
+                animation: germany-blink 2s infinite step-end;
+            }
+        </style>
     </head>
     <body class="font-sans antialiased bg-gray-900 text-gray-100">
         <div class="min-h-screen">

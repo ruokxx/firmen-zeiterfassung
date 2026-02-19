@@ -114,6 +114,12 @@
         </div>
 
         <div class="flex items-center gap-4">
+            <input id="daily_reminder_enabled" name="daily_reminder_enabled" type="checkbox" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" {{ old('daily_reminder_enabled', $user->daily_reminder_enabled) ? 'checked' : '' }}>
+            <x-input-label for="daily_reminder_enabled" :value="__('Tägliche Erinnerung (Mo-Fr, 18 Uhr) bei weniger als 8 Stunden')" class="mb-0" />
+            <x-input-error class="mt-2" :messages="$errors->get('daily_reminder_enabled')" />
+        </div>
+
+        <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
             @if (session('status') === 'profile-updated')

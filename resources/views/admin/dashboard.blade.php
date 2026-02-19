@@ -50,6 +50,24 @@
                     </a>
                 </div>
 
+                <!-- Vacation Settings (Moved from Settings) -->
+                <div class="mb-8 border-b border-gray-700 pb-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-100">Urlaubseinstellungen</h3>
+                    <form method="POST" action="{{ route('admin.settings.update-vacation') }}" class="bg-gray-900 border border-gray-700 rounded-lg p-4">
+                        @csrf
+                        <div class="flex items-end gap-4">
+                            <div class="flex-grow max-w-xs">
+                                <x-input-label for="vacation_days_per_year" :value="__('Urlaubstage pro Jahr (Global)')" />
+                                <x-text-input id="vacation_days_per_year" class="block mt-1 w-full" type="number" name="vacation_days_per_year" :value="old('vacation_days_per_year', \App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30)" min="0" />
+                            </div>
+                            <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded text-sm transition h-10 mb-0.5">
+                                Speichern
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2">Anzahl der Urlaubstage, die jedem Mitarbeiter pro Jahr zustehen.</p>
+                    </form>
+                </div>
+
                 <h3 class="text-lg font-bold mb-4 text-gray-100">Mitarbeiter Übersicht</h3>
                 
                 <div class="space-y-6">
@@ -126,16 +144,28 @@
                                             @php
                                                 $dateObj = \Carbon\Carbon::createFromFormat('Y-m', $month);
                                                 $totalHours = 0;
+                                                $vacationDays = 0;
                                                 foreach($days as $day) {
                                                     $startTime = \Carbon\Carbon::parse($day->start_time);
                                                     $endTime = \Carbon\Carbon::parse($day->end_time);
                                                     $duration = $endTime->diffInMinutes($startTime) - $day->break_duration;
                                                     $totalHours += ($duration / 60);
+
+                                                    // Calculate Vacation Days for this month
+                                                    // Check entries for 'Urlaub'
+                                                    foreach($day->timeEntries as $entry) {
+                                                        if($entry->constructionSite && $entry->constructionSite->name === 'Urlaub') {
+                                                            $vacationDays += ($entry->hours / 8); 
+                                                        }
+                                                    }
                                                 }
                                             @endphp
                                             <div class="bg-gray-800 p-3 rounded shadow-sm border border-gray-700">
                                                 <div class="font-semibold text-center mb-2 text-gray-300">{{ $dateObj->locale('de')->isoFormat('MMMM YYYY') }}</div>
                                                 <div class="text-center text-2xl font-bold text-orange-500">{{ number_format($totalHours, 1) }} h</div>
+                                                @if($vacationDays > 0)
+                                                    <div class="text-center text-sm font-bold mt-1" style="color: #22c55e;">{{ number_format($vacationDays, 1) }} Urlaubstage</div>
+                                                @endif
                                                 <div class="text-center mt-2">
                                                     <a href="{{ route('report.download', ['year' => $dateObj->year, 'month' => $dateObj->month, 'user_id' => $user->id, 'include_carryover' => 0]) }}" 
                                                        class="text-xs bg-gray-700 text-white px-2 py-1 rounded hover:bg-gray-600 border border-gray-600">

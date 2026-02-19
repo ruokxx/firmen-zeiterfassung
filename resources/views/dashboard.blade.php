@@ -1,11 +1,28 @@
 <x-app-layout>
+    @push('styles')
+    <style>
+        @keyframes germany-blink {
+            0%, 32% { background-color: #000000; color: white; border-color: #000000; }
+            33%, 65% { background-color: #DD0000; color: white; border-color: #DD0000; }
+            66%, 100% { background-color: #FFCE00; color: black; border-color: #FFCE00; }
+        }
+        .animate-germany-blink {
+            animation: germany-blink 2s infinite step-end;
+        }
+    </style>
+    @endpush
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-center py-2 gap-4 md:gap-0">
             <h2 class="font-semibold text-lg text-gray-100 leading-tight">
                 {{ __('Jahresübersicht') }}
             </h2>
+
+            <a href="{{ route('workday.edit', \Carbon\Carbon::today()->format('Y-m-d')) }}" 
+               class="order-1 md:order-2 px-4 py-2 bg-gray-800 border border-gray-600 rounded-md text-orange-500 font-bold hover:bg-gray-700 hover:text-orange-400 transition shadow-sm">
+                {{ \Carbon\Carbon::today()->locale('de')->isoFormat('dddd, DD.MM.YYYY') }}
+            </a>
             
-            <div class="flex items-center space-x-4 order-3 md:order-2">
+            <div class="flex items-center space-x-4 order-3 md:order-3">
                 <span class="text-gray-400 text-sm">Gesamt:</span>
                 <span class="text-xl font-bold text-orange-500">{{ number_format($yearlyTotal, 1) }} h</span>
             </div>
@@ -86,6 +103,27 @@
                 </div>
             </div>
 
+            <div class="mb-6 flex flex-wrap gap-4 justify-center sm:justify-start bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-sm">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2 self-center">Legende:</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-300">Arbeit</span>
+                    <div class="w-3 h-3 rounded-sm bg-orange-600 shadow-sm flex-shrink-0" style="min-width: 0.75rem; min-height: 0.75rem;"></div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-300">Urlaub</span>
+                    <div class="w-3 h-3 rounded-sm shadow-sm flex-shrink-0" style="background-color: #22c55e; min-width: 0.75rem; min-height: 0.75rem;"></div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-300">Krank</span>
+                    <div class="w-3 h-3 rounded-sm shadow-sm flex-shrink-0" style="background-color: #ef4444; min-width: 0.75rem; min-height: 0.75rem;"></div>
+                </div>
+                <!-- Removed Schule / Sonstiges upon request -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-300">Feiertag</span>
+                    <div class="w-3 h-3 rounded-sm shadow-sm animate-germany-blink flex-shrink-0" style="min-width: 0.75rem; min-height: 0.75rem;"></div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 @foreach($months as $monthNum => $data)
                     <div class="block bg-gray-800 border border-gray-700 rounded-lg shadow-md hover:shadow-xl transition p-4 transform hover:scale-105 duration-200 group relative"> <!-- Expanded Industrial Card -->
@@ -96,6 +134,12 @@
                                 {{ number_format($data['total_hours'], 1) }} / {{ number_format($data['target_hours'], 0) }} h
                             </div>
                         </a>
+
+                        @if(isset($data['vacation_days']) && $data['vacation_days'] > 0)
+                            <div class="text-xs font-bold text-center mb-2" style="color: #22c55e;">
+                                {{ number_format($data['vacation_days'], 1) }} Urlaubstage
+                            </div>
+                        @endif
 
                         {{-- Micro Calendar Visual --}}
                         <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;" class="text-center text-xs leading-tight">
@@ -124,12 +168,22 @@
                                     $currentDayOfWeek = ($d + $firstDayOfWeek - 2) % 7 + 1;
                                     $isWeekend = $currentDayOfWeek >= 6;
                                     $hasEntry = in_array($d, $data['worked_days']);
+                                    $isVacation = in_array($d, $data['vacation_dates'] ?? []);
+                                    $isSick = in_array($d, $data['sick_dates'] ?? []);
+                                    $isFolgt = in_array($d, $data['folgt_dates'] ?? []);
+                                    $isHoliday = in_array($d, $data['holiday_dates'] ?? []);
                                     $currentDateStr = $data['date']->copy()->day($d)->format('Y-m-d');
                                 @endphp
                                 
                                 <a href="{{ route('workday.edit', $currentDateStr) }}" class="aspect-square flex items-center justify-center rounded-sm text-sm cursor-pointer
-                                    {{ $hasEntry ? 'bg-orange-600 text-white font-bold shadow-sm hover:bg-orange-500' : ($isWeekend ? 'text-red-400 font-bold bg-gray-900/50 hover:bg-gray-800' : 'text-gray-300 bg-gray-900 hover:bg-gray-700 transition') }}
-                                ">
+                                    {{ $isVacation ? 'text-white font-bold shadow-sm hover:opacity-80' : 
+                                       ($isSick ? 'text-white font-bold shadow-sm hover:opacity-80' : 
+                                       ($isFolgt ? 'text-white font-bold shadow-sm hover:opacity-80' :
+                                       ($isHoliday ? 'text-white font-bold shadow-sm hover:opacity-80 animate-germany-blink' :
+                                       ($hasEntry ? 'bg-orange-600 text-white font-bold shadow-sm hover:bg-orange-500' : 
+                                       ($isWeekend ? 'text-red-400 font-bold bg-gray-900/50 hover:bg-gray-800' : 'text-gray-300 bg-gray-900 hover:bg-gray-700 transition'))))) }}"
+                                   style="{{ $isVacation ? 'background-color: #22c55e;' : ($isSick ? 'background-color: #ef4444;' : ($isFolgt ? 'background-color: #000000; border: 1px solid #374151;' : '')) }}"
+                                >
                                     {{ $d }}
                                 </a>
                             @endfor

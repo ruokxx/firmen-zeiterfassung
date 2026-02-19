@@ -19,21 +19,21 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'first_name',
-        'last_name',
         'email',
         'password',
-        'is_active',
-        'role',
+        'is_admin',
+        'is_super_admin',
+        'is_chef',
         'address',
         'mobile_number',
-        'language',
-        'must_change_password',
+        'is_active',
+        'approval_token',
         'google_calendar_url',
         'trello_url',
-        'trello_id',
         'trello_token',
-        'trello_token_secret',
+        'must_change_password',
+        'language',
+        'daily_reminder_enabled',
     ];
 
     /**
@@ -53,6 +53,13 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_admin' => 'boolean',
+        'is_super_admin' => 'boolean',
+        'is_chef' => 'boolean',
+        'is_active' => 'boolean',
+        'must_change_password' => 'boolean',
+        'daily_reminder_enabled' => 'boolean',
     ];
 
     public function getIsAdminAttribute(): bool

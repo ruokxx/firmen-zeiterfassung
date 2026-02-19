@@ -13,7 +13,7 @@ class AdminController extends Controller
         }
 
         $users = \App\Models\User::with(['workDays' => function ($query) {
-            $query->orderBy('date', 'desc');
+            $query->orderBy('date', 'desc')->with('timeEntries.constructionSite');
         }])->get();
 
         // Group workdays by month for each user

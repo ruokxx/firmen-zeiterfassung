@@ -10,6 +10,11 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('help')" :active="request()->routeIs('help')" 
+                        class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('help') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                        {{ __('Hilfe & FAQ') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" 
                         class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('material-orders.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                         {{ __('Material Bestellungen') }}
@@ -88,6 +93,10 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-gray-300 hover:text-white hover:bg-gray-800">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('help')" :active="request()->routeIs('help')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                {{ __('Hilfe & FAQ') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">

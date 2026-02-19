@@ -27,8 +27,8 @@ class WorkDayController extends Controller
 
     public function setStatus(Request $request, $date)
     {
-        $status = $request->input('status'); // 'Krank' or 'Urlaub'
-        if (!in_array($status, ['Krank', 'Urlaub'])) {
+        $status = $request->input('status'); // 'Krank', 'Urlaub' or 'Folgt nächsten Monat'
+        if (!in_array($status, ['Krank', 'Urlaub', 'Folgt nächsten Monat'])) {
             return back()->with('error', 'Ungültiger Status.');
         }
 
@@ -217,6 +217,20 @@ class WorkDayController extends Controller
 
             throw $e;
         }
+    }
+
+    public function destroy(Request $request, $date)
+    {
+        $user = auth()->user();
+        $workDay = $user->workDays()->where('date', $date)->first();
+
+        if ($workDay) {
+            $workDay->timeEntries()->delete();
+            $workDay->delete();
+            return back()->with('success', 'Einträge für ' . $date . ' wurden zurückgesetzt.');
+        }
+
+        return back()->with('error', 'Keine Einträge gefunden.');
     }
 
     private function isAjax(Request $request)

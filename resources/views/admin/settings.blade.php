@@ -147,6 +147,8 @@
                             </div>
                         </div>
 
+                        </div>
+
                         <div class="flex justify-end">
                             <x-primary-button>
                                 {{ __('Speichern') }}

@@ -1,8 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center py-2">
-            <h2 class="font-semibold text-xl text-gray-100 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-100 leading-tight flex items-center gap-4">
                 {{ $startOfMonth->locale('de')->isoFormat('MMMM YYYY') }}
+                <span class="text-base font-normal text-gray-400">
+                    Gesamt: <span class="text-orange-500 font-bold">{{ number_format($totalHours, 1, ',', '.') }} h</span>
+                    <span class="text-gray-500 mx-1">/</span>
+                    <span class="text-gray-400">{{ number_format($targetHours, 0, ',', '.') }} h (Soll)</span>
+                </span>
             </h2>
             <div class="flex items-center space-x-4">
                 <a href="{{ route('month.show', ['year' => $startOfMonth->copy()->subMonth()->year, 'month' => $startOfMonth->copy()->subMonth()->month]) }}" class="px-3 py-1 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition">&larr;</a>
@@ -51,6 +56,22 @@
                 </div>
             @endif
 
+            {{-- Legend --}}
+            <div class="mb-4 px-2 flex flex-wrap gap-4 text-sm text-gray-400">
+                <div class="flex items-center gap-2">
+                    <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">K</span>
+                    <span>= Krank</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">U</span>
+                    <span>= Urlaub</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">8</span>
+                    <span>= Folgt nächsten Monat (8 Std)</span>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-2">
                 @foreach ($calendarDays as $currentDate)
                     @php
@@ -92,6 +113,11 @@
                                         <input type="hidden" name="status" value="Urlaub">
                                         <button type="submit" class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-blue-500" title="Urlaub">U</button>
                                     </form>
+                                    <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
+                                        @csrf
+                                        <input type="hidden" name="status" value="Folgt nächsten Monat">
+                                        <button type="submit" class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-gray-500" title="Folgt nächsten Monat">8</button>
+                                    </form>
                                 </div>
                             @endif
                         </div>
@@ -111,12 +137,25 @@
                         </div>
 
                         {{-- Footer: Action --}}
-                        <a href="{{ route('workday.edit', $dateString) }}" 
-                           class="block w-full text-center py-2 rounded text-sm font-semibold transition after:absolute after:inset-0
-                           {{ $hasEntry ? 'bg-gray-700 text-gray-100 hover:bg-gray-600' : 'bg-gray-900 text-orange-500 hover:text-orange-300 hover:bg-gray-950 border border-gray-700' }}
-                        ">
-                            {{ $hasEntry ? 'Bearbeiten' : 'Erfassen' }}
-                        </a>
+                            <div class="flex gap-1">
+                                <a href="{{ route('workday.edit', $dateString) }}" 
+                                   class="block flex-grow text-center py-2 rounded text-sm font-semibold transition
+                                   {{ $hasEntry ? 'bg-gray-700 text-gray-100 hover:bg-gray-600' : 'bg-gray-900 text-orange-500 hover:text-orange-300 hover:bg-gray-950 border border-gray-700' }}
+                                ">
+                                    {{ $hasEntry ? 'Bearbeiten' : 'Erfassen' }}
+                                </a>
+                                @if($hasEntry)
+                                    <form method="POST" action="{{ route('workday.reset', $dateString) }}" onsubmit="return confirm('Möchten Sie alle Einträge für diesen Tag wirklich löschen?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="h-full px-3 bg-red-900/50 text-red-400 border border-red-800 rounded hover:bg-red-800 hover:text-white transition flex items-center justify-center" title="Tag zurücksetzen">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                     </div>
                 @endforeach
             </div>

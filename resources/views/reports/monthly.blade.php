@@ -26,6 +26,11 @@
             </span>
         </p>
         @endif
+        <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">
+            <p><strong>Urlaubstage (Jahr):</strong> {{ $vacationDaysPerYear }} Tage</p>
+            <p><strong>Genommen (Jahr):</strong> {{ number_format($yearlyVacationDaysTaken, 1) }} Tage</p>
+            <p><strong>Verbleibend:</strong> <span style="{{ $remainingVacationDays < 0 ? 'color: red;' : '' }}">{{ number_format($remainingVacationDays, 1) }} Tage</span></p>
+        </div>
         <p><strong>Erstellt am:</strong> {{ date('d.m.Y H:i') }}</p>
     </div>
 

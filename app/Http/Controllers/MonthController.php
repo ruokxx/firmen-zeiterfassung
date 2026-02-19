@@ -36,7 +36,33 @@ class MonthController extends Controller
             $calendarDays = $part1->merge($part2);
         }
 
-        return view('month', compact('year', 'month', 'startOfMonth', 'daysInMonth', 'workDays', 'calendarDays'));
+        $totalHours = $workDays->sum(function ($day) {
+            return $day->timeEntries->sum('hours');
+        });
+
+        // Calculate Target Hours
+        $targetHours = 0;
+        $holidays = $this->getHolidaysNI($year);
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = $startOfMonth->copy()->day($day);
+
+            if ($date->isWeekday()) {
+                $isHoliday = false;
+                foreach ($holidays as $h) {
+                    if ($h->isSameDay($date)) {
+                        $isHoliday = true;
+                        break;
+                    }
+                }
+
+                if (!$isHoliday) {
+                    $targetHours += 8;
+                }
+            }
+        }
+
+        return view('month', compact('year', 'month', 'startOfMonth', 'daysInMonth', 'workDays', 'calendarDays', 'totalHours', 'targetHours'));
     }
 
     public function importHolidays(Request $request)

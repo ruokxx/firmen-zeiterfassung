@@ -90,7 +90,21 @@ class ReportController extends Controller
             $previousMonthBalance = $prevActualHours - $prevTargetHours;
         }
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover'));
+
+
+        // Vacation Calculation
+        $vacationDaysPerYear = (int)\App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30;
+
+        $yearlyVacationEntries = \App\Models\TimeEntry::whereHas('workDay', function ($query) use ($year, $user) {
+            $query->whereYear('date', $year)->where('user_id', $user->id);
+        })->whereHas('constructionSite', function ($query) {
+            $query->where('name', 'Urlaub');
+        })->sum('hours');
+
+        $yearlyVacationDaysTaken = $yearlyVacationEntries / 8;
+        $remainingVacationDays = $vacationDaysPerYear - $yearlyVacationDaysTaken;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays'));
 
         return $pdf->download("Monatsbericht_{$user->name}_{$month}_{$year}.pdf");
     }
@@ -170,7 +184,21 @@ class ReportController extends Controller
             $previousMonthBalance = $prevActualHours - $prevTargetHours;
         }
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover'));
+        // Vacation Calculation
+        $vacationDaysPerYear = (int)\App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30;
+
+        // Calculate taken vacation in current year up to this month
+        // We look at the whole year because vacation quota is per year
+        $yearlyVacationEntries = \App\Models\TimeEntry::whereHas('workDay', function ($query) use ($year, $user) {
+            $query->whereYear('date', $year)->where('user_id', $user->id);
+        })->whereHas('constructionSite', function ($query) {
+            $query->where('name', 'Urlaub');
+        })->sum('hours');
+
+        $yearlyVacationDaysTaken = $yearlyVacationEntries / 8;
+        $remainingVacationDays = $vacationDaysPerYear - $yearlyVacationDaysTaken;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays'));
         $pdfContent = $pdf->output();
 
         try {
