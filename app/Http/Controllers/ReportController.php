@@ -27,6 +27,7 @@ class ReportController extends Controller
             ->whereYear('date', $year)
             ->whereMonth('date', $month)
             ->with(['timeEntries.constructionSite'])
+            ->orderBy('date')
             ->get(); // Fixed missing semicolon here or after ->with if get was missing
 
         $targetHoursMonth = 0;
