@@ -41,7 +41,7 @@
                     </div>
                 @endif
 
-                <div class="mb-6 flex flex-wrap gap-4">
+                <div class="mb-6 flex flex-col sm:flex-row gap-4">
                     <a href="{{ route('admin.materials.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto justify-center text-center">
                         Material-Katalog verwalten
                     </a>

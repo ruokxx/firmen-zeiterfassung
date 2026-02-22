@@ -54,29 +54,30 @@
                     @if($siteDetails->isEmpty())
                         <p class="text-gray-500 italic">Keine Einträge gefunden.</p>
                     @else
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto -mx-6 sm:mx-0">
                             <table class="min-w-full divide-y divide-gray-700">
                                 <thead class="bg-gray-750">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Datum</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Mitarbeiter</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Baustelle</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Stunden</th>
+                                        <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Datum</th>
+                                        <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Mitarbeiter</th>
+                                        <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Baustelle</th>
+                                        <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Stunden</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-gray-800 divide-y divide-gray-700">
                                     @foreach($siteDetails as $detail)
                                         <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                                {{ \Carbon\Carbon::parse($detail['date'])->locale('de')->isoFormat('dddd, D. MMMM YYYY') }}
+                                            <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-300">
+                                                <span class="hidden sm:inline">{{ \Carbon\Carbon::parse($detail['date'])->locale('de')->isoFormat('dddd, D. MMMM YYYY') }}</span>
+                                                <span class="sm:hidden">{{ \Carbon\Carbon::parse($detail['date'])->format('d.m.y') }}</span>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-100 font-semibold">
+                                            <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-100 font-semibold break-words">
                                                 {{ $detail['user_name'] }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-400">
+                                            <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-orange-400 break-words">
                                                 {{ $detail['site_name'] }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                            <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-300 whitespace-nowrap">
                                                 {{ number_format($detail['hours'], 1) }} h
                                             </td>
                                         </tr>
