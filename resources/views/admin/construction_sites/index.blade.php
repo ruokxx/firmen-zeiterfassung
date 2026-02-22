@@ -13,8 +13,8 @@
                 <form method="GET" action="{{ route('admin.construction-sites.index') }}" class="flex flex-col lg:flex-row gap-4 items-end">
                     
                     <div class="w-full lg:w-1/4">
-                        <x-input-label for="search" :value="__('Baustelle')" />
-                        <x-text-input id="search" class="block w-full mt-1 bg-gray-900 border-gray-600 focus:border-orange-500 focus:ring-orange-500 text-gray-100" type="text" name="search" value="{{ $search }}" placeholder="Stuttgart..." autofocus />
+                        <x-input-label for="search" :value="__('Straße, Kunde, Baustelle')" />
+                        <x-text-input id="search" class="block w-full mt-1 bg-gray-900 border-gray-600 focus:border-orange-500 focus:ring-orange-500 text-gray-100" type="text" name="search" value="{{ $search }}" placeholder="Straße, Kunde..." autofocus />
                     </div>
 
                     <div class="w-full lg:w-1/4">
