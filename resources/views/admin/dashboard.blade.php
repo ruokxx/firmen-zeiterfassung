@@ -41,14 +41,14 @@
                     </div>
                 @endif
 
-                <div class="mb-6 flex gap-4">
-                    <a href="{{ route('admin.materials.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <div class="mb-6 flex flex-wrap gap-4">
+                    <a href="{{ route('admin.materials.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto justify-center text-center">
                         Material-Katalog verwalten
                     </a>
-                    <a href="{{ route('admin.construction-sites.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    <a href="{{ route('admin.construction-sites.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto justify-center text-center">
                         Baustellen Suche
                     </a>
-                    <a href="{{ route('admin.faqs.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    <a href="{{ route('admin.faqs.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto justify-center text-center">
                         FAQs verwalten
                     </a>
                 </div>
@@ -58,12 +58,12 @@
                     <h3 class="text-lg font-bold mb-4 text-gray-100">Urlaubseinstellungen</h3>
                     <form method="POST" action="{{ route('admin.settings.update-vacation') }}" class="bg-gray-900 border border-gray-700 rounded-lg p-4">
                         @csrf
-                        <div class="flex items-end gap-4">
-                            <div class="flex-grow max-w-xs">
+                        <div class="flex flex-wrap items-end gap-4">
+                            <div class="flex-grow w-full sm:w-auto max-w-xs">
                                 <x-input-label for="vacation_days_per_year" :value="__('Urlaubstage pro Jahr (Global)')" />
                                 <x-text-input id="vacation_days_per_year" class="block mt-1 w-full" type="number" name="vacation_days_per_year" :value="old('vacation_days_per_year', \App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30)" min="0" />
                             </div>
-                            <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded text-sm transition h-10 mb-0.5">
+                            <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded text-sm transition h-10 w-full sm:w-auto mb-0.5 mt-2 sm:mt-0">
                                 Speichern
                             </button>
                         </div>
@@ -97,11 +97,11 @@
                                     </div>
                                     
                                     @if($user->id !== auth()->id())
-                                        <div class="mt-4 pt-4 border-t border-gray-700 flex flex-wrap items-center gap-4" @click.stop>
+                                        <div class="mt-4 pt-4 border-t border-gray-700 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-center gap-4" @click.stop>
                                             {{-- Role Update --}}
-                                            <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex items-center gap-2">
+                                            <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                                 @csrf
-                                                <select name="role" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 py-1.5">
+                                                <select name="role" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 py-1.5 w-full sm:w-auto">
                                                     <option value="employee" {{ $user->role === 'employee' ? 'selected' : '' }}>Mitarbeiter</option>
                                                     <option value="chef" {{ $user->role === 'chef' ? 'selected' : '' }}>Chef</option>
                                                     @if(auth()->user()->is_super_admin)
@@ -110,26 +110,26 @@
                                                         <option value="admin" selected disabled>Admin</option>
                                                     @endif
                                                 </select>
-                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition">
+                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition w-full sm:w-auto">
                                                     Speichern
                                                 </button>
                                             </form>
 
                                             {{-- Vacation Days Update --}}
-                                            <form method="POST" action="{{ route('admin.users.update-vacation-days', $user) }}" class="flex items-center gap-2">
+                                            <form method="POST" action="{{ route('admin.users.update-vacation-days', $user) }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                                 @csrf
-                                                <input type="number" name="vacation_days_per_year" value="{{ $user->vacation_days_per_year }}" placeholder="Global ({{ \App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30 }})" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 w-28 py-1.5" min="0">
-                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition whitespace-nowrap">
+                                                <input type="number" name="vacation_days_per_year" value="{{ $user->vacation_days_per_year }}" placeholder="Global ({{ \App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30 }})" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 w-full sm:w-28 py-1.5" min="0">
+                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition whitespace-nowrap w-full sm:w-auto text-center">
                                                     Urlaub speichern
                                                 </button>
                                             </form>
 
                                             {{-- Delete User --}}
-                                            <form method="POST" action="{{ route('admin.users.delete', $user) }}" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Daten (Arbeitszeiten, Berichte) werden unwiderruflich gelöscht.');">
+                                            <form method="POST" action="{{ route('admin.users.delete', $user) }}" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Daten (Arbeitszeiten, Berichte) werden unwiderruflich gelöscht.');" class="col-span-1 sm:col-span-2 lg:col-span-1 border-t border-gray-700 pt-2 lg:border-t-0 lg:pt-0">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded border border-red-800 bg-red-900/30 text-red-500 hover:bg-red-900/50 transition">
-                                                    Löschen
+                                                <button type="submit" class="text-xs font-semibold px-3 py-2 rounded border border-red-800 bg-red-900/30 text-red-500 hover:bg-red-900/50 transition w-full text-center">
+                                                    Benutzer löschen
                                                 </button>
                                             </form>
                                         </div>
