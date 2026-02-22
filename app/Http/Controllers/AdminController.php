@@ -6,14 +6,34 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->user()->is_admin) {
             abort(403);
         }
 
-        $users = \App\Models\User::with(['workDays' => function ($query) {
-            $query->orderBy('date', 'desc')->with('timeEntries.constructionSite');
+        $search = $request->input('search');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        $query = \App\Models\User::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $users = $query->with(['workDays' => function ($q) use ($dateFrom, $dateTo) {
+            if ($dateFrom) {
+                $q->whereDate('date', '>=', $dateFrom);
+            }
+            if ($dateTo) {
+                $q->whereDate('date', '<=', $dateTo);
+            }
+            $q->orderBy('date', 'desc')->with('timeEntries.constructionSite');
         }])->get();
 
         // Group workdays by month for each user
@@ -26,7 +46,7 @@ class AdminController extends Controller
 
         $pendingUsers = \App\Models\User::where('is_active', false)->get();
 
-        return view('admin.dashboard', compact('users', 'pendingUsers'));
+        return view('admin.dashboard', compact('users', 'pendingUsers', 'search', 'dateFrom', 'dateTo'));
     }
     public function updateRole(Request $request, \App\Models\User $user)
     {
