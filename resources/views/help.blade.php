@@ -79,61 +79,21 @@
                 <h3 class="text-xl font-bold text-gray-100 mb-6 border-b border-gray-700 pb-2">Häufig gestellte Fragen (FAQ)</h3>
                 
                 <div class="space-y-2">
-                    <!-- FAQ Item 1 -->
+                    @forelse($faqs ?? [] as $faq)
                     <div class="border border-gray-700 rounded-lg bg-gray-750">
-                        <button @click="active = active === 1 ? null : 1" class="w-full text-left px-4 py-3 flex justify-between items-center focus:outline-none">
-                            <span class="font-bold text-gray-200">Wie trage ich meinen Urlaub ein?</span>
-                            <svg class="h-5 w-5 text-orange-500 transform transition-transform duration-200" :class="{'rotate-180': active === 1}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button @click="active = active === {{ $faq->id }} ? null : {{ $faq->id }}" class="w-full text-left px-4 py-3 flex justify-between items-center focus:outline-none">
+                            <span class="font-bold text-gray-200">{{ $faq->question }}</span>
+                            <svg class="h-5 w-5 text-orange-500 transform transition-transform duration-200" :class="{'rotate-180': active === {{ $faq->id }}}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
-                        <div x-show="active === 1" x-collapse class="px-4 pb-4 text-gray-400 text-sm">
-                            Gehen Sie in die Monatsansicht des entsprechenden Monats. Klicken Sie bei den gewünschten Tagen auf den Button <strong>"U"</strong>. 
-                            Der Tag wird grün markiert und als 8 Stunden Urlaub berechnet (sofern nicht anders eingestellt).
+                        <div x-show="active === {{ $faq->id }}" x-collapse class="px-4 pb-4 text-gray-400 text-sm prose prose-invert max-w-none">
+                            {!! nl2br(strip_tags($faq->answer, '<strong><br><ul><li><em><i><b><a>')) !!}
                         </div>
                     </div>
-
-                    <!-- FAQ Item 2 -->
-                    <div class="border border-gray-700 rounded-lg bg-gray-750">
-                        <button @click="active = active === 2 ? null : 2" class="w-full text-left px-4 py-3 flex justify-between items-center focus:outline-none">
-                            <span class="font-bold text-gray-200">Was bedeutet der "8" Button?</span>
-                            <svg class="h-5 w-5 text-orange-500 transform transition-transform duration-200" :class="{'rotate-180': active === 2}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div x-show="active === 2" x-collapse class="px-4 pb-4 text-gray-400 text-sm">
-                            Der "8" Button ist für Tage gedacht, an denen eine pauschale Zeit von 8 Stunden erfasst werden soll, z.B. für Berufsschule oder "Folgt nächsten Monat". 
-                            Diese Tage werden im Dashboard schwarz markiert.
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 3 -->
-                    <div class="border border-gray-700 rounded-lg bg-gray-750">
-                        <button @click="active = active === 3 ? null : 3" class="w-full text-left px-4 py-3 flex justify-between items-center focus:outline-none">
-                            <span class="font-bold text-gray-200">Ich habe mein Passwort vergessen. Was nun?</span>
-                            <svg class="h-5 w-5 text-orange-500 transform transition-transform duration-200" :class="{'rotate-180': active === 3}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div x-show="active === 3" x-collapse class="px-4 pb-4 text-gray-400 text-sm">
-                            Bitte wenden Sie sich an Ihren Administrator. Dieser kann Ihr Passwort zurücksetzen. 
-                            Sie können Ihr Passwort jederzeit in Ihrem Profil ändern, solange Sie eingeloggt sind.
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 4 -->
-                    <div class="border border-gray-700 rounded-lg bg-gray-750">
-                        <button @click="active = active === 4 ? null : 4" class="w-full text-left px-4 py-3 flex justify-between items-center focus:outline-none">
-                            <span class="font-bold text-gray-200">Wie kann ich einen fehlerhaften Eintrag löschen?</span>
-                            <svg class="h-5 w-5 text-orange-500 transform transition-transform duration-200" :class="{'rotate-180': active === 4}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div x-show="active === 4" x-collapse class="px-4 pb-4 text-gray-400 text-sm">
-                            In der Monatsansicht finden Sie neben Tagen mit Einträgen ein <strong>Mülleimer-Symbol</strong>. 
-                            Klicken Sie darauf, um alle Einträge für diesen Tag zurückzusetzen.
-                        </div>
-                    </div>
+                    @empty
+                        <p class="text-gray-400 italic">Es sind noch keine FAQs hinterlegt.</p>
+                    @endforelse
                 </div>
             </div>
 

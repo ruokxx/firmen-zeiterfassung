@@ -19,7 +19,7 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 gap-4" x-data="{ includeCarryover: true }">
+            <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 gap-4" x-data="{ includeCarryover: false }">
                 <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-orange-400 transition flex items-center gap-1">
                     <span>&larr;</span> Zurück zur Übersicht
                 </a>
@@ -158,6 +158,25 @@
                             </div>
                     </div>
                 @endforeach
+            </div>
+
+            <div class="mt-8 bg-gray-800 rounded-lg border border-gray-700 p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-gray-100 mb-4 border-b border-gray-700 pb-2">Sonstiges für {{ $startOfMonth->locale('de')->isoFormat('MMMM YYYY') }}</h3>
+                <form action="{{ route('month.remark') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="year" value="{{ $year }}">
+                    <input type="hidden" name="month" value="{{ $month }}">
+                    
+                    <div class="mb-4">
+                        <textarea name="remark" class="w-full bg-gray-900 border-gray-600 text-gray-200 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm min-h-[100px]" placeholder="Hier können Sie zusätzliche Anmerkungen für den Monat eintragen. Dieser Text erscheint auch auf dem PDF-Bericht.">{{ old('remark', $remark?->remark) }}</textarea>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded transition text-sm">
+                            Sonstiges speichern
+                        </button>
+                    </div>
+                </form>
             </div>
 
         </div>

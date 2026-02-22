@@ -62,7 +62,32 @@ class MonthController extends Controller
             }
         }
 
-        return view('month', compact('year', 'month', 'startOfMonth', 'daysInMonth', 'workDays', 'calendarDays', 'totalHours', 'targetHours'));
+        $remark = \App\Models\MonthlyRemark::where('user_id', auth()->id())
+            ->where('year', $year)
+            ->where('month', $month)
+            ->first();
+
+        return view('month', compact('year', 'month', 'startOfMonth', 'daysInMonth', 'workDays', 'calendarDays', 'totalHours', 'targetHours', 'remark'));
+    }
+
+    public function saveRemark(Request $request)
+    {
+        $validated = $request->validate([
+            'year' => 'required|integer',
+            'month' => 'required|integer|between:1,12',
+            'remark' => 'nullable|string'
+        ]);
+
+        \App\Models\MonthlyRemark::updateOrCreate(
+        [
+            'user_id' => auth()->id(),
+            'year' => $validated['year'],
+            'month' => $validated['month']
+        ],
+        ['remark' => $validated['remark']]
+        );
+
+        return back()->with('success', 'Sonstiges wurde gespeichert.');
     }
 
     public function importHolidays(Request $request)

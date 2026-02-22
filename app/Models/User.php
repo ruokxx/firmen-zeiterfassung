@@ -34,6 +34,7 @@ class User extends Authenticatable
         'must_change_password',
         'language',
         'daily_reminder_enabled',
+        'vacation_days_per_year',
     ];
 
     /**

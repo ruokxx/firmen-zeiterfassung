@@ -73,6 +73,22 @@ class AdminController extends Controller
         return back()->with('success', $message);
     }
 
+    public function updateVacationDays(Request $request, \App\Models\User $user)
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $request->validate([
+            'vacation_days_per_year' => 'nullable|integer|min:0',
+        ]);
+
+        $user->vacation_days_per_year = $request->vacation_days_per_year;
+        $user->save();
+
+        return back()->with('success', "Individuelle Urlaubstage für {$user->name} gespeichert.");
+    }
+
     public function destroy(\App\Models\User $user)
     {
         if (!auth()->user()->is_admin) {

@@ -12,8 +12,11 @@ Route::get('/', function () {
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class , 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/month/{year}/{month}', [\App\Http\Controllers\MonthController::class , 'show'])->middleware(['auth', 'verified'])->name('month.show');
 Route::post('/month/import-holidays', [\App\Http\Controllers\MonthController::class , 'importHolidays'])->middleware(['auth', 'verified'])->name('month.import-holidays');
-Route::view('/help', 'help')->middleware(['auth', 'verified'])->name('help');
-
+Route::post('/month/remark', [\App\Http\Controllers\MonthController::class , 'saveRemark'])->middleware(['auth', 'verified'])->name('month.remark');
+Route::get('/help', function () {
+    $faqs = \App\Models\Faq::where('is_active', true)->orderBy('order')->get();
+    return view('help', compact('faqs'));
+})->middleware(['auth', 'verified'])->name('help');
 Route::middleware('auth')->group(function () {
     Route::get('/workday/{date}', [\App\Http\Controllers\WorkDayController::class , 'edit'])->name('workday.edit');
     Route::post('/workday/ajax-save', [\App\Http\Controllers\WorkDayController::class , 'saveAjax'])->name('workday.save-ajax');
@@ -32,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'email'])->name('admin.users.email');
     Route::post('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'sendEmail'])->name('admin.users.email.send');
     Route::post('/admin/users/{user}/approve', [\App\Http\Controllers\AdminController::class , 'approve'])->name('admin.users.approve');
+    Route::post('/admin/users/{user}/vacation-days', [\App\Http\Controllers\AdminController::class , 'updateVacationDays'])->name('admin.users.update-vacation-days');
     Route::delete('/admin/users/{user}', [\App\Http\Controllers\AdminController::class , 'destroy'])->name('admin.users.delete'); // Soft delete or hard delete
 
     // Admin Settings
@@ -60,6 +64,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/backup/download/{filename}', [\App\Http\Controllers\AdminSettingsController::class , 'downloadBackup'])->name('admin.backup.download');
     Route::post('/admin/backup/restore', [\App\Http\Controllers\AdminSettingsController::class , 'restoreBackup'])->name('admin.backup.restore');
     Route::delete('/admin/backup/{filename}', [\App\Http\Controllers\AdminSettingsController::class , 'deleteBackup'])->name('admin.backup.delete');
+
+    // Admin FAQs
+    Route::resource('admin/faqs', \App\Http\Controllers\AdminFaqController::class)->names('admin.faqs')->except(['show']);
 
     // Trello OAuth
     Route::get('/auth/trello/redirect', [\App\Http\Controllers\TrelloController::class , 'redirect'])->name('auth.trello.redirect');

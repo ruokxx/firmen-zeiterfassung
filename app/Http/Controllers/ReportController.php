@@ -50,9 +50,9 @@ class ReportController extends Controller
         // Checks show blade uses $totalHoursMonth + $previousMonthBalance. 
         // It doesn't display "Target Current" in footer, but for correctness of "Overtime" calculation if added later.
 
-        // Check if carryover should be included (default: true)
+        // Check if carryover should be included (default: false)
         // Explicitly cast to boolean to be safe (though '0' is false, filter_var is clearer)
-        $includeCarryover = filter_var($request->input('include_carryover', 'true'), FILTER_VALIDATE_BOOLEAN);
+        $includeCarryover = filter_var($request->input('include_carryover', 'false'), FILTER_VALIDATE_BOOLEAN);
         $previousMonthBalance = 0;
 
         if ($includeCarryover) {
@@ -94,7 +94,9 @@ class ReportController extends Controller
 
 
         // Vacation Calculation
-        $vacationDaysPerYear = (int)\App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30;
+        $vacationDaysPerYear = $user->vacation_days_per_year !== null
+            ? (int)$user->vacation_days_per_year
+            : ((int)\App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30);
 
         $yearlyVacationEntries = \App\Models\TimeEntry::whereHas('workDay', function ($query) use ($year, $user) {
             $query->whereYear('date', $year)->where('user_id', $user->id);
@@ -105,7 +107,12 @@ class ReportController extends Controller
         $yearlyVacationDaysTaken = $yearlyVacationEntries / 8;
         $remainingVacationDays = $vacationDaysPerYear - $yearlyVacationDaysTaken;
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays'));
+        $remark = \App\Models\MonthlyRemark::where('user_id', $user->id)
+            ->where('year', $year)
+            ->where('month', $month)
+            ->first();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays', 'remark'));
 
         return $pdf->download("Monatsbericht_{$user->name}_{$month}_{$year}.pdf");
     }
@@ -186,7 +193,9 @@ class ReportController extends Controller
         }
 
         // Vacation Calculation
-        $vacationDaysPerYear = (int)\App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30;
+        $vacationDaysPerYear = $user->vacation_days_per_year !== null
+            ? (int)$user->vacation_days_per_year
+            : ((int)\App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30);
 
         // Calculate taken vacation in current year up to this month
         // We look at the whole year because vacation quota is per year
@@ -199,7 +208,12 @@ class ReportController extends Controller
         $yearlyVacationDaysTaken = $yearlyVacationEntries / 8;
         $remainingVacationDays = $vacationDaysPerYear - $yearlyVacationDaysTaken;
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays'));
+        $remark = \App\Models\MonthlyRemark::where('user_id', $user->id)
+            ->where('year', $year)
+            ->where('month', $month)
+            ->first();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays', 'remark'));
         $pdfContent = $pdf->output();
 
         try {

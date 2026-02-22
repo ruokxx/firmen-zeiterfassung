@@ -72,11 +72,6 @@
         </tbody>
         <tfoot>
             <tr>
-            <tr>
-                <td colspan="3" style="text-align: right; font-weight: bold;">Gesamtstunden (Aktuell):</td>
-                <td colspan="2" style="font-weight: bold;">{{ number_format($totalHoursMonth, 1) }} h</td>
-            </tr>
-            <tr>
                 <td colspan="3" style="text-align: right; font-weight: bold;">Gesamtstunden (Aktuell):</td>
                 <td colspan="2" style="font-weight: bold;">{{ number_format($totalHoursMonth, 1) }} h</td>
             </tr>
@@ -96,6 +91,13 @@
             @endif
         </tfoot>
     </table>
+
+    @if(isset($remark) && $remark->remark)
+    <div style="margin-top: 30px; page-break-inside: avoid;">
+        <h3>Sonstiges:</h3>
+        <p style="white-space: pre-wrap; font-family: sans-serif; font-size: 11px; color: #333;">{{ $remark->remark }}</p>
+    </div>
+    @endif
 
     <div class="footer">
         Seite 1 von 1

@@ -48,6 +48,9 @@
                     <a href="{{ route('admin.construction-sites.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                         Baustellen Suche
                     </a>
+                    <a href="{{ route('admin.faqs.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                        FAQs verwalten
+                    </a>
                 </div>
 
                 <!-- Vacation Settings (Moved from Settings) -->
@@ -64,7 +67,7 @@
                                 Speichern
                             </button>
                         </div>
-                        <p class="text-sm text-gray-400 mt-2">Anzahl der Urlaubstage, die jedem Mitarbeiter pro Jahr zustehen.</p>
+                        <p class="text-sm text-gray-400 mt-2">Anzahl der Urlaubstage, die jedem Mitarbeiter pro Jahr zustehen. Diese Einstellung gilt für alle Mitarbeiter, es sei denn, beim Mitarbeiter selbst wurden abweichend eigene Urlaubstage festgelegt.</p>
                     </form>
                 </div>
 
@@ -94,33 +97,38 @@
                                     </div>
                                     
                                     @if($user->id !== auth()->id())
-                                        <div class="flex space-x-2 mt-2" @click.stop>
-                                    @php
-                                        // $user->role is available? NO, we need to ensure it's available or use the attribute if we cast/access it correctly.
-                                        // We added 'role' to the model.
-                                    @endphp
-                                    <div class="mt-4 border-t border-gray-700 pt-2" @click.stop>
-                                         <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex items-center gap-2">
-                                            @csrf
-                                            <select name="role" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500">
-                                                <option value="employee" {{ $user->role === 'employee' ? 'selected' : '' }}>Mitarbeiter</option>
-                                                <option value="chef" {{ $user->role === 'chef' ? 'selected' : '' }}>Chef</option>
-                                                @if(auth()->user()->is_super_admin)
-                                                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                                                @elseif($user->role === 'admin')
-                                                    <option value="admin" selected disabled>Admin</option>
-                                                @endif
-                                            </select>
-                                            <button type="submit" class="text-xs font-semibold px-2 py-1 rounded bg-orange-700 text-white hover:bg-orange-600 transition">
-                                                Speichern
-                                            </button>
-                                        </form>
-                                    </div>
+                                        <div class="mt-4 pt-4 border-t border-gray-700 flex flex-wrap items-center gap-4" @click.stop>
+                                            {{-- Role Update --}}
+                                            <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex items-center gap-2">
+                                                @csrf
+                                                <select name="role" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 py-1.5">
+                                                    <option value="employee" {{ $user->role === 'employee' ? 'selected' : '' }}>Mitarbeiter</option>
+                                                    <option value="chef" {{ $user->role === 'chef' ? 'selected' : '' }}>Chef</option>
+                                                    @if(auth()->user()->is_super_admin)
+                                                        <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                                    @elseif($user->role === 'admin')
+                                                        <option value="admin" selected disabled>Admin</option>
+                                                    @endif
+                                                </select>
+                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition">
+                                                    Speichern
+                                                </button>
+                                            </form>
 
+                                            {{-- Vacation Days Update --}}
+                                            <form method="POST" action="{{ route('admin.users.update-vacation-days', $user) }}" class="flex items-center gap-2">
+                                                @csrf
+                                                <input type="number" name="vacation_days_per_year" value="{{ $user->vacation_days_per_year }}" placeholder="Global ({{ \App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30 }})" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 w-28 py-1.5" min="0">
+                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition whitespace-nowrap">
+                                                    Urlaub speichern
+                                                </button>
+                                            </form>
+
+                                            {{-- Delete User --}}
                                             <form method="POST" action="{{ route('admin.users.delete', $user) }}" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Daten (Arbeitszeiten, Berichte) werden unwiderruflich gelöscht.');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-xs font-semibold px-2 py-1 rounded border border-red-800 bg-red-900/30 text-red-500 hover:bg-red-900/50 transition">
+                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded border border-red-800 bg-red-900/30 text-red-500 hover:bg-red-900/50 transition">
                                                     Löschen
                                                 </button>
                                             </form>
