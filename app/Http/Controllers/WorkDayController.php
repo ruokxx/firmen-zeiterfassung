@@ -28,7 +28,7 @@ class WorkDayController extends Controller
 
         $sites = \App\Models\ConstructionSite::where('status', 'active')->get();
 
-        return view('workday.edit', compact('workDay', 'sites'));
+        return view('workday.edit', compact('workDay', 'sites', 'defaultStart', 'defaultEnd', 'defaultBreak'));
     }
 
     public function setStatus(Request $request, $date)

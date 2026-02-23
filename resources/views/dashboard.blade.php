@@ -98,8 +98,8 @@
                     <span class="text-sm font-medium text-gray-300">Arbeitstage: {{ $daysWorked }} / {{ $totalWorkingDays }}</span>
                     <span class="text-xs font-medium text-gray-400">{{ number_format($progressPercentage, 1, ',', '.') }}%</span>
                 </div>
-                <div class="w-full bg-gray-700 rounded-full h-2.5">
-                    <div class="h-2.5 rounded-full transition-all duration-500" style="width: {{ number_format($progressPercentage, 2, '.', '') }}%; background-color: #3b82f6; box-shadow: 0 0 10px #3b82f6;"></div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
+                    <div class="bg-blue-500 h-full rounded-full transition-all duration-500 shadow-[0_0_10px_#3b82f6]" style="width: {{ number_format($progressPercentage, 2, '.', '') }}%;"></div>
                 </div>
             </div>
 
@@ -226,7 +226,7 @@
                                     @elseif($member->role === 'geselle')
                                         <span class="text-green-500 font-bold">Geselle</span>
                                     @else
-                                        <span class="text-blue-500 font-bold">Mitarbeiter</span>
+                                        <span class="text-yellow-500 font-bold">Mitarbeiter</span>
                                     @endif
                                 </div>
                             </div>

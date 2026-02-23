@@ -49,8 +49,15 @@
                     </div>
                     
                     <div class="mb-6 flex gap-4">
+                        @php
+                            $start = \Carbon\Carbon::parse($defaultStart);
+                            $end = \Carbon\Carbon::parse($defaultEnd);
+                            $diffMinutes = $start->diffInMinutes($end);
+                            $workMinutes = max(0, $diffMinutes - $defaultBreak);
+                            $defaultHoursConfigured = round($workMinutes / 60, 2);
+                        @endphp
                         <button type="button" @click="fillStandardHours()" class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-gray-200 uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 border border-gray-600">
-                            Standardzeit (8h) einfügen
+                            Standardzeit ({{ rtrim(rtrim((string)$defaultHoursConfigured, '0'), '.') }}h) einfügen
                         </button>
                         <button type="button" @click="clearHours()" class="inline-flex items-center px-4 py-2 bg-red-900/30 border border-red-800 rounded-md font-semibold text-xs text-red-400 uppercase tracking-widest hover:bg-red-900/50 focus:bg-red-900/50 active:bg-red-900/50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             Zeiten zurücksetzen
@@ -158,9 +165,9 @@
                 },
                 
                 fillStandardHours() {
-                    document.getElementById('start_time').value = '08:00';
-                    document.getElementById('end_time').value = '16:30';
-                    document.getElementById('break_duration').value = '30';
+                    document.getElementById('start_time').value = '{{ $defaultStart }}';
+                    document.getElementById('end_time').value = '{{ $defaultEnd }}';
+                    document.getElementById('break_duration').value = '{{ $defaultBreak }}';
                     
                     const noBreakCheckbox = document.getElementById('no_break');
                     if (noBreakCheckbox && noBreakCheckbox.checked) {
@@ -191,8 +198,17 @@
                 },
 
                 calculateEndTime() {
-                    // Start at 08:00
-                    let startMinutes = 8 * 60;
+                    // Get configured start time
+                    let defaultStartStr = '{{ $defaultStart }}' || '08:00';
+                    let startParts = defaultStartStr.split(':');
+                    let startMinutes = (parseInt(startParts[0]) || 8) * 60 + (parseInt(startParts[1]) || 0);
+
+                    // If user manually changed start_time, use that.
+                    let currentStartInput = document.getElementById('start_time').value;
+                    if(currentStartInput) {
+                        let currentParts = currentStartInput.split(':');
+                        startMinutes = (parseInt(currentParts[0]) || 0) * 60 + (parseInt(currentParts[1]) || 0);
+                    }
                     
                     // Add Site Hours
                     let workMinutes = this.entries.reduce((sum, entry) => sum + parseFloat(entry.hours || 0), 0) * 60;
@@ -203,14 +219,16 @@
 
                     let totalMinutes = startMinutes + workMinutes + breakVal;
                     
-                    let hours = Math.floor(totalMinutes / 60);
+                    let hours = Math.floor(totalMinutes / 60) % 24;
                     let minutes = Math.round(totalMinutes % 60);
                     
                     // Format HH:mm
                     let formatted = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
                     
                     document.getElementById('end_time').value = formatted;
-                    document.getElementById('start_time').value = '08:00'; // Ensure start time is 08:00 as requested
+                    if(!currentStartInput) {
+                        document.getElementById('start_time').value = defaultStartStr; 
+                    }
                 },
 
                 async save() {

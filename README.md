@@ -1,193 +1,194 @@
-# Firmen Zeiterfassung
+# ⏱️ Firmen Zeiterfassung
 
-Ein Zeiterfassungssystem für Firmen, entwickelt mit Laravel.
+🚀 Ein modernes, sicheres und benutzerfreundliches Zeiterfassungssystem für Firmen, entwickelt mit **Laravel** und **Tailwind CSS**. 
 
-## Installation
-
-Folge diesen Schritten, um das Projekt auf deinem lokalen Rechner zu installieren:
-
-1.  **Repository klonen:**
-    ```bash
-    git clone https://github.com/ruokxx/firmen-zeiterfassung.git
-    cd firmen-zeiterfassung
-    ```
-
-2.  **Abhängigkeiten installieren:**
-    ```bash
-    composer install
-    npm install
-    npm run build
-    ```
-
-3.  **Berechtigungen setzen (WICHTIG):**
-    Stelle sicher, dass der Webserver (z.B. `www-data`) Schreibrechte auf die Ordner `storage` und `bootstrap/cache` hat:
-    ```bash
-    sudo chown -R www-data:www-data /var/www/firmen-zeiterfassung
-    sudo chmod -R 775 storage bootstrap/cache
-    ```
-
-4.  **Umgebungsvariablen konfigurieren:**
-    Kopiere die `.env.example` zu `.env`:
-    ```bash
-    cp .env.example .env
-    ```
-    Öffne die `.env` Datei und konfiguriere deine Datenbankverbindung (z.B. SQLite, MySQL).
-
-4.  **App Key generieren:**
-    ```bash
-    php artisan key:generate
-    ```
-
-5.  **Datenbank migrieren und Seeder ausführen:**
-    Dies erstellt die Tabellen und den Standard-Admin-Account.
-    ```bash
-    php artisan migrate --seed
-    ```
-
-### Erster Login
-
-Nach der Installation steht ein Standard-Admin-Account zur Verfügung:
-
-*   **E-Mail:** `admin@admin.de`
-*   **Passwort:** `password`
-
-**Wichtig:** Beim ersten Login wirst du aufgefordert, die E-Mail-Adresse und das Passwort aus Sicherheitsgründen zu ändern.
+Perfekt geeignet für kleine bis mittelständische Unternehmen, um Arbeitszeiten, Pausen, Urlaub und Krankheitstage übersichtlich zu verwalten. 
 
 ---
 
-## Server starten (Port 1234)
+## ✨ Features im Überblick
 
-Um den Server standardmäßig auf Port **1234** zu starten, verwende folgenden Befehl:
-
-```bash
-php artisan serve --port=1234
-```
-
-Die Anwendung ist dann unter `http://localhost:1234` erreichbar.
-
----
-
-## SSL / HTTPS aktivieren
-
-### Lokale Entwicklung (Windows/Mac/Linux)
-
-Für eine einfache lokale HTTPS-Entwicklung wird empfohlen, Laravel Valet (Mac) oder Laragon (Windows) zu verwenden, die SSL automatisch verwalten.
-
-Wenn du `php artisan serve` nutzt, kannst du kein echtes SSL-Zertifikat direkt einbinden. Du kannst jedoch einen lokalen Proxy wie **Ngrok** oder **Expose** nutzen:
-
-1.  Starte den Server:
-    ```bash
-    php artisan serve --port=1234
-    ```
-2.  Starte Ngrok (falls installiert):
-    ```bash
-    ngrok http 1234
-    ```
-    Ngrok gibt dir eine sichere `https://...` URL.
-
-### Produktion (Nginx / Apache)
-
-Auf einem Produktionsserver (z.B. Ubuntu mit Nginx) solltest du **Let's Encrypt** verwenden.
-
-**Beispiel Nginx Konfiguration:**
-
-1.  Installiere Certbot:
-    ```bash
-    sudo apt install certbot python3-certbot-nginx
-    ```
-
-2.  Erstelle eine Nginx Konfiguration für deine Domain (z.B. `zeiterfassung.deine-firma.de`) und leite Port 80/443 auf deinen PHP-FPM Socket oder Proxy weiter.
-
-3.  Zertifikat anfordern:
-    ```bash
-    sudo certbot --nginx -d zeiterfassung.deine-firma.de
-    ```
-
-4.  Certbot konfiguriert Nginx automatisch für SSL.
-
----
-
-## Funktionen
-
-### Zeiterfassung & Berichte
+### 📝 Zeiterfassung & Berichte
 *   **Arbeitszeiterfassung:** Einfaches Starten und Stoppen der Arbeitszeit, inkl. Pausenerfassung.
-*   **Monatsübersicht:** Detaillierte Ansicht der Arbeitsstunden pro Monat mit automatischer Berechnung der Gesamtstunden.
-*   **PDF-Export:** Generierung von professionellen PDF-Berichten für jeden Monat.
+*   **Monatsübersicht:** Detaillierte Ansicht der Arbeitsstunden pro Monat mit automatischer Berechnung der Soll/Ist-Wochenarbeitszeit.
+*   **PDF-Export:** Generierung von professionellen PDF-Berichten (auf Wunsch mit Firmenlogo).
 *   **Berichtversand:** Mitarbeiter können ihre Monatsberichte direkt per E-Mail an den Vorgesetzten senden.
 
-### Dokumentenverwaltung (Neu)
-*   **Dokumente verteilen:** Admins können Dateien (z.B. Verträge, Anweisungen) an einzelne oder alle Mitarbeiter verteilen.
-*   **Status-Tracking:** Verfolgung, ob ein Dokument bearbeitet wurde (Offen / Erledigt).
-*   **Rückmeldung:** Mitarbeiter können bearbeitete Dokumente (z.B. unterschrieben) wieder hochladen.
-*   **Download:** Einfacher Download von Original- und Antwortdateien.
+### 👥 Benutzer & Team (Admin)
+*   **Dashboard & Statistiken:** Übersicht über alle Mitarbeiter, Urlaubstage und die Jahresübersicht.
+*   **Freigabeprozess:** Neue Registrierungen müssen durch einen Admin genehmigt werden (inklusive E-Mail-News).
+*   **Rollenverwaltung:** Chef, Admin, Geselle, Azubi, Mitarbeiter – mit jeweils angepassten Funktionen.
+*   **Urlaubsverwaltung:** Automatische Berechnung von Resturlaub und Krankentagen.
 
-### Benutzerverwaltung (Admin)
-*   **Dashboard:** Übersicht über alle registrierten Mitarbeiter und deren Status.
-*   **Freigabeprozess:** Neue Registrierungen müssen durch einen Admin genehmigt werden. Admins erhalten eine E-Mail-Benachrichtigung bei neuen Registrierungen.
-*   **Mitarbeiter-Details:** Einsicht in Kontaktdaten (Adresse, Telefon) und Arbeitsstunden der Mitarbeiter.
-*   **Rollenverwaltung:** Beförderung von Mitarbeitern zu Admins und Entzug von Rechten.
-*   **Account-Management:** Löschen und Deaktivieren von Benutzerkonten.
+### 📄 Dokumentenverwaltung & Material
+*   **Dokumente verteilen:** Admins können Dateien gezielt an bestimmte Mitarbeiter ausspielen.
+*   **Status-Tracking:** Rückmeldungen anfordern (Mitarbeiter können z.B. unterschriebene Dokumente hochladen). 
+*   **Materialbestellungen:** Ein übersichtliches System für Teammitglieder, fehlendes Material auf Baustellen direkt per Klick zu ordern.
 
-### Sonstiges
-*   **Benutzerprofil:** Mitarbeiter können ihre persönlichen Daten und Spracheinstellungen verwalten.
-*   **Mehrsprachigkeit:** Benutzeroberfläche verfügbar in Deutsch und Englisch.
-*   **Responsive Design:** Optimiert für Desktop und mobile Endgeräte (Dark/Light Mode Unterstützung).
+### ⚙️ Konfigurierbar & Modern
+*   **Einstellungen:** Dashboard-Nachrichten, Standard-Arbeitszeiten, Webhooks für Discord und eigene Logos direkt im Admin-Panel einstellbar.
+*   **Responsive:** Optimiert für alle Endgeräte (Smartphone, Tablet, PC).
+*   **Theme:** Modernes "Industrial" Dark-Theme (Grau/Orange/Blau).
 
-## Fehlerbehebung (Troubleshooting)
+---
 
-### Fehler: "Permission denied" (storage/logs/...)
-Wenn du einen Fehler erhältst, dass Logs nicht geschrieben werden können:
+## 🛠️ Installation: Windows (Lokale Entwicklung mit Laragon)
+
+Für die lokale Entwicklung auf Windows wird [Laragon](https://laragon.org/download/) wärmstens empfohlen, da es PHP, MySQL, Composer und Node.js optimal vereint.
+
+1. **Voraussetzungen:** Installiere Laragon (Full) und starte die Dienste ("Start All").
+2. **Terminal öffnen:** Öffne das Laragon Terminal.
+3. **Repository klonen:**
+   ```bash
+   cd C:\laragon\www
+   git clone https://github.com/ruokxx/firmen-zeiterfassung.git
+   cd firmen-zeiterfassung
+   ```
+4. **Abhängigkeiten installieren:**
+   ```bash
+   composer install
+   npm install
+   npm run build
+   ```
+5. **Umgebung konfigurieren:**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+6. **Datenbank verbinden:**
+   Öffne Laragon -> Database (HeidiSQL) und erstelle eine neue Datenbank z.B. namens `zeiterfassung`.
+   Öffne die Datei `.env` in deinem Code-Editor und passe die Datenbankzugangsdaten an:
+   ```env
+   DB_DATABASE=zeiterfassung
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+7. **Datenbank migrieren und Standard-Account erstellen:**
+   ```bash
+   php artisan migrate --seed
+   ```
+8. **Fertig!**
+   Die App ist nun in Laragon erreichbar unter: `http://firmen-zeiterfassung.test` (sofern Laragon Auto-Virtual-Hosts an hat) oder über das Terminal mit `php artisan serve`.
+
+---
+
+## 🌍 Installation: Ubuntu Server (Produktion)
+
+Folgende Schritte begleiten dich durch die Installation auf einem echten Linux Server (z.B. Ubuntu 22.04 oder 24.04). Vorausgesetzt wird ein installierter **LEMP-Stack** (Linux, Nginx, MySQL/MariaDB, PHP > 8.1) und `composer` sowie `npm`.
+
+### 1. Repository klonen
+```bash
+cd /var/www/
+sudo git clone https://github.com/ruokxx/firmen-zeiterfassung.git
+cd firmen-zeiterfassung
+```
+
+### 2. Abhängigkeiten installieren
+```bash
+sudo composer install --optimize-autoloader --no-dev
+sudo npm install
+sudo npm run build
+```
+
+### 3. Dateirechte setzen (WICHTIG!)
+Der Webserver (meist `www-data` bei Nginx/Apache) braucht unbedingt Lese- und Schreibrechte auf wichtige Ordner:
 ```bash
 sudo chown -R www-data:www-data /var/www/firmen-zeiterfassung
 sudo chmod -R 775 storage bootstrap/cache
 ```
 
-### Fehler: "Database Access denied" (SQL 1044/1045)
-Wenn der Fehler `Access denied for user ...` erscheint:
-
-1.  **Prüfe die `.env` Datei:**
-    Stelle sicher, dass `DB_DATABASE`, `DB_USERNAME` und `DB_PASSWORD` korrekt sind.
-
-2.  **Caches leeren:**
-    Nach Änderungen an der `.env` Datei *immer* den Cache leeren:
-    ```bash
-    php artisan optimize:clear
-    ```
-
-3.  **Datenbank-Rechte prüfen:**
-    Logge dich in MySQL ein und prüfe die Rechte:
-    ```sql
-    mysql -u root -p
-    -- In MySQL:
-    GRANT ALL PRIVILEGES ON firma.* TO 'smartscope_user'@'localhost';
-    FLUSH PRIVILEGES;
-    ```
-    (Ersetze `firma` und `smartscope_user` mit deinen Werten).
-
-### Fehler: 502 Bad Gateway
-Dies bedeutet meist, dass Nginx nicht mit PHP kommunizieren kann.
-Prüfe in der Nginx-Config (`/etc/nginx/sites-available/firmen-zeiterfassung`), ob die PHP-Version stimmt:
-`fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;` (oder php8.1, php8.3 usw.)
-
-### Fehler: "Unknown database" (SQL 1049)
-Die Datenbank, die in der `.env` Datei unter `DB_DATABASE` angegeben ist (z.B. `firma`), existiert nicht.
-
-**Lösung:**
-1.  Logge dich in MySQL ein:
-    ```bash
-    mysql -u root -p
-    ```
-2.  Erstelle die Datenbank:
-    ```sql
-    CREATE DATABASE firma;
-    EXIT;
-    ```
-    (Ersetze `firma` mit dem Namen aus deiner `.env` Datei).
-
-### Fehler: "fatal: detected dubious ownership" (Git)
-Wenn Git sich beschwert, dass der Ordner einem anderen User gehört:
+### 4. Umgebung konfigurieren (.env)
 ```bash
-git config --global --add safe.directory /var/www/firmen-zeiterfassung
+cp .env.example .env
+php artisan key:generate
 ```
-Danach kannst du `git pull` ausführen.
+Passe in der `.env` Datei deine Datenbankeinstellungen und die App-URL an:
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://deine-domain.de
+
+DB_DATABASE=deine_datenbank
+DB_USERNAME=dein_db_user
+DB_PASSWORD=dein_db_passwort
+```
+
+### 5. Datenbank migrieren
+```bash
+php artisan migrate --seed --force
+```
+*(Das `--seed` erstellt den Standard-Admin-Account, siehe unten)*
+
+### 6. Caches generieren (für maximale Performance)
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### 7. Nginx Konfiguration (Beispiel)
+Damit Nginx das Laravel Projekt lädt, erstelle eine Config: `sudo nano /etc/nginx/sites-available/zeiterfassung`
+```nginx
+server {
+    listen 80;
+    server_name deine-domain.de;
+    root /var/www/firmen-zeiterfassung/public;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    index index.php;
+
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock; # Passe die PHP Version an!
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+Anschließend Seite aktivieren und Nginx neu laden:
+```bash
+sudo ln -s /etc/nginx/sites-available/zeiterfassung /etc/nginx/sites-enabled/
+sudo systemctl reload nginx
+```
+*(Empfehlung: Installiere ein SSL Zertifikat via `sudo certbot --nginx`)*
+
+---
+
+## 🔒 Erster Login (Standard-Zugang)
+
+Nach erfolgreicher Migration (`migrate --seed`) wurde ein Standard-Account angelegt. Mit diesem kannst du dich initial einloggen und andere Kollegen verwalten.
+
+*   **E-Mail:** `admin@admin.de`
+*   **Passwort:** `password`
+
+**Wichtig:** Beim ersten Login wirst du aus Sicherheitsgründen *zwingend* dazu aufgefordert, die E-Mail-Adresse und das Passwort sofort in deine eigenen Daten zu ändern!
+
+---
+
+## 💡 Fehlerbehebung / Troubleshooting
+
+*   **Fehler 500 oder weiße Seite nach Installation:** 
+    Höchstwahrscheinlich stimmen die Schreibrechte nicht. Siehe Installation Ubuntu Schritt 3 (`chown` / `chmod` für `storage` Ordner).
+*   **CSS / Design fehlt (alles weiß/blau ohne Formatierung):**
+    Die Vite Builds fehlen. Führe im Projektordner `npm run build` aus.
+*   **"SQLSTATE[HY000] [1045] Access denied for user":**
+    Falsche Datenbank-Zugangsdaten in der `.env`. Korrigiere sie und leere den Cache mit `php artisan optimize:clear`.
+
+❤️ Entwickelt für maximale Übersicht und Fairness im Handwerk & Büro.
 
