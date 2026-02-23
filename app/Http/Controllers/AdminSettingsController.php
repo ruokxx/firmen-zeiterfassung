@@ -66,6 +66,9 @@ class AdminSettingsController extends Controller
             'auto_backup_enabled' => 'nullable|boolean',
             'backup_retention_count' => 'nullable|integer|min:1',
             'vacation_days_per_year' => 'nullable|integer|min:0',
+            'material_email_enabled' => 'nullable|boolean',
+            'material_email_time' => 'nullable|date_format:H:i',
+
         ]);
 
         // Handle checkbox (if unchecked, it's missing from request, so we must set it to false if not present? 
@@ -77,6 +80,9 @@ class AdminSettingsController extends Controller
 
         if (!$request->has('auto_backup_enabled')) {
             $data['auto_backup_enabled'] = '0';
+        }
+        if (!$request->has('material_email_enabled')) {
+            $data['material_email_enabled'] = '0';
         }
 
         foreach ($data as $key => $value) {
@@ -99,6 +105,30 @@ class AdminSettingsController extends Controller
         Setting::updateOrCreate(['key' => 'vacation_days_per_year'], ['value' => $data['vacation_days_per_year']]);
 
         return back()->with('success', 'Urlaubstage erfolgreich gespeichert.');
+    }
+
+    public function testMaterialEmail()
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('material-orders:send');
+            $output = \Illuminate\Support\Facades\Artisan::output();
+
+            // Check if the command itself reported that it was disabled or no orders found.
+            // The command returns 0 on success (or when disabled/no orders), but outputs info text.
+            if (str_contains($output, 'disabled') || str_contains($output, 'No open')) {
+                return back()->with('success', 'Test-Aufruf ausgeführt, aber: ' . $output);
+            }
+
+            return back()->with('success', 'Test-E-Mail (falls offene Bestellungen vorhanden) erfolgreich ausgelöst!');
+        }
+        catch (\Exception $e) {
+            Log::error('Test Material Email Exception: ' . $e->getMessage());
+            return back()->with('error', 'Fehler beim Ausführen der Test-E-Mail: ' . $e->getMessage());
+        }
     }
 
     // --- Backup Methods ---

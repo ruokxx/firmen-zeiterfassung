@@ -147,6 +147,29 @@
                             </div>
                         </div>
 
+                        <!-- Material Order Email Settings -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Materialbestellungen Erinnerung</h4>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="material_email_enabled" id="material_email_enabled" value="1" {{ ($settings->get('material_email_enabled', '0') == '1') ? 'checked' : '' }} class="rounded bg-gray-900 border-gray-600 text-blue-600 shadow-sm focus:ring-blue-500">
+                                    <label for="material_email_enabled" class="ml-2 block text-sm font-medium text-gray-300">Tägliche E-Mail für offene Materialbestellungen aktivieren</label>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="material_email_time" :value="__('Uhrzeit für E-Mail Versand')" />
+                                    <x-text-input id="material_email_time" class="block mt-1 md:w-1/4 w-full" type="time" name="material_email_time" :value="old('material_email_time', $settings->get('material_email_time', '08:00'))" />
+                                    <p class="text-sm text-gray-400 mt-1">Die E-Mail wird täglich zu dieser Uhrzeit an den Berichtsempfänger (Chef) gesendet.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex">
+                                <button type="submit" form="test-material-email-form" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded text-sm transition shadow-md">
+                                    Test-E-Mail jetzt manuell auslösen
+                                </button>
+                            </div>
+                        </div>
+
                         </div>
 
                         <div class="flex justify-end">
@@ -154,6 +177,11 @@
                                 {{ __('Speichern') }}
                             </x-primary-button>
                         </div>
+                    </form>
+
+                    <!-- Hidden Form for Testing Material Email -->
+                    <form id="test-material-email-form" method="POST" action="{{ route('admin.settings.test-material-email') }}" class="hidden">
+                        @csrf
                     </form>
                 </div>
             </div>

@@ -14,6 +14,16 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('backup:auto')->dailyAt('22:00');
         $schedule->command('reminders:send-daily')->weekdays()->at('18:00');
+
+        try {
+            // Attempt to get the configured time from the database
+            $time = \App\Models\Setting::where('key', 'material_email_time')->value('value') ?? '08:00';
+            $schedule->command('material-orders:send')->dailyAt($time);
+        }
+        catch (\Exception $e) {
+            // If DB is not available (e.g., during migrations), fallback
+            $schedule->command('material-orders:send')->dailyAt('08:00');
+        }
     }
 
     /**
