@@ -41,6 +41,10 @@ class MaterialOrderController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->role === 'azubi') {
+            abort(403, 'Auszubildende können keine Bestellungen aufgeben.');
+        }
+
         $request->validate([
             'item_name' => 'required|string|max:255',
         ]);

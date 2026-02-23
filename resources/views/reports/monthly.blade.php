@@ -15,7 +15,11 @@
 <body>
     <div class="header" style="position: relative;">
         <div style="position: absolute; right: 0; top: -20px;">
-            <img src="{{ public_path('logo_pdf.jpg') }}" style="width: 150px; height: auto;" alt="Logo"/>
+            @php
+                $pdfLogo = \App\Models\Setting::where('key', 'pdf_logo')->value('value');
+                $logoPath = $pdfLogo ? storage_path('app/public/' . $pdfLogo) : public_path('logo_pdf.jpg');
+            @endphp
+            <img src="{{ $logoPath }}" style="width: 150px; height: auto;" alt="Logo"/>
         </div>
         <h1>Monatsbericht</h1>
         <p><strong>Mitarbeiter:</strong> {{ $user->name }}</p>

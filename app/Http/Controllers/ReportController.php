@@ -30,6 +30,19 @@ class ReportController extends Controller
             ->orderBy('date')
             ->get(); // Fixed missing semicolon here or after ->with if get was missing
 
+        // Load configured defaults once per request
+        $defaultStart = \App\Models\Setting::where('key', 'default_start_time')->value('value') ?: '08:00';
+        $defaultEnd = \App\Models\Setting::where('key', 'default_end_time')->value('value') ?: '16:00';
+        $defaultBreak = \App\Models\Setting::where('key', 'default_break_duration')->value('value') !== null
+            ? (int)\App\Models\Setting::where('key', 'default_break_duration')->value('value')
+            : 0;
+
+        $startTimeParse = \Carbon\Carbon::parse($defaultStart);
+        $endTimeParse = \Carbon\Carbon::parse($defaultEnd);
+        $diffMinutes = $startTimeParse->diffInMinutes($endTimeParse);
+        $workMinutes = max(0, $diffMinutes - $defaultBreak);
+        $defaultDailyHours = round($workMinutes / 60, 2);
+
         $targetHoursMonth = 0;
         $daysInMonth = $startOfMonth->daysInMonth;
         for ($d = 1; $d <= $daysInMonth; $d++) {
@@ -41,7 +54,7 @@ class ReportController extends Controller
             });
 
             if (!$date->isWeekend()) {
-                $targetHoursMonth += 8;
+                $targetHoursMonth += $defaultDailyHours;
             }
         }
 
@@ -84,7 +97,7 @@ class ReportController extends Controller
                 });
 
                 if (!$date->isWeekend()) {
-                    $prevTargetHours += 8;
+                    $prevTargetHours += $defaultDailyHours;
                 }
             }
 
@@ -104,7 +117,7 @@ class ReportController extends Controller
             $query->where('name', 'Urlaub');
         })->sum('hours');
 
-        $yearlyVacationDaysTaken = $yearlyVacationEntries / 8;
+        $yearlyVacationDaysTaken = $defaultDailyHours > 0 ? $yearlyVacationEntries / $defaultDailyHours : 0;
         $remainingVacationDays = $vacationDaysPerYear - $yearlyVacationDaysTaken;
 
         $remark = \App\Models\MonthlyRemark::where('user_id', $user->id)
@@ -138,6 +151,19 @@ class ReportController extends Controller
             ->with(['timeEntries.constructionSite'])
             ->orderBy('date')
             ->get();
+
+        // Load configured defaults once per request
+        $defaultStart = \App\Models\Setting::where('key', 'default_start_time')->value('value') ?: '08:00';
+        $defaultEnd = \App\Models\Setting::where('key', 'default_end_time')->value('value') ?: '16:00';
+        $defaultBreak = \App\Models\Setting::where('key', 'default_break_duration')->value('value') !== null
+            ? (int)\App\Models\Setting::where('key', 'default_break_duration')->value('value')
+            : 0;
+
+        $startTimeParse = \Carbon\Carbon::parse($defaultStart);
+        $endTimeParse = \Carbon\Carbon::parse($defaultEnd);
+        $diffMinutes = $startTimeParse->diffInMinutes($endTimeParse);
+        $workMinutes = max(0, $diffMinutes - $defaultBreak);
+        $defaultDailyHours = round($workMinutes / 60, 2);
 
         // Check if carryover should be included (default: false if unchecked, true if checked - assuming checkbox sends 1)
         // Checkboxes only send value if checked. We set value="1".
@@ -185,7 +211,7 @@ class ReportController extends Controller
                 });
 
                 if (!$date->isWeekend()) {
-                    $prevTargetHours += 8;
+                    $prevTargetHours += $defaultDailyHours;
                 }
             }
 
@@ -205,7 +231,7 @@ class ReportController extends Controller
             $query->where('name', 'Urlaub');
         })->sum('hours');
 
-        $yearlyVacationDaysTaken = $yearlyVacationEntries / 8;
+        $yearlyVacationDaysTaken = $defaultDailyHours > 0 ? $yearlyVacationEntries / $defaultDailyHours : 0;
         $remainingVacationDays = $vacationDaysPerYear - $yearlyVacationDaysTaken;
 
         $remark = \App\Models\MonthlyRemark::where('user_id', $user->id)

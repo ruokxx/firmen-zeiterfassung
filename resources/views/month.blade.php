@@ -66,10 +66,29 @@
                     <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">U</span>
                     <span>= Urlaub</span>
                 </div>
+                @php
+                    $defaultStart = \App\Models\Setting::where('key', 'default_start_time')->value('value') ?: '08:00';
+                    $defaultEnd = \App\Models\Setting::where('key', 'default_end_time')->value('value') ?: '16:00';
+                    $defaultBreak = \App\Models\Setting::where('key', 'default_break_duration')->value('value') !== null 
+                        ? (int)\App\Models\Setting::where('key', 'default_break_duration')->value('value') 
+                        : 0;
+            
+                    $start = \Carbon\Carbon::parse($defaultStart);
+                    $end = \Carbon\Carbon::parse($defaultEnd);
+                    $diffMinutes = $start->diffInMinutes($end);
+                    $workMinutes = max(0, $diffMinutes - $defaultBreak);
+                    $defaultDailyHours = round($workMinutes / 60, 2);
+                @endphp
                 <div class="flex items-center gap-2">
-                    <span class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">8</span>
-                    <span>= Folgt nächsten Monat (8 Std)</span>
+                    <span class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">{{ rtrim(rtrim((string)$defaultDailyHours, '0'), '.') }}</span>
+                    <span>= Folgt nächsten Monat ({{ rtrim(rtrim((string)$defaultDailyHours, '0'), '.') }} Std)</span>
                 </div>
+                @if(auth()->user()->role === 'azubi')
+                <div class="flex items-center gap-2">
+                    <span class="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">S</span>
+                    <span>= Schule</span>
+                </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-2">
@@ -116,8 +135,15 @@
                                     <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
                                         @csrf
                                         <input type="hidden" name="status" value="Folgt nächsten Monat">
-                                        <button type="submit" class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-gray-500" title="Folgt nächsten Monat">8</button>
+                                        <button type="submit" class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-gray-500" title="Folgt nächsten Monat">{{ rtrim(rtrim((string)$defaultDailyHours, '0'), '.') }}</button>
                                     </form>
+                                    @if(auth()->user()->role === 'azubi')
+                                    <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
+                                        @csrf
+                                        <input type="hidden" name="status" value="Schule">
+                                        <button type="submit" class="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-green-500" title="Schule">S</button>
+                                    </form>
+                                    @endif
                                 </div>
                             @endif
                         </div>

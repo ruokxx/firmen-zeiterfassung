@@ -103,6 +103,8 @@
                                                 @csrf
                                                 <select name="role" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 py-1.5 w-full sm:w-auto">
                                                     <option value="employee" {{ $user->role === 'employee' ? 'selected' : '' }}>Mitarbeiter</option>
+                                                    <option value="geselle" {{ $user->role === 'geselle' ? 'selected' : '' }}>Geselle</option>
+                                                    <option value="azubi" {{ $user->role === 'azubi' ? 'selected' : '' }}>Azubi</option>
                                                     <option value="chef" {{ $user->role === 'chef' ? 'selected' : '' }}>Chef</option>
                                                     @if(auth()->user()->is_super_admin)
                                                         <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>

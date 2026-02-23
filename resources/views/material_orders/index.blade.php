@@ -9,6 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             
             {{-- New Order Form --}}
+            @if(auth()->user()->role !== 'azubi')
             <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-700 p-6">
                 <h3 class="text-lg font-bold text-gray-100 mb-4">Neue Bestellung aufgeben</h3>
                 <form method="POST" action="{{ route('material-orders.store') }}" class="flex gap-4">
@@ -26,6 +27,11 @@
                     </x-primary-button>
                 </form>
             </div>
+            @else
+            <div class="bg-blue-900/50 border border-blue-700 text-blue-200 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">Als Auszubildender kannst du hier einsehen, was bestellt wurde. Bestellungen aufgeben können nur Mitarbeiter und Chefs.</span>
+            </div>
+            @endif
 
             {{-- Active Orders --}}
             <div>

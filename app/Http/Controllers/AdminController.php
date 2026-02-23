@@ -59,7 +59,7 @@ class AdminController extends Controller
         }
 
         $request->validate([
-            'role' => 'required|in:employee,chef,admin',
+            'role' => 'required|in:employee,chef,admin,azubi,geselle',
         ]);
 
         // Only Super Admins can make other Admins

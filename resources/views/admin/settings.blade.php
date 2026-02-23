@@ -29,7 +29,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.settings.update') }}" class="space-y-6">
+                    <form method="POST" action="{{ route('admin.settings.update') }}" class="space-y-6" enctype="multipart/form-data">
                         @csrf
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -167,6 +167,86 @@
                                 <button type="submit" form="test-material-email-form" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded text-sm transition shadow-md">
                                     Test-E-Mail jetzt manuell auslösen
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Appearance Settings -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Erscheinungsbild</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="col-span-1 md:col-span-2">
+                                    <x-input-label for="page_title" :value="__('Seiten-Titel')" />
+                                    <x-text-input id="page_title" class="block mt-1 w-full" type="text" name="page_title" :value="old('page_title', $settings->get('page_title', 'Asendorf-Elektrotechnik Zeiterfassung'))" />
+                                    <p class="text-sm text-gray-400 mt-1">Dieser Text wird im Browser-Tab und auf der Startseite angezeigt.</p>
+                                </div>
+                                
+                                <div>
+                                    <x-input-label for="app_logo" :value="__('App Logo (für Login-Seite)')" />
+                                    @if($settings->get('app_logo'))
+                                        <div class="mb-2">
+                                            <img src="{{ asset('storage/' . $settings->get('app_logo')) }}" alt="App Logo" class="h-16 w-auto object-contain bg-white p-1 rounded">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="app_logo" id="app_logo" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600 cursor-pointer border border-gray-700 rounded mt-1 bg-gray-900" accept="image/*">
+                                </div>
+
+                                <div>
+                                    <x-input-label for="pdf_logo" :value="__('PDF Logo (für Monatsbericht)')" />
+                                    @if($settings->get('pdf_logo'))
+                                        <div class="mb-2">
+                                            <img src="{{ asset('storage/' . $settings->get('pdf_logo')) }}" alt="PDF Logo" class="h-16 w-auto object-contain bg-white p-1 rounded">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="pdf_logo" id="pdf_logo" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600 cursor-pointer border border-gray-700 rounded mt-1 bg-gray-900" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- General Work Settings -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Standard Arbeitszeiten</h4>
+                            <div class="bg-blue-900/30 border border-blue-800 text-blue-200 px-4 py-3 rounded relative mb-4" role="alert">
+                                <span class="block sm:inline text-sm">Diese Zeiten werden als Vorgabe für neu angelegte Tage und beim Klicken der Status-Buttons (Krank, Urlaub, Schule, Folgt...) genutzt. Die Tages-Sollstunden werden automatisch daraus berechnet.</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <x-input-label for="default_start_time" :value="__('Standard Startzeit')" />
+                                    <x-text-input id="default_start_time" class="block mt-1 w-full" type="time" name="default_start_time" :value="old('default_start_time', $settings->get('default_start_time', '08:00'))" />
+                                </div>
+                                <div>
+                                    <x-input-label for="default_end_time" :value="__('Standard Endzeit')" />
+                                    <x-text-input id="default_end_time" class="block mt-1 w-full" type="time" name="default_end_time" :value="old('default_end_time', $settings->get('default_end_time', '16:00'))" />
+                                </div>
+                                <div>
+                                    <x-input-label for="default_break_duration" :value="__('Standard Pause (Minuten)')" />
+                                    <x-text-input id="default_break_duration" class="block mt-1 w-full" type="number" name="default_break_duration" :value="old('default_break_duration', $settings->get('default_break_duration', '0'))" min="0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Help Page Settings -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Hilfeseite & FAQ</h4>
+                             
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <x-input-label for="help_page_title" :value="__('Titel der Hilfeseite')" />
+                                    <x-text-input id="help_page_title" class="block mt-1 w-full" type="text" name="help_page_title" :value="old('help_page_title', $settings->get('help_page_title', 'Willkommen im Work Time Tracker'))" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="help_page_content" :value="__('Einleitungs-Text (HTML erlaubt)')" />
+                                    @php
+                                        $defaultHelpText = "Dies ist Ihre zentrale Plattform für Arbeitszeiterfassung, Urlaubsplanung und Materialbestellungen. Hier finden Sie eine Übersicht über Ihre geleisteten Stunden, können Ihren Status pflegen und wichtige Dokumente einsehen.<br><br><strong>Arbeitszeiterfassung:</strong> Erfassen Sie Ihre täglichen Arbeitszeiten über das Dashboard oder die Tagesansicht.<br><br><strong>Kalender & Status:</strong> Nutzen Sie die Monatsübersicht, um Tage als \"Urlaub\" (U) oder \"Krank\" (K) zu markieren.<br><br><strong>Material Bestellungen:</strong> Bestellen Sie benötigtes Material direkt über das System.";
+                                    @endphp
+                                    <textarea id="help_page_content" name="help_page_content" rows="6" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-900 text-gray-300 border-gray-700">{{ old('help_page_content', $settings->get('help_page_content', $defaultHelpText)) }}</textarea>
+                                    <p class="text-sm text-gray-400 mt-1">Dieser Text ersetzt die oberen Blöcke der Hilfeseite. Einfaches HTML (z.B. &lt;br&gt;, &lt;strong&gt;) ist erlaubt.</p>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="help_page_copyright" :value="__('Copyright / Footer Text auf der Hilfeseite')" />
+                                    <x-text-input id="help_page_copyright" class="block mt-1 w-full" type="text" name="help_page_copyright" :value="old('help_page_copyright', $settings->get('help_page_copyright', '&copy; ' . date('Y') . ' Work Time Tracker. Bei weiteren Fragen wenden Sie sich bitte an den Support oder Ihren Vorgesetzten.'))" />
+                                </div>
                             </div>
                         </div>
 

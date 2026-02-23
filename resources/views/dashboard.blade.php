@@ -96,10 +96,10 @@
             <div class="mb-6 bg-gray-800 border border-gray-700 rounded-lg shadow p-4">
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-sm font-medium text-gray-300">Arbeitstage: {{ $daysWorked }} / {{ $totalWorkingDays }}</span>
-                    <span class="text-xs font-medium text-gray-400">{{ number_format($progressPercentage, 1) }}%</span>
+                    <span class="text-xs font-medium text-gray-400">{{ number_format($progressPercentage, 1, ',', '.') }}%</span>
                 </div>
                 <div class="w-full bg-gray-700 rounded-full h-2.5">
-                    <div class="bg-orange-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ $progressPercentage }}%"></div>
+                    <div class="h-2.5 rounded-full transition-all duration-500" style="width: {{ number_format($progressPercentage, 2, '.', '') }}%; background-color: #3b82f6; box-shadow: 0 0 10px #3b82f6;"></div>
                 </div>
             </div>
 
@@ -117,6 +117,12 @@
                     <span class="text-xs text-gray-300">Krank</span>
                     <div class="w-3 h-3 rounded-sm shadow-sm flex-shrink-0" style="background-color: #ef4444; min-width: 0.75rem; min-height: 0.75rem;"></div>
                 </div>
+                @if(auth()->user()->role === 'azubi')
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-300">Schule</span>
+                    <div class="w-3 h-3 rounded-sm shadow-sm flex-shrink-0" style="background-color: #3b82f6; min-width: 0.75rem; min-height: 0.75rem;"></div>
+                </div>
+                @endif
                 <!-- Removed Schule / Sonstiges upon request -->
                 <div class="flex items-center gap-2">
                     <span class="text-xs text-gray-300">Feiertag</span>
@@ -170,6 +176,7 @@
                                     $hasEntry = in_array($d, $data['worked_days']);
                                     $isVacation = in_array($d, $data['vacation_dates'] ?? []);
                                     $isSick = in_array($d, $data['sick_dates'] ?? []);
+                                    $isSchool = in_array($d, $data['school_dates'] ?? []);
                                     $isFolgt = in_array($d, $data['folgt_dates'] ?? []);
                                     $isHoliday = in_array($d, $data['holiday_dates'] ?? []);
                                     $currentDateStr = $data['date']->copy()->day($d)->format('Y-m-d');
@@ -178,11 +185,12 @@
                                 <a href="{{ route('workday.edit', $currentDateStr) }}" class="aspect-square flex items-center justify-center rounded-sm text-sm cursor-pointer
                                     {{ $isVacation ? 'text-white font-bold shadow-sm hover:opacity-80' : 
                                        ($isSick ? 'text-white font-bold shadow-sm hover:opacity-80' : 
+                                       ($isSchool ? 'text-white font-bold shadow-sm hover:opacity-80' : 
                                        ($isFolgt ? 'text-white font-bold shadow-sm hover:opacity-80' :
                                        ($isHoliday ? 'text-white font-bold shadow-sm hover:opacity-80 animate-germany-blink' :
                                        ($hasEntry ? 'bg-orange-600 text-white font-bold shadow-sm hover:bg-orange-500' : 
-                                       ($isWeekend ? 'text-red-400 font-bold bg-gray-900/50 hover:bg-gray-800' : 'text-gray-300 bg-gray-900 hover:bg-gray-700 transition'))))) }}"
-                                   style="{{ $isVacation ? 'background-color: #22c55e;' : ($isSick ? 'background-color: #ef4444;' : ($isFolgt ? 'background-color: #000000; border: 1px solid #374151;' : '')) }}"
+                                       ($isWeekend ? 'text-red-400 font-bold bg-gray-900/50 hover:bg-gray-800' : 'text-gray-300 bg-gray-900 hover:bg-gray-700 transition')))))) }}"
+                                   style="{{ $isVacation ? 'background-color: #22c55e;' : ($isSick ? 'background-color: #ef4444;' : ($isSchool ? 'background-color: #3b82f6;' : ($isFolgt ? 'background-color: #000000; border: 1px solid #374151;' : ''))) }}"
                                 >
                                     {{ $d }}
                                 </a>
@@ -213,8 +221,12 @@
                                         <span class="text-orange-500 font-bold">Admin</span>
                                     @elseif($member->role === 'chef')
                                         <span class="text-yellow-500 font-bold">Chef</span>
+                                    @elseif($member->role === 'azubi')
+                                        <span class="text-green-500 font-bold">Azubi</span>
+                                    @elseif($member->role === 'geselle')
+                                        <span class="text-green-500 font-bold">Geselle</span>
                                     @else
-                                        Mitarbeiter
+                                        <span class="text-blue-500 font-bold">Mitarbeiter</span>
                                     @endif
                                 </div>
                             </div>

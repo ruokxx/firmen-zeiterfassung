@@ -10,6 +10,19 @@ class DashboardController extends Controller
     {
         $year = $request->input('year', date('Y'));
 
+        // Load configured defaults once per request
+        $defaultStart = \App\Models\Setting::where('key', 'default_start_time')->value('value') ?: '08:00';
+        $defaultEnd = \App\Models\Setting::where('key', 'default_end_time')->value('value') ?: '16:00';
+        $defaultBreak = \App\Models\Setting::where('key', 'default_break_duration')->value('value') !== null
+            ? (int)\App\Models\Setting::where('key', 'default_break_duration')->value('value')
+            : 0;
+
+        $start = \Carbon\Carbon::parse($defaultStart);
+        $end = \Carbon\Carbon::parse($defaultEnd);
+        $diffMinutes = $start->diffInMinutes($end);
+        $workMinutes = max(0, $diffMinutes - $defaultBreak);
+        $defaultDailyHours = round($workMinutes / 60, 2);
+
         // Get all workdays for the selected year
         $workDays = \App\Models\WorkDay::where('user_id', auth()->id())
             ->whereYear('date', $year)
@@ -64,7 +77,7 @@ class DashboardController extends Controller
                 // I will just replace the start and end of the block I am touching.
 
                 if (!$date->isWeekend()) {
-                    $targetHours += 8;
+                    $targetHours += $defaultDailyHours;
                 }
             }
 
@@ -103,6 +116,16 @@ class DashboardController extends Controller
                 return (int)\Carbon\Carbon::parse($day->date)->day;
             })->toArray();
 
+            // Get days with "Schule" entries
+            $schoolDates = $monthWorkDays->filter(function ($day) {
+                return $day->timeEntries->contains(function ($entry) {
+                        return $entry->constructionSite && $entry->constructionSite->name === 'Schule';
+                    }
+                    );
+                })->map(function ($day) {
+                return (int)\Carbon\Carbon::parse($day->date)->day;
+            })->toArray();
+
             // Get days with Holiday entries (starts with "Feiertag:")
             $holidayDates = $monthWorkDays->filter(function ($day) {
                 return $day->timeEntries->contains(function ($entry) {
@@ -121,6 +144,7 @@ class DashboardController extends Controller
                 'worked_days' => $workedDays,
                 'vacation_dates' => $vacationDates,
                 'sick_dates' => $sickDates,
+                'school_dates' => $schoolDates,
                 'folgt_dates' => $folgtDates,
                 'holiday_dates' => $holidayDates,
             ];

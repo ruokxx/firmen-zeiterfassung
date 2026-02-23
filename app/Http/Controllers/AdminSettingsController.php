@@ -68,7 +68,15 @@ class AdminSettingsController extends Controller
             'vacation_days_per_year' => 'nullable|integer|min:0',
             'material_email_enabled' => 'nullable|boolean',
             'material_email_time' => 'nullable|date_format:H:i',
-
+            'app_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'pdf_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'page_title' => 'nullable|string',
+            'help_page_title' => 'nullable|string',
+            'help_page_content' => 'nullable|string',
+            'help_page_copyright' => 'nullable|string',
+            'default_start_time' => 'nullable|date_format:H:i',
+            'default_end_time' => 'nullable|date_format:H:i',
+            'default_break_duration' => 'nullable|integer|min:0',
         ]);
 
         // Handle checkbox (if unchecked, it's missing from request, so we must set it to false if not present? 
@@ -83,6 +91,16 @@ class AdminSettingsController extends Controller
         }
         if (!$request->has('material_email_enabled')) {
             $data['material_email_enabled'] = '0';
+        }
+
+        if ($request->hasFile('app_logo')) {
+            $path = $request->file('app_logo')->store('logos', 'public');
+            $data['app_logo'] = $path;
+        }
+
+        if ($request->hasFile('pdf_logo')) {
+            $path = $request->file('pdf_logo')->store('logos', 'public');
+            $data['pdf_logo'] = $path;
         }
 
         foreach ($data as $key => $value) {

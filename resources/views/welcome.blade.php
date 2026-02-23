@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Asendorf-Elektrotechnik Zeiterfassung</title>
+    <title>{{ \App\Models\Setting::where('key', 'page_title')->value('value') ?: 'Asendorf-Elektrotechnik - Zeiterfassung' }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -68,7 +68,7 @@
     <div class="min-h-screen flex flex-col justify-center items-center relative bg-gray-900 px-4">
         
         <div class="animated-text">
-            Asendorf-Elektrotechnik - Zeiterfassung
+            {{ \App\Models\Setting::where('key', 'page_title')->value('value') ?: 'Asendorf-Elektrotechnik - Zeiterfassung' }}
         </div>
 
         {{-- Custom Logo --}}

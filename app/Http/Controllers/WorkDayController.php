@@ -9,12 +9,18 @@ class WorkDayController extends Controller
     public function edit($date)
     {
         $user = auth()->user();
+        $defaultStart = \App\Models\Setting::where('key', 'default_start_time')->value('value') ?: '08:00';
+        $defaultEnd = \App\Models\Setting::where('key', 'default_end_time')->value('value') ?: '16:00';
+        $defaultBreak = \App\Models\Setting::where('key', 'default_break_duration')->value('value') !== null
+            ? (int)\App\Models\Setting::where('key', 'default_break_duration')->value('value')
+            : 0;
+
         $workDay = $user->workDays()->firstOrCreate(
         ['date' => $date],
         [
-            'start_time' => null,
-            'end_time' => null,
-            'break_duration' => null
+            'start_time' => $defaultStart,
+            'end_time' => $defaultEnd,
+            'break_duration' => $defaultBreak
         ]
         );
 
@@ -27,20 +33,33 @@ class WorkDayController extends Controller
 
     public function setStatus(Request $request, $date)
     {
-        $status = $request->input('status'); // 'Krank', 'Urlaub' or 'Folgt nächsten Monat'
-        if (!in_array($status, ['Krank', 'Urlaub', 'Folgt nächsten Monat'])) {
+        $status = $request->input('status'); // 'Krank', 'Urlaub', 'Folgt nächsten Monat', or 'Schule'
+        if (!in_array($status, ['Krank', 'Urlaub', 'Folgt nächsten Monat', 'Schule'])) {
             return back()->with('error', 'Ungültiger Status.');
         }
 
         $user = auth()->user();
 
-        // Find or create WorkDay with standard 8h times
+        $defaultStart = \App\Models\Setting::where('key', 'default_start_time')->value('value') ?: '08:00';
+        $defaultEnd = \App\Models\Setting::where('key', 'default_end_time')->value('value') ?: '16:00';
+        $defaultBreak = \App\Models\Setting::where('key', 'default_break_duration')->value('value') !== null
+            ? (int)\App\Models\Setting::where('key', 'default_break_duration')->value('value')
+            : 0;
+
+        // Calculate hours
+        $start = \Carbon\Carbon::parse($defaultStart);
+        $end = \Carbon\Carbon::parse($defaultEnd);
+        $diffMinutes = $start->diffInMinutes($end);
+        $workMinutes = max(0, $diffMinutes - $defaultBreak);
+        $defaultHours = round($workMinutes / 60, 2);
+
+        // Find or create WorkDay with configured times
         $workDay = $user->workDays()->updateOrCreate(
         ['date' => $date],
         [
-            'start_time' => '08:00',
-            'end_time' => '16:00',
-            'break_duration' => 0
+            'start_time' => $defaultStart,
+            'end_time' => $defaultEnd,
+            'break_duration' => $defaultBreak
         ]
         );
 
@@ -53,10 +72,10 @@ class WorkDayController extends Controller
         ['status' => 'active']
         );
 
-        // Add 8h entry
+        // Add calculated entry
         $workDay->timeEntries()->create([
             'construction_site_id' => $site->id,
-            'hours' => 8
+            'hours' => $defaultHours
         ]);
 
         return back()->with('success', "$status für $date wurde eingetragen.");
