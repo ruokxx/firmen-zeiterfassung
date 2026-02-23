@@ -13,6 +13,10 @@ Folgende Materialien müssen noch bestellt werden:
 
 Bitte prüfen und bestellen.
 
+<x-mail::button :url="route('material-orders.index')">
+Zu den Materialbestellungen
+</x-mail::button>
+
 Mit freundlichen Grüßen,<br>
 {{ config('app.name') }}
 </x-mail::message>
