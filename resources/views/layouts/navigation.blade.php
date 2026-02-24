@@ -1,41 +1,62 @@
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
 <nav x-data="{ open: false }" class="bg-gray-900 border-b border-gray-800">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center">
                 <!-- Navigation Links (Buttons) -->
-                <div class="hidden space-x-4 sm:-my-px sm:flex">
+                <div class="hidden sm:-my-px sm:flex sm:items-center sm:gap-4 overflow-x-auto no-scrollbar">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" 
-                        class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('dashboard') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                        class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('dashboard') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('help')" :active="request()->routeIs('help')" 
-                        class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('help') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                        class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('help') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                         {{ __('Hilfe & FAQ') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" 
-                        class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('material-orders.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                        class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('material-orders.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                         {{ __('Material Bestellungen') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')" 
+                        class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('materials.index') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                        {{ __('Lager') }}
+                    </x-nav-link>
+
+                    @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
+                        <x-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')" 
+                            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('materials.manage') || request()->routeIs('materials.stats') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            {{ __('Materialverwaltung') }}
+                        </x-nav-link>
+                    @endif
+
                     @if(auth()->user()->is_admin)
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" 
-                            class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('admin.dashboard') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                             {{ __('Chef Bereich') }}
                         </x-nav-link>
 
                         @if(auth()->user()->is_super_admin)
                             <x-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" 
-                                class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.settings') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}"
+                                class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('admin.settings') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}"
                                 onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
                                 {{ __('Einstellungen') }}
                             </x-nav-link>
                         @endif
 
                         <x-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" 
-                            class="px-4 py-2 rounded-md font-semibold transition {{ request()->routeIs('admin.documents.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('admin.documents.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                             {{ __('Dokument an alle senden') }}
                         </x-nav-link>
                     @endif
@@ -102,6 +123,16 @@
             <x-responsive-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">
                 {{ __('Material Bestellungen') }}
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                {{ __('Lager') }}
+            </x-responsive-nav-link>
+
+            @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
+                <x-responsive-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                    {{ __('Materialverwaltung') }}
+                </x-responsive-nav-link>
+            @endif
 
             @if(auth()->user()->is_admin)
                 <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-gray-300 hover:text-white hover:bg-gray-800">

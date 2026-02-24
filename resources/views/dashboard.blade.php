@@ -228,6 +228,9 @@
                                     @else
                                         <span class="text-yellow-500 font-bold">Mitarbeiter</span>
                                     @endif
+                                    @if($member->is_materialwart)
+                                        <span class="text-gray-400 font-bold ml-1 text-[10px] uppercase">(Materialwart)</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>

@@ -9,16 +9,18 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AdminMessageMail extends Mailable
+class MaterialReminderMail extends Mailable
 {
     use Queueable, SerializesModels;
+
+    public $user;
 
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($user)
     {
-    //
+        $this->user = $user;
     }
 
     /**
@@ -28,8 +30,8 @@ class AdminMessageMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Admin Message Mail')
-            ->markdown('emails.admin_message');
+        return $this->subject('Erinnerung: Materialbuchung')
+            ->markdown('emails.materials.reminder');
     }
 
     /**

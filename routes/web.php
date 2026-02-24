@@ -89,6 +89,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/material-orders/{order}/toggle', [\App\Http\Controllers\MaterialOrderController::class , 'toggle'])->name('material-orders.toggle');
     Route::patch('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'update'])->name('material-orders.update');
     Route::delete('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'destroy'])->name('material-orders.destroy');
+
+    // Materials (Lager & Verwaltung)
+    Route::get('/materials', [\App\Http\Controllers\MaterialController::class , 'index'])->name('materials.index');
+    Route::post('/materials/{material}/transaction', [\App\Http\Controllers\MaterialController::class , 'transaction'])->name('materials.transaction');
+    Route::get('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'manage'])->name('materials.manage');
+    Route::post('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'store'])->name('materials.store');
+    Route::put('/admin/materials/{material}', [\App\Http\Controllers\MaterialController::class , 'update'])->name('materials.update');
+    Route::delete('/admin/materials/{material}', [\App\Http\Controllers\MaterialController::class , 'destroy'])->name('materials.destroy');
+    Route::get('/admin/materials/stats', [\App\Http\Controllers\MaterialController::class , 'stats'])->name('materials.stats');
+    Route::post('/admin/materials/settings', [\App\Http\Controllers\MaterialController::class , 'updateSettings'])->name('materials.settings.update');
 });
 
 require __DIR__ . '/auth.php';

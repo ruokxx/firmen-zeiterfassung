@@ -24,6 +24,23 @@ class Kernel extends ConsoleKernel
             // If DB is not available (e.g., during migrations), fallback
             $schedule->command('material-orders:send')->dailyAt('08:00');
         }
+
+        try {
+            $dailyReportTime = \App\Models\Setting::where('key', 'material_daily_report_time')->value('value') ?? '18:00';
+            $schedule->command('materials:send-daily-report')->dailyAt($dailyReportTime);
+        }
+        catch (\Exception $e) {
+            $schedule->command('materials:send-daily-report')->dailyAt('18:00');
+        }
+
+        try {
+            $reminderTime = \App\Models\Setting::where('key', 'material_reminder_time')->value('value') ?? '17:00';
+            $schedule->command('materials:send-reminders')->dailyAt($reminderTime);
+        }
+        catch (\Exception $e) {
+            // If DB is not available, run at default time
+            $schedule->command('materials:send-reminders')->dailyAt('17:00');
+        }
     }
 
     /**

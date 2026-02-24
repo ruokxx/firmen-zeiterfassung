@@ -35,6 +35,8 @@ class User extends Authenticatable
         'language',
         'daily_reminder_enabled',
         'vacation_days_per_year',
+        'is_materialwart',
+        'daily_material_reminder_enabled',
     ];
 
     /**
@@ -61,6 +63,7 @@ class User extends Authenticatable
         'is_active' => 'boolean',
         'must_change_password' => 'boolean',
         'daily_reminder_enabled' => 'boolean',
+        'is_materialwart' => 'boolean',
     ];
 
     public function getIsAdminAttribute(): bool

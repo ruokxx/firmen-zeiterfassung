@@ -50,17 +50,22 @@ class AdminController extends Controller
     }
     public function updateRole(Request $request, \App\Models\User $user)
     {
-        if (!auth()->user()->is_admin) {
+        if (!auth()->user()->is_admin && !auth()->user()->is_chef) {
             abort(403);
-        }
-
-        if ($user->id === auth()->id()) {
-            return back()->with('error', 'Du kannst deine eigene Rolle nicht ändern.');
         }
 
         $request->validate([
             'role' => 'required|in:employee,chef,admin,azubi,geselle',
         ]);
+
+        // If the user being modified is an admin, and their new role is NOT admin,
+        // we must ensure there is at least one OTHER admin left in the system.
+        if ($user->role === 'admin' && $request->role !== 'admin') {
+            $adminCount = \App\Models\User::where('role', 'admin')->count();
+            if ($adminCount <= 1) {
+                return back()->with('error', 'Fehler: Es muss mindestens ein Admin im System verbleiben!');
+            }
+        }
 
         // Only Super Admins can make other Admins
         if ($request->role === 'admin' && !auth()->user()->is_super_admin) {
@@ -68,9 +73,10 @@ class AdminController extends Controller
         }
 
         $user->role = $request->role;
+        $user->is_materialwart = $request->has('is_materialwart');
         $user->save();
 
-        return back()->with('success', "Rolle von {$user->name} wurde auf {$request->role} geändert.");
+        return back()->with('success', "Daten von {$user->name} wurden erfolgreich aktualisiert.");
     }
 
     public function approve(\App\Models\User $user)

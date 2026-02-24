@@ -71,6 +71,43 @@
                     </form>
                 </div>
 
+                <!-- Material Settings -->
+                <div class="mb-8 border-b border-gray-700 pb-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-100">Lagereinstellungen & Benachrichtigungen</h3>
+                    <form method="POST" action="{{ route('materials.settings.update') }}" class="bg-gray-900 border border-gray-700 rounded-lg p-4">
+                        @csrf
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <x-input-label for="low_stock_email_address" :value="__('E-Mail für Warnungen und Tagesbericht')" />
+                                <x-text-input id="low_stock_email_address" class="block mt-1 w-full" type="email" name="low_stock_email_address" :value="old('low_stock_email_address', \App\Models\Setting::where('key', 'low_stock_email_address')->value('value') ?? '')" placeholder="z.B. chef@firma.de" />
+                                <p class="text-sm text-gray-400 mt-1">Lass dieses Feld leer, wenn keine E-Mails verschickt werden sollen.</p>
+
+                                <div class="mt-6">
+                                    <label for="material_reminder_time" class="block text-sm font-medium text-gray-300">Uhrzeit für automatische Erinnerung (Mitarbeiter/Gesellen)</label>
+                                    <input type="time" name="material_reminder_time" id="material_reminder_time" value="{{ old('material_reminder_time', \App\Models\Setting::where('key', 'material_reminder_time')->value('value') ?? '17:00') }}" class="mt-1 block w-32 bg-gray-800 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                    <p class="text-xs text-gray-500 mt-1">Sendet täglich an alle, die kein Material entnommen haben. Im Profil von jedem deaktivierbar.</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 md:pt-0">
+                                <div class="flex items-center gap-2 mb-2 md:mt-6">
+                                    <input type="checkbox" name="material_daily_report_enabled" id="material_daily_report_enabled" value="1" {{ \App\Models\Setting::where('key', 'material_daily_report_enabled')->value('value') === '1' ? 'checked' : '' }} class="rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-orange-500">
+                                    <label for="material_daily_report_enabled" class="text-sm font-medium text-gray-300">Täglichen Bericht an Chef senden</label>
+                                </div>
+                                <div class="ml-6">
+                                    <label for="material_daily_report_time" class="block text-xs font-medium text-gray-400">Uhrzeit für den Versand</label>
+                                    <input type="time" name="material_daily_report_time" id="material_daily_report_time" value="{{ old('material_daily_report_time', \App\Models\Setting::where('key', 'material_daily_report_time')->value('value') ?? '18:00') }}" class="mt-1 block w-32 bg-gray-800 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded text-sm transition h-10 w-full sm:w-auto">
+                                Speichern
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
                 <h3 class="text-lg font-bold mb-4 text-gray-100">Mitarbeiter Übersicht</h3>
                 
                 <div class="space-y-6">
@@ -96,7 +133,6 @@
                                         </a>
                                     </div>
                                     
-                                    @if($user->id !== auth()->id())
                                         <div class="mt-4 pt-4 border-t border-gray-700 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-center gap-4" @click.stop>
                                             {{-- Role Update --}}
                                             <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -112,30 +148,37 @@
                                                         <option value="admin" selected disabled>Admin</option>
                                                     @endif
                                                 </select>
+                                                
+                                                <div class="flex items-center ml-2 border border-gray-600 rounded px-2 py-1.5 bg-gray-800 w-full sm:w-auto">
+                                                    <input type="checkbox" name="is_materialwart" id="is_materialwart_{{ $user->id }}" value="1" {{ $user->is_materialwart ? 'checked' : '' }} class="rounded border-gray-600 bg-gray-900 text-orange-500 focus:ring-orange-500">
+                                                    <label for="is_materialwart_{{ $user->id }}" class="ml-2 text-xs text-gray-300 whitespace-nowrap">Materialwart</label>
+                                                </div>
+
                                                 <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition w-full sm:w-auto">
                                                     Speichern
                                                 </button>
                                             </form>
 
-                                            {{-- Vacation Days Update --}}
-                                            <form method="POST" action="{{ route('admin.users.update-vacation-days', $user) }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                                @csrf
-                                                <input type="number" name="vacation_days_per_year" value="{{ $user->vacation_days_per_year }}" placeholder="Global ({{ \App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30 }})" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 w-full sm:w-28 py-1.5" min="0">
-                                                <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition whitespace-nowrap w-full sm:w-auto text-center">
-                                                    Urlaub speichern
-                                                </button>
-                                            </form>
+                                            @if($user->id !== auth()->id())
+                                                {{-- Vacation Days Update --}}
+                                                <form method="POST" action="{{ route('admin.users.update-vacation-days', $user) }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                                    @csrf
+                                                    <input type="number" name="vacation_days_per_year" value="{{ $user->vacation_days_per_year }}" placeholder="Global ({{ \App\Models\Setting::where('key', 'vacation_days_per_year')->value('value') ?: 30 }})" class="bg-gray-800 text-gray-200 border-gray-600 rounded text-xs focus:ring-orange-500 focus:border-orange-500 w-full sm:w-28 py-1.5" min="0">
+                                                    <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition whitespace-nowrap w-full sm:w-auto text-center">
+                                                        Urlaub speichern
+                                                    </button>
+                                                </form>
 
-                                            {{-- Delete User --}}
-                                            <form method="POST" action="{{ route('admin.users.delete', $user) }}" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Daten (Arbeitszeiten, Berichte) werden unwiderruflich gelöscht.');" class="col-span-1 sm:col-span-2 lg:col-span-1 border-t border-gray-700 pt-2 lg:border-t-0 lg:pt-0">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-xs font-semibold px-3 py-2 rounded border border-red-800 bg-red-900/30 text-red-500 hover:bg-red-900/50 transition w-full text-center">
-                                                    Benutzer löschen
-                                                </button>
-                                            </form>
+                                                {{-- Delete User --}}
+                                                <form method="POST" action="{{ route('admin.users.delete', $user) }}" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen? Alle zugehörigen Daten (Arbeitszeiten, Berichte) werden unwiderruflich gelöscht.');" class="col-span-1 sm:col-span-2 lg:col-span-1 border-t border-gray-700 pt-2 lg:border-t-0 lg:pt-0">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-xs font-semibold px-3 py-2 rounded border border-red-800 bg-red-900/30 text-red-500 hover:bg-red-900/50 transition w-full text-center">
+                                                        Benutzer löschen
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
-                                    @endif
                                 </div>
                                 <div class="flex items-center text-gray-500">
                                     <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

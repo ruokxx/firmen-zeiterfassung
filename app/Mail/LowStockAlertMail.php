@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AdminMessageMail extends Mailable
+class LowStockAlertMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -28,8 +28,8 @@ class AdminMessageMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Admin Message Mail')
-            ->markdown('emails.admin_message');
+        return $this->subject('Low Stock Alert Mail')
+            ->markdown('emails.materials.low_stock');
     }
 
     /**

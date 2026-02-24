@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration 
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('materials', function (Blueprint $table) {
+            $table->integer('stock_count')->default(0)->after('name');
+            $table->integer('low_stock_threshold')->default(2)->after('stock_count');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('materials', function (Blueprint $table) {
+            $table->dropColumn(['stock_count', 'low_stock_threshold']);
+        });
+    }
+};

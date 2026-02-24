@@ -10,7 +10,7 @@
             
             @php
                 $settings = \App\Models\Setting::all()->pluck('value', 'key');
-                $defaultHelpText = "Dies ist Ihre zentrale Plattform für Arbeitszeiterfassung, Urlaubsplanung und Materialbestellungen. Hier finden Sie eine Übersicht über Ihre geleisteten Stunden, können Ihren Status pflegen und wichtige Dokumente einsehen.<br><br><strong>Arbeitszeiterfassung:</strong> Erfassen Sie Ihre täglichen Arbeitszeiten über das Dashboard oder die Tagesansicht.<br><br><strong>Kalender & Status:</strong> Nutzen Sie die Monatsübersicht, um Tage als \"Urlaub\" (U) oder \"Krank\" (K) zu markieren.<br><br><strong>Material Bestellungen:</strong> Bestellen Sie benötigtes Material direkt über das System.";
+                $defaultHelpText = "Dies ist Ihre zentrale Plattform für Arbeitszeiterfassung, Urlaubsplanung und Materialbestellungen. Hier finden Sie eine Übersicht über Ihre geleisteten Stunden, können Ihren Status pflegen und wichtige Dokumente einsehen.<br><br><strong>Arbeitszeiterfassung:</strong> Erfassen Sie Ihre täglichen Arbeitszeiten über das Dashboard oder die Tagesansicht.<br><br><strong>Kalender & Status:</strong> Nutzen Sie die Monatsübersicht, um Tage als \"Urlaub\" (U) oder \"Krank\" (K) zu markieren.<br><br><strong>Lager & Material:</strong> Im Reiter 'Lager' sehen Sie unsere aktuellen Bestände. Wenn Sie Material entnehmen, buchen Sie es hier aus. Fällt der Bestand unter ein Minimum, generiert das System automatisch eine Materialbestellung.<br><br><strong>Material Bestellungen:</strong> Werfen Sie hier einen Blick auf offene Bestellungen oder tragen Sie benötigte Sonder-Artikel direkt ein.";
             @endphp
             
             <!-- Welcome / Intro -->

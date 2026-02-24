@@ -22,6 +22,7 @@ class ProfileUpdateRequest extends FormRequest
             'mobile_number' => ['required', 'string', 'max:20'],
             'language' => ['required', 'string', 'in:de,en'],
             'daily_reminder_enabled' => ['boolean'],
+            'daily_material_reminder_enabled' => ['boolean'],
             'google_calendar_url' => ['nullable', 'url', 'active_url'],
             'trello_url' => ['nullable', 'url', 'active_url'],
         ];
