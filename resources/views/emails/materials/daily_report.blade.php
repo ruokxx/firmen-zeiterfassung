@@ -19,7 +19,11 @@
     <div class="container">
         <div class="header">
             <h2 style="margin: 0; color: #111827;">Täglicher Materialbericht</h2>
-            <p style="margin: 5px 0 0 0; color: #6b7280;">Übersicht der heutigen Entnahmen am {{ $date }}</p>
+            @if(isset($customBody) && !empty($customBody))
+                <p style="margin: 5px 0 0 0; color: #6b7280; white-space: pre-wrap;">{{ $customBody }}</p>
+            @else
+                <p style="margin: 5px 0 0 0; color: #6b7280;">Übersicht der heutigen Entnahmen am {{ $date }}</p>
+            @endif
         </div>
 
         @if($transactions->isEmpty())

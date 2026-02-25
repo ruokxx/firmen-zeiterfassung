@@ -1,8 +1,11 @@
 <x-mail::message>
 # Offene Materialbestellungen
 
+@if(isset($customBody) && !empty($customBody))
+{{ $customBody }}
+@else
 Folgende Materialien müssen noch bestellt werden:
-
+@endif
 <x-mail::table>
 | Material | Name des Mitarbeiters |
 | :--- | :--- |

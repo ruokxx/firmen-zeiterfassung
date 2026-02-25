@@ -26,7 +26,14 @@ class DailyReminderMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Erinnerung: Arbeitszeit noch nicht vollständig')
-            ->view('emails.daily_reminder');
+        $subject = \App\Models\Setting::where('key', 'email_template_daily_reminder_subject')->value('value') ?: 'Erinnerung: Arbeitszeit noch nicht vollständig';
+        $subject = str_replace('{name}', $this->user->name, $subject);
+
+        $body = \App\Models\Setting::where('key', 'email_template_daily_reminder_body')->value('value') ?: "Hallo {name},\n\ndu hast für heute noch keine Arbeitszeit eingetragen oder deine 8h noch nicht voll.\nBitte denk daran, diese noch zu erfassen.\n\nMit freundlichen Grüßen,\nDein Team";
+        $body = str_replace('{name}', $this->user->name, $body);
+
+        return $this->subject($subject)
+            ->view('emails.daily_reminder')
+            ->with(['customBody' => $body]);
     }
 }

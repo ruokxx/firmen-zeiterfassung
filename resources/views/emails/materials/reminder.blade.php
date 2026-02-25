@@ -1,10 +1,14 @@
 @component('mail::message')
 # Erinnerung: Material entnommen?
 
+@if(isset($customBody) && !empty($customBody))
+{{ $customBody }}
+@else
 Hallo {{ $user->first_name }},
 
 hast du heute Material aus dem Lager entnommen? Falls ja, trage dieses bitte noch schnell im System ein. 
 Dies hilft uns, den Überblick über die Bestände zu behalten und rechtzeitig neues Material zu bestellen.
+@endif
 
 @component('mail::button', ['url' => route('materials.index')])
 Zum Lager

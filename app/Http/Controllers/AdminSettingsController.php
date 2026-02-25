@@ -130,6 +130,27 @@ class AdminSettingsController extends Controller
         return back()->with('success', 'Urlaubstage erfolgreich gespeichert.');
     }
 
+    public function updateEmailTemplate(Request $request)
+    {
+        if (!auth()->user()->is_super_admin) {
+            abort(403);
+        }
+
+        // We expect requests like: template_key_prefix (e.g. 'account_approved')
+        $request->validate([
+            'template_key' => 'required|string',
+            'subject' => 'required|string',
+            'body' => 'required|string',
+        ]);
+
+        $prefix = $request->input('template_key');
+
+        Setting::updateOrCreate(['key' => $prefix . '_subject'], ['value' => $request->input('subject')]);
+        Setting::updateOrCreate(['key' => $prefix . '_body'], ['value' => $request->input('body')]);
+
+        return back()->with('success', 'E-Mail Vorlage erfolgreich gespeichert.');
+    }
+
     public function testMaterialEmail()
     {
         if (!auth()->user()->is_admin) {

@@ -9,9 +9,13 @@
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
         <h2 style="color: #d9534f;">Achtung: Geringer Lagerbestand!</h2>
         
-        <p>Hallo,</p>
-        
-        <p>das Material <strong>{{ $material->name }}</strong> hat den Mindestbestand erreicht oder unterschritten.</p>
+        @if(isset($customBody) && !empty($customBody))
+            <p style="white-space: pre-wrap;">{{ $customBody }}</p>
+        @else
+            <p>Hallo,</p>
+            
+            <p>das Material <strong>{{ $material->name }}</strong> hat den Mindestbestand erreicht oder unterschritten.</p>
+        @endif
         
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
             <tr>

@@ -36,8 +36,15 @@ class DailyMaterialReportMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Täglicher Materialbericht - ' . $this->date)
-            ->view('emails.materials.daily_report');
+        $subject = \App\Models\Setting::where('key', 'email_template_daily_material_report_subject')->value('value') ?: 'Täglicher Materialbericht - {date}';
+        $subject = str_replace('{date}', $this->date, $subject);
+
+        $body = \App\Models\Setting::where('key', 'email_template_daily_material_report_body')->value('value') ?: "Hallo,\n\nanbei die heutige Übersicht der Materialentnahmen vom {date}.";
+        $body = str_replace('{date}', $this->date, $body);
+
+        return $this->subject($subject)
+            ->view('emails.materials.daily_report')
+            ->with(['customBody' => $body]);
     }
 
     /**

@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/settings', [\App\Http\Controllers\AdminSettingsController::class , 'index'])->name('admin.settings');
     Route::post('/admin/settings', [\App\Http\Controllers\AdminSettingsController::class , 'update'])->name('admin.settings.update');
     Route::post('/admin/settings/vacation', [\App\Http\Controllers\AdminSettingsController::class , 'updateVacation'])->name('admin.settings.update-vacation');
+    Route::post('/admin/settings/email-template', [\App\Http\Controllers\AdminSettingsController::class , 'updateEmailTemplate'])->name('admin.settings.update-email-template');
     Route::post('/admin/settings/test-material-email', [\App\Http\Controllers\AdminSettingsController::class , 'testMaterialEmail'])->name('admin.settings.test-material-email');
 
     // Admin Documents

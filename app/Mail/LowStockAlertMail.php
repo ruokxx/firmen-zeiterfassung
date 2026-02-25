@@ -13,12 +13,14 @@ class LowStockAlertMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $material;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($material)
     {
-    //
+        $this->material = $material;
     }
 
     /**
@@ -28,8 +30,19 @@ class LowStockAlertMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Low Stock Alert Mail')
-            ->markdown('emails.materials.low_stock');
+        $subject = \App\Models\Setting::where('key', 'email_template_low_stock_subject')->value('value') ?: 'Lager-Warnung: {material_name} geht zur Neige';
+        $subject = str_replace('{material_name}', $this->material->name, $subject);
+
+        $body = \App\Models\Setting::where('key', 'email_template_low_stock_body')->value('value') ?: "Hallo,\n\ndas Material {material_name} hat die Warnschwelle erreicht oder unterschritten.\nAktueller Bestand: {stock} (Warnschwelle: {warning_threshold})\n\nBitte nachbestellen!";
+        $body = str_replace(
+        ['{material_name}', '{stock}', '{warning_threshold}'],
+        [$this->material->name, $this->material->stock, $this->material->warning_threshold],
+            $body
+        );
+
+        return $this->subject($subject)
+            ->markdown('emails.materials.low_stock')
+            ->with(['customBody' => $body]);
     }
 
     /**

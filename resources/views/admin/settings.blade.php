@@ -91,44 +91,6 @@
                                 </div>
                             </div>
 
-                            <!-- Monthly Report Email Settings -->
-                            <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
-                                <h4 class="text-md font-medium text-gray-200 mb-4">E-Mail Text für Monatsbericht</h4>
-                                 
-                                <div class="grid grid-cols-1 gap-6">
-                                    <div>
-                                        <x-input-label for="monthly_report_subject" :value="__('Betreff')" />
-                                        <x-text-input id="monthly_report_subject" class="block mt-1 w-full" type="text" name="monthly_report_subject" :value="old('monthly_report_subject', $settings->get('monthly_report_subject', 'Monatsbericht {month} {year}'))" />
-                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {month}, {year}, {name}</p>
-                                    </div>
-
-                                    <div>
-                                        <x-input-label for="monthly_report_body" :value="__('E-Mail Text')" />
-                                        <textarea id="monthly_report_body" name="monthly_report_body" rows="5" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-900 text-gray-300 border-gray-700">{{ old('monthly_report_body', $settings->get('monthly_report_body', "Hallo,\n\nanbei erhalten Sie den Monatsbericht von {name} für {month} {year}.\n\nMit freundlichen Grüßen,\n" . config('app.name'))) }}</textarea>
-                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {month}, {year}, {name}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Account Approved Email Settings -->
-                            <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
-                                <h4 class="text-md font-medium text-gray-200 mb-4">E-Mail Text für Account Freischaltung</h4>
-                                 
-                                <div class="grid grid-cols-1 gap-6">
-                                    <div>
-                                        <x-input-label for="account_approved_subject" :value="__('Betreff')" />
-                                        <x-text-input id="account_approved_subject" class="block mt-1 w-full" type="text" name="account_approved_subject" :value="old('account_approved_subject', $settings->get('account_approved_subject', 'Dein Account wurde freigeschaltet'))" />
-                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {name}, {app_name}</p>
-                                    </div>
-
-                                    <div>
-                                        <x-input-label for="account_approved_body" :value="__('E-Mail Text')" />
-                                        <textarea id="account_approved_body" name="account_approved_body" rows="5" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-900 text-gray-300 border-gray-700">{{ old('account_approved_body', $settings->get('account_approved_body', "Hallo {name},\n\nDein Account wurde erfolgreich freigeschaltet.\nDu kannst dich nun einloggen und deine Arbeitszeiten erfassen.\n\nZum Login: {login_url}\n\nMit freundlichen Grüßen,\n{app_name}")) }}</textarea>
-                                        <p class="text-sm text-gray-400 mt-1">Platzhalter: {name}, {login_url}, {app_name}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Auto Backup Settings -->
                         <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
@@ -309,6 +271,146 @@
                     <form id="test-material-email-form" method="POST" action="{{ route('admin.settings.test-material-email') }}" class="hidden">
                         @csrf
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @php
+        $emailTemplates = [
+            [
+                'id' => 1,
+                'title' => 'Account freigeschaltet',
+                'prefix' => 'email_template_account_approved',
+                'placeholders' => '{name}, {app_name}, {login_url}',
+                'default_subject' => 'Dein Account wurde freigeschaltet',
+                'default_body' => "Hallo {name},\n\nDein Account wurde erfolgreich freigeschaltet.\nDu kannst dich nun einloggen und deine Arbeitszeiten erfassen.\n\nZum Login: {login_url}\n\nMit freundlichen Grüßen,\n{app_name}",
+            ],
+            [
+                'id' => 2,
+                'title' => 'Neuer Benutzer registriert (An Admin)',
+                'prefix' => 'email_template_new_user',
+                'placeholders' => '{name}, {email}, {admin_url}',
+                'default_subject' => 'Neuer Benutzer registriert: {name}',
+                'default_body' => "Hallo,\n\nEin neuer Benutzer hat sich gerade registriert.\n\nName: {name}\nE-Mail: {email}\n\nBitte prüfe die Daten und schalte den Account frei.\nZum Admin-Bereich: {admin_url}",
+            ],
+            [
+                'id' => 3,
+                'title' => 'Monatsbericht (PDF)',
+                'prefix' => 'monthly_report',
+                'placeholders' => '{month}, {year}, {name}',
+                'default_subject' => 'Monatsbericht {month} {year}',
+                'default_body' => "Hallo,\n\nanbei erhalten Sie den Monatsbericht von {name} für {month} {year}.\n\nMit freundlichen Grüßen,\n" . config('app.name'),
+            ],
+            [
+                'id' => 4,
+                'title' => 'Tägliche Erinnerung (Fehlende Arbeitszeit)',
+                'prefix' => 'email_template_daily_reminder',
+                'placeholders' => '{name}',
+                'default_subject' => 'Erinnerung: Arbeitszeit noch nicht vollständig',
+                'default_body' => "Hallo {name},\n\ndu hast für heute noch keine Arbeitszeit eingetragen oder deine 8h noch nicht voll.\nBitte denk daran, diese noch zu erfassen.\n\nMit freundlichen Grüßen,\nDein Team",
+            ],
+            [
+                'id' => 5,
+                'title' => 'Tägliche Erinnerung (Fehlende Materialbuchung)',
+                'prefix' => 'email_template_material_reminder',
+                'placeholders' => '{name}',
+                'default_subject' => 'Erinnerung: Materialbuchung',
+                'default_body' => "Hallo {name},\n\ndu hast heute Arbeitszeit erfasst, aber keine Materialentnahme am Lager ausgebucht.\nWenn du Material entnommen hast, hole die Buchung bitte noch nach.\n\nMit freundlichen Grüßen,\nDein Team",
+            ],
+            [
+                'id' => 6,
+                'title' => 'Lager-Warnung (Mindestbestand erreicht)',
+                'prefix' => 'email_template_low_stock',
+                'placeholders' => '{material_name}, {stock}, {warning_threshold}',
+                'default_subject' => 'Lager-Warnung: {material_name} geht zur Neige',
+                'default_body' => "Hallo,\n\ndas Material {material_name} hat die Warnschwelle erreicht oder unterschritten.\nAktueller Bestand: {stock} (Warnschwelle: {warning_threshold})\n\nBitte nachbestellen!",
+            ],
+            [
+                'id' => 7,
+                'title' => 'Täglicher Materialbericht',
+                'prefix' => 'email_template_daily_material_report',
+                'placeholders' => '{date}',
+                'default_subject' => 'Täglicher Materialbericht - {date}',
+                'default_body' => "Hallo,\n\nanbei die heutige Übersicht der Materialentnahmen vom {date}.",
+            ],
+            [
+                'id' => 8,
+                'title' => 'Offene Materialbestellungen',
+                'prefix' => 'email_template_open_material_orders',
+                'placeholders' => '(Keine Variablen)',
+                'default_subject' => 'Offene Materialbestellungen',
+                'default_body' => "Hallo,\n\nes gibt aktuell unbestellte Materialbestellungen in der Warteschlange, die zur Prüfung bereitstehen.",
+            ],
+        ];
+    @endphp
+
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-700 p-6 text-gray-100">
+                <h3 class="text-lg font-bold mb-4">E-Mail Vorlagen bearbeiten</h3>
+                <p class="text-sm text-gray-400 mb-6">Hier kannst du die Betreffzeilen und die Textblöcke aller vom System versendeten E-Mails anpassen. Klicke auf eine Vorlage, um sie zu bearbeiten.</p>
+
+                <div x-data="{ activeAccordion: null }" class="space-y-3">
+                    @foreach($emailTemplates as $template)
+                        <div class="border border-gray-700 rounded-md bg-gray-900 overflow-hidden">
+                            <!-- Accordion Header -->
+                            <button 
+                                @click="activeAccordion = activeAccordion === {{ $template['id'] }} ? null : {{ $template['id'] }}" 
+                                class="w-full flex justify-between items-center px-4 py-3 bg-gray-800 hover:bg-gray-700 transition focus:outline-none"
+                            >
+                                <span class="font-medium text-gray-200">{{ $template['title'] }}</span>
+                                <svg 
+                                    class="w-5 h-5 text-gray-400 transform transition-transform duration-200" 
+                                    :class="{ 'rotate-180': activeAccordion === {{ $template['id'] }} }" 
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Accordion Body -->
+                            <div 
+                                x-show="activeAccordion === {{ $template['id'] }}" 
+                                x-collapse 
+                                x-cloak
+                                class="px-4 py-4 border-t border-gray-700"
+                            >
+                                <form method="POST" action="{{ route('admin.settings.update-email-template') }}">
+                                    @csrf
+                                    <input type="hidden" name="template_key" value="{{ $template['prefix'] }}">
+
+                                    <div class="mb-4">
+                                        <label class="block font-medium text-sm text-gray-300 mb-1">Betreff</label>
+                                        <input 
+                                            type="text" 
+                                            name="subject" 
+                                            value="{{ App\Models\Setting::where('key', $template['prefix'] . '_subject')->value('value') ?: $template['default_subject'] }}" 
+                                            class="block w-full border-gray-600 bg-gray-800 text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        >
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="block font-medium text-sm text-gray-300 mb-1">Textinhalt</label>
+                                        <textarea 
+                                            name="body" 
+                                            rows="4" 
+                                            class="block w-full border-gray-600 bg-gray-800 text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        >{{ App\Models\Setting::where('key', $template['prefix'] . '_body')->value('value') ?: $template['default_body'] }}</textarea>
+                                    </div>
+
+                                    <div class="flex justify-between items-center mt-4">
+                                        <div class="text-xs text-gray-400">
+                                            <strong>Platzhalter:</strong> <span class="text-indigo-400">{{ $template['placeholders'] }}</span>
+                                        </div>
+                                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-1.5 px-4 rounded text-sm transition">
+                                            Vorlage speichern
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
