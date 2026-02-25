@@ -62,8 +62,7 @@ class SendDailyMaterialReminderCommand extends Command
 
         $eligibleUsers = User::where('is_active', true)
             ->where('daily_material_reminder_enabled', true)
-            ->where('is_admin', false)
-            ->where('is_chef', false)
+            ->whereIn('role', ['employee', 'geselle'])
             ->get();
 
         foreach ($eligibleUsers as $user) {

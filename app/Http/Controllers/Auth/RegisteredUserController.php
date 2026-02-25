@@ -49,7 +49,9 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         // Notify admins and chefs
-        $admins = User::where('is_admin', true)->orWhere('is_chef', true)->get();
+        $admins = User::whereIn('role', ['admin', 'chef'])
+            ->orWhere('is_admin', true)
+            ->get();
         foreach ($admins as $admin) {
             \Illuminate\Support\Facades\Mail::to($admin)->send(new \App\Mail\NewUserRegistered($user));
         }
