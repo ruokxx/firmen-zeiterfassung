@@ -68,12 +68,12 @@ class User extends Authenticatable
 
     public function getIsAdminAttribute(): bool
     {
-        return in_array($this->role, ['admin', 'chef']);
+        return $this->attributes['is_admin'] || in_array($this->role, ['admin', 'chef']);
     }
 
     public function getIsSuperAdminAttribute(): bool
     {
-        return $this->role === 'admin';
+        return (isset($this->attributes['is_super_admin']) && $this->attributes['is_super_admin']) || $this->role === 'admin';
     }
 
     // Keep existing method for compatibility, but check for both roles

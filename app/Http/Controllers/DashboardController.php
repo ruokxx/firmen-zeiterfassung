@@ -186,7 +186,9 @@ class DashboardController extends Controller
         // Fetch Team List
         $team = \App\Models\User::orderBy('name')->where('is_active', true)->get();
 
-        return view('dashboard', compact('year', 'months', 'yearlyTotal', 'daysWorked', 'totalWorkingDays', 'progressPercentage', 'team'));
+        $hasLowStock = \App\Models\Material::whereColumn('stock_count', '<=', 'low_stock_threshold')->exists();
+
+        return view('dashboard', compact('year', 'months', 'yearlyTotal', 'daysWorked', 'totalWorkingDays', 'progressPercentage', 'team', 'hasLowStock'));
     }
 
     private function getHolidaysNI($year)

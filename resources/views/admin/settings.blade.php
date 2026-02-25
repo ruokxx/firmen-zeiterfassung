@@ -202,6 +202,52 @@
                             </div>
                         </div>
 
+                        <!-- Role Colors Settings -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Farben der Mitarbeiter Rollen (Dashboard Team-Liste)</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                                <div>
+                                    <x-input-label for="role_color_admin" :value="__('Admin')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="role_color_admin" name="role_color_admin" value="{{ old('role_color_admin', $settings->get('role_color_admin', '#f97316')) }}" class="p-0 border-0 h-8 w-10 bg-transparent cursor-pointer rounded">
+                                        <span class="text-xs text-gray-400 font-mono">{{ old('role_color_admin', $settings->get('role_color_admin', '#f97316')) }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="role_color_chef" :value="__('Chef')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="role_color_chef" name="role_color_chef" value="{{ old('role_color_chef', $settings->get('role_color_chef', '#eab308')) }}" class="p-0 border-0 h-8 w-10 bg-transparent cursor-pointer rounded">
+                                        <span class="text-xs text-gray-400 font-mono">{{ old('role_color_chef', $settings->get('role_color_chef', '#eab308')) }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="role_color_azubi" :value="__('Azubi')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="role_color_azubi" name="role_color_azubi" value="{{ old('role_color_azubi', $settings->get('role_color_azubi', '#22c55e')) }}" class="p-0 border-0 h-8 w-10 bg-transparent cursor-pointer rounded">
+                                        <span class="text-xs text-gray-400 font-mono">{{ old('role_color_azubi', $settings->get('role_color_azubi', '#22c55e')) }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="role_color_geselle" :value="__('Geselle')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="role_color_geselle" name="role_color_geselle" value="{{ old('role_color_geselle', $settings->get('role_color_geselle', '#22c55e')) }}" class="p-0 border-0 h-8 w-10 bg-transparent cursor-pointer rounded">
+                                        <span class="text-xs text-gray-400 font-mono">{{ old('role_color_geselle', $settings->get('role_color_geselle', '#22c55e')) }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <x-input-label for="role_color_employee" :value="__('Mitarbeiter')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="role_color_employee" name="role_color_employee" value="{{ old('role_color_employee', $settings->get('role_color_employee', '#eab308')) }}" class="p-0 border-0 h-8 w-10 bg-transparent cursor-pointer rounded">
+                                        <span class="text-xs text-gray-400 font-mono">{{ old('role_color_employee', $settings->get('role_color_employee', '#eab308')) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- General Work Settings -->
                         <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
                             <h4 class="text-md font-medium text-gray-200 mb-4">Standard Arbeitszeiten</h4>

@@ -124,12 +124,15 @@
                                         <span class="text-sm text-gray-500 block mt-1 whitespace-pre-line">{{ $user->address }}</span>
                                     @endif
 
-                                    <div class="mt-2 flex gap-2">
+                                    <div class="mt-2 flex flex-wrap gap-2">
                                          <a href="{{ route('admin.documents.create', ['user_id' => $user->id]) }}" class="inline-flex items-center px-2 py-1 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                             Dokument senden
                                         </a>
                                         <a href="{{ route('admin.users.email', $user) }}" class="inline-flex items-center px-2 py-1 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-500 active:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                             Email senden
+                                        </a>
+                                        <a href="{{ route('admin.users.edit', $user) }}" class="inline-flex items-center px-2 py-1 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                            Bearbeiten
                                         </a>
                                     </div>
                                     
@@ -141,18 +144,29 @@
                                                     <option value="employee" {{ $user->role === 'employee' ? 'selected' : '' }}>Mitarbeiter</option>
                                                     <option value="geselle" {{ $user->role === 'geselle' ? 'selected' : '' }}>Geselle</option>
                                                     <option value="azubi" {{ $user->role === 'azubi' ? 'selected' : '' }}>Azubi</option>
-                                                    <option value="chef" {{ $user->role === 'chef' ? 'selected' : '' }}>Chef</option>
-                                                    @if(auth()->user()->is_super_admin)
-                                                        <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                                                    @elseif($user->role === 'admin')
-                                                        <option value="admin" selected disabled>Admin</option>
-                                                    @endif
                                                 </select>
                                                 
                                                 <div class="flex items-center ml-2 border border-gray-600 rounded px-2 py-1.5 bg-gray-800 w-full sm:w-auto">
                                                     <input type="checkbox" name="is_materialwart" id="is_materialwart_{{ $user->id }}" value="1" {{ $user->is_materialwart ? 'checked' : '' }} class="rounded border-gray-600 bg-gray-900 text-orange-500 focus:ring-orange-500">
                                                     <label for="is_materialwart_{{ $user->id }}" class="ml-2 text-xs text-gray-300 whitespace-nowrap">Materialwart</label>
                                                 </div>
+
+                                                @if(auth()->user()->is_super_admin || $user->id === auth()->id())
+                                                <div class="flex items-center ml-2 border border-gray-600 rounded px-2 py-1.5 bg-gray-800 w-full sm:w-auto">
+                                                    <input type="checkbox" name="is_admin" id="is_admin_{{ $user->id }}" value="1" {{ $user->is_admin ? 'checked' : '' }} {{ !auth()->user()->is_super_admin ? 'disabled' : '' }} class="rounded border-gray-600 bg-gray-900 text-orange-500 focus:ring-orange-500">
+                                                    @if(!auth()->user()->is_super_admin)
+                                                        <input type="hidden" name="is_admin" value="{{ $user->is_admin ? '1' : '0' }}">
+                                                    @endif
+                                                    <label for="is_admin_{{ $user->id }}" class="ml-2 text-xs text-gray-300 whitespace-nowrap">Admin</label>
+                                                </div>
+                                                @endif
+
+                                                @if(auth()->user()->is_super_admin)
+                                                <div class="flex items-center ml-2 border border-gray-600 rounded px-2 py-1.5 bg-gray-800 w-full sm:w-auto">
+                                                    <input type="checkbox" name="is_super_admin" id="is_super_admin_{{ $user->id }}" value="1" {{ $user->is_super_admin ? 'checked' : '' }} class="rounded border-gray-600 bg-gray-900 text-orange-500 focus:ring-orange-500">
+                                                    <label for="is_super_admin_{{ $user->id }}" class="ml-2 text-xs text-gray-300 whitespace-nowrap">Super-Admin</label>
+                                                </div>
+                                                @endif
 
                                                 <button type="submit" class="text-xs font-semibold px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 transition w-full sm:w-auto">
                                                     Speichern

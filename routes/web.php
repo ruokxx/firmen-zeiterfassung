@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/setup-account', [\App\Http\Controllers\SetupAccountController::class , 'store'])->name('admin.setup.store');
 
     Route::get('/admin', [\App\Http\Controllers\AdminController::class , 'index'])->name('admin.dashboard');
+    Route::get('/admin/users/{user}/edit', [\App\Http\Controllers\AdminController::class , 'editUser'])->name('admin.users.edit');
+    Route::patch('/admin/users/{user}/update', [\App\Http\Controllers\AdminController::class , 'updateUser'])->name('admin.users.update');
     Route::post('/admin/users/{user}/role', [\App\Http\Controllers\AdminController::class , 'updateRole'])->name('admin.users.update-role');
     Route::get('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'email'])->name('admin.users.email');
     Route::post('/admin/users/{user}/email', [\App\Http\Controllers\AdminController::class , 'sendEmail'])->name('admin.users.email.send');

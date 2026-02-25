@@ -58,22 +58,35 @@ class AdminController extends Controller
             'role' => 'required|in:employee,chef,admin,azubi,geselle',
         ]);
 
-        // If the user being modified is an admin, and their new role is NOT admin,
-        // we must ensure there is at least one OTHER admin left in the system.
-        if ($user->role === 'admin' && $request->role !== 'admin') {
-            $adminCount = \App\Models\User::where('role', 'admin')->count();
-            if ($adminCount <= 1) {
-                return back()->with('error', 'Fehler: Es muss mindestens ein Admin im System verbleiben!');
+        // If the user being modified is a super admin, and their new rights are NOT super admin,
+        // we must ensure there is at least one OTHER super admin left in the system.
+        if ($user->is_super_admin && !$request->has('is_super_admin')) {
+            $superAdminCount = \App\Models\User::where('is_super_admin', true)->count();
+            if ($superAdminCount <= 1) {
+                return back()->with('error', 'Fehler: Es muss mindestens ein Super-Admin im System verbleiben!');
             }
         }
 
-        // Only Super Admins can make other Admins
-        if ($request->role === 'admin' && !auth()->user()->is_super_admin) {
-            return back()->with('error', 'Nur Super-Admins können Datenbank-Admins ernennen.');
+        // Only Super Admins can make other Super Admins or Admins
+        if (($request->has('is_admin') || $request->has('is_super_admin')) && !auth()->user()->is_super_admin && $user->id !== auth()->id()) {
+            // A normal admin cannot grant admin rights to someone else
+            // Except they can keep their own admin rights if they are just changing their role name
+            return back()->with('error', 'Nur Super-Admins können Admin-Rechte vergeben.');
         }
 
         $user->role = $request->role;
         $user->is_materialwart = $request->has('is_materialwart');
+
+        // Handle admin flags
+        if (auth()->user()->is_super_admin || $user->id === auth()->id()) {
+            $user->is_admin = $request->has('is_admin');
+
+            // Only super admins can grant/revoke super admin rights
+            if (auth()->user()->is_super_admin) {
+                $user->is_super_admin = $request->has('is_super_admin');
+            }
+        }
+
         $user->save();
 
         return back()->with('success', "Daten von {$user->name} wurden erfolgreich aktualisiert.");
@@ -129,6 +142,37 @@ class AdminController extends Controller
         return back()->with('success', "Nutzer {$user->name} wurde gelöscht.");
     }
 
+
+    public function editUser(\App\Models\User $user)
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function updateUser(Request $request, \App\Models\User $user)
+    {
+        if (!auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'mobile_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'daily_material_reminder_enabled' => 'nullable|boolean',
+            'daily_reminder_enabled' => 'nullable|boolean',
+        ]);
+
+        $validatedData['daily_material_reminder_enabled'] = $request->has('daily_material_reminder_enabled');
+        $validatedData['daily_reminder_enabled'] = $request->has('daily_reminder_enabled');
+
+        $user->update($validatedData);
+
+        return redirect()->route('admin.dashboard')->with('success', "Nutzer {$user->name} wurde erfolgreich aktualisiert.");
+    }
 
     public function email(\App\Models\User $user)
     {

@@ -37,7 +37,6 @@
 
     <div class="py-2">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> <!-- Standard width for margins -->
-
             
             @if(auth()->user()->google_calendar_url)
                 <div x-data="{ open: false }" class="mb-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-w-xl mx-auto overflow-hidden">
@@ -102,6 +101,25 @@
                     <div class="bg-blue-500 h-full rounded-full transition-all duration-500 shadow-[0_0_10px_#3b82f6]" style="width: {{ number_format($progressPercentage, 2, '.', '') }}%;"></div>
                 </div>
             </div>
+
+            {{-- Small Lager Status Alert --}}
+            <a href="{{ route('materials.index') }}" class="block mb-4 overflow-hidden rounded-lg shadow-sm transition hover:scale-[1.01] focus:outline-none w-full">
+                @if(isset($hasLowStock) && $hasLowStock)
+                    <div class="flex items-center justify-center p-4 bg-red-900/80 border border-red-600 animate-pulse text-red-100 font-bold uppercase tracking-wider text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Lagerbestand prüfen !
+                    </div>
+                @else
+                    <div class="flex items-center justify-center p-4 bg-gray-800 border border-green-600 text-green-400 font-bold uppercase tracking-wider text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="animate-pulse">Lagerbestand Okay</span>
+                    </div>
+                @endif
+            </a>
 
             <div class="mb-6 flex flex-wrap gap-4 justify-center sm:justify-start bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-sm">
                 <span class="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2 self-center">Legende:</span>
@@ -218,15 +236,15 @@
                                 <div class="text-sm font-medium text-gray-200">{{ $member->name }}</div>
                                 <div class="text-xs text-gray-400">
                                     @if($member->role === 'admin')
-                                        <span class="text-orange-500 font-bold">Admin</span>
+                                        <span class="font-bold" style="color: {{ \App\Models\Setting::where('key', 'role_color_admin')->value('value') ?? '#f97316' }}">Admin</span>
                                     @elseif($member->role === 'chef')
-                                        <span class="text-yellow-500 font-bold">Chef</span>
+                                        <span class="font-bold" style="color: {{ \App\Models\Setting::where('key', 'role_color_chef')->value('value') ?? '#eab308' }}">Chef</span>
                                     @elseif($member->role === 'azubi')
-                                        <span class="text-green-500 font-bold">Azubi</span>
+                                        <span class="font-bold" style="color: {{ \App\Models\Setting::where('key', 'role_color_azubi')->value('value') ?? '#22c55e' }}">Azubi</span>
                                     @elseif($member->role === 'geselle')
-                                        <span class="text-green-500 font-bold">Geselle</span>
+                                        <span class="font-bold" style="color: {{ \App\Models\Setting::where('key', 'role_color_geselle')->value('value') ?? '#22c55e' }}">Geselle</span>
                                     @else
-                                        <span class="text-yellow-500 font-bold">Mitarbeiter</span>
+                                        <span class="font-bold" style="color: {{ \App\Models\Setting::where('key', 'role_color_employee')->value('value') ?? '#eab308' }}">Mitarbeiter</span>
                                     @endif
                                     @if($member->is_materialwart)
                                         <span class="text-gray-400 font-bold ml-1 text-[10px] uppercase">(Materialwart)</span>

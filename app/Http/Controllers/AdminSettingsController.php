@@ -77,6 +77,11 @@ class AdminSettingsController extends Controller
             'default_start_time' => 'nullable|date_format:H:i',
             'default_end_time' => 'nullable|date_format:H:i',
             'default_break_duration' => 'nullable|integer|min:0',
+            'role_color_admin' => 'nullable|string',
+            'role_color_chef' => 'nullable|string',
+            'role_color_azubi' => 'nullable|string',
+            'role_color_geselle' => 'nullable|string',
+            'role_color_employee' => 'nullable|string',
         ]);
 
         // Handle checkbox (if unchecked, it's missing from request, so we must set it to false if not present? 
