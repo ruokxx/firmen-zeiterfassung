@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
             <h2 class="font-semibold text-xl text-gray-100 leading-tight">
                 {{ __('Materialverwaltung') }}
             </h2>
-            <div class="space-x-2">
-                <a href="{{ route('materials.index') }}" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-4 rounded transition border border-gray-600 text-sm">
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                <a href="{{ route('materials.index') }}" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-4 rounded transition border border-gray-600 text-sm flex-1 sm:flex-none text-center">
                     Zum Lager
                 </a>
-                <a href="{{ route('materials.stats') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition shadow text-sm">
+                <a href="{{ route('materials.stats') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition shadow text-sm flex-1 sm:flex-none text-center">
                     Statistiken
                 </a>
             </div>
@@ -88,50 +88,57 @@
                                 Materialien bearbeiten
                             </h3>
 
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-700">
-                                    <thead class="bg-gray-900">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Bestand</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Warnschwelle</th>
-                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Aktionen</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-gray-800 divide-y divide-gray-700">
-                                        @forelse($materials as $material)
-                                            <tr>
-                                                <form action="{{ route('materials.update', $material) }}" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <td class="px-4 py-4">
-                                                        <input type="text" name="name" value="{{ $material->name }}" required class="min-w-[150px] w-full bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap">
-                                                        <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" required class="w-24 bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap">
-                                                        <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" required class="w-24 bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
-                                                    </td>
-                                                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <div class="flex justify-end items-center gap-2">
-                                                            <button type="submit" class="text-blue-400 hover:text-blue-300 bg-gray-700 px-3 py-1 rounded">Speichern</button>
-                                                </form>
-                                                            <form action="{{ route('materials.destroy', $material) }}" method="POST" class="inline">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" onclick="return confirm('Möchtest du dieses Material wirklich löschen? Historie bleibt bei den Transaktionen ggf. erhalten (ohne Material Name), besser ist es Bestand auf 0 zu setzen.')" class="text-red-400 hover:text-red-300 bg-gray-700 px-3 py-1 rounded">Löschen</button>
-                                                            </form>
-                                                        </div>
-                                                    </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 text-center">Keine Materialien gefunden.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                            <div class="space-y-4">
+                                <!-- Desktop Header (Hidden on Mobile) -->
+                                <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-4 py-3 bg-gray-900 border border-gray-700 text-xs font-bold text-gray-400 uppercase tracking-wider rounded-lg mb-2">
+                                    <div class="col-span-5">Name</div>
+                                    <div class="col-span-2">Bestand</div>
+                                    <div class="col-span-2">Warnschwelle</div>
+                                    <div class="col-span-3 text-right">Aktionen</div>
+                                </div>
+
+                                @forelse($materials as $material)
+                                    <div class="bg-gray-900 sm:bg-transparent border border-gray-700 sm:border-b sm:border-t-0 sm:border-l-0 sm:border-r-0 rounded-lg sm:rounded-none p-4 sm:p-0 sm:pb-3 mb-4 sm:mb-0 relative shadow-sm sm:shadow-none">
+                                        <form action="{{ route('materials.update', $material) }}" method="POST" class="flex flex-col sm:grid sm:grid-cols-12 gap-4 items-start sm:items-center">
+                                            @csrf
+                                            @method('PUT')
+                                            
+                                            <!-- Name -->
+                                            <div class="w-full sm:col-span-5">
+                                                <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Name</label>
+                                                <input type="text" name="name" value="{{ $material->name }}" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                            </div>
+
+                                            <div class="w-full grid grid-cols-2 gap-4 sm:col-span-4 sm:flex sm:gap-x-8 sm:w-auto">
+                                                <!-- Bestand -->
+                                                <div class="w-full sm:w-24">
+                                                    <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Bestand</label>
+                                                    <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                </div>
+
+                                                <!-- Warnschwelle -->
+                                                <div class="w-full sm:w-24">
+                                                    <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Warnschwelle</label>
+                                                    <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                </div>
+                                            </div>
+
+                                            <!-- Actions -->
+                                            <div class="w-full sm:col-span-3 flex flex-row justify-end items-center gap-2 mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-gray-700 sm:border-0">
+                                                <button type="submit" class="text-blue-100 bg-blue-700 hover:bg-blue-600 border border-blue-600 sm:border-0 sm:bg-gray-700 sm:text-blue-400 sm:hover:text-blue-300 px-4 py-2 sm:px-3 sm:py-1 rounded text-sm font-medium transition flex-1 sm:flex-none text-center shadow sm:shadow-none">Speichern</button>
+                                                <button type="button" onclick="if(confirm('Möchtest du dieses Material wirklich löschen? Historie bleibt bei den Transaktionen ggf. erhalten (ohne Material Name), besser ist es Bestand auf 0 zu setzen.')) { document.getElementById('delete-form-{{ $material->id }}').submit(); }" class="text-red-100 bg-red-900 hover:bg-red-800 border border-red-700 sm:border-0 sm:bg-gray-700 sm:text-red-400 sm:hover:text-red-300 px-4 py-2 sm:px-3 sm:py-1 rounded text-sm font-medium transition flex-1 sm:flex-none text-center shadow sm:shadow-none">Löschen</button>
+                                            </div>
+                                        </form>
+                                        
+                                        <!-- Separate Delete Form outside the visual layout grid -->
+                                        <form id="delete-form-{{ $material->id }}" action="{{ route('materials.destroy', $material) }}" method="POST" class="hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                    </div>
+                                @empty
+                                    <div class="text-sm text-gray-400 text-center py-8">Keine Materialien gefunden.</div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
