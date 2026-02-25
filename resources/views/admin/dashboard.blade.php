@@ -100,10 +100,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-4">
+                        <div class="mt-4 flex flex-col sm:flex-row gap-4">
                             <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded text-sm transition h-10 w-full sm:w-auto">
                                 Speichern
                             </button>
+                            <a href="{{ route('materials.settings.test-email') }}" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded text-sm transition h-10 w-full sm:w-auto flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                Test-E-Mail senden
+                            </a>
                         </div>
                     </form>
                 </div>

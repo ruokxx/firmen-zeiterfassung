@@ -37,6 +37,17 @@
 
     <div class="py-2">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> <!-- Standard width for margins -->
+
+            @if(auth()->user()->is_materialwart)
+                <div class="mb-6 bg-orange-900 border border-orange-700 text-orange-100 px-4 py-3 rounded relative shadow-md flex items-center gap-3" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <strong class="font-bold">Info:</strong> Du bist aktuell als <span class="uppercase tracking-wider font-extrabold text-orange-300">Materialwart</span> eingeteilt!
+                    </div>
+                </div>
+            @endif
             
             @if(auth()->user()->google_calendar_url)
                 <div x-data="{ open: false }" class="mb-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-w-xl mx-auto overflow-hidden">

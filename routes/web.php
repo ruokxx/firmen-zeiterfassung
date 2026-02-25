@@ -99,7 +99,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'update'])->name('materials.update');
     Route::delete('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'destroy'])->name('materials.destroy');
     Route::get('/admin/materials/stats', [\App\Http\Controllers\MaterialController::class , 'stats'])->name('materials.stats');
+    Route::delete('/admin/materials/stats/clear', [\App\Http\Controllers\MaterialController::class , 'clearStats'])->name('materials.stats.clear');
     Route::post('/admin/materials/settings', [\App\Http\Controllers\MaterialController::class , 'updateSettings'])->name('materials.settings.update');
+    Route::get('/admin/materials/settings/test-email', [\App\Http\Controllers\MaterialController::class , 'sendTestEmail'])->name('materials.settings.test-email');
 });
 
 require __DIR__ . '/auth.php';

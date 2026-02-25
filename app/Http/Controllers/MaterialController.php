@@ -185,6 +185,25 @@ class MaterialController extends Controller
     }
 
     /**
+     * Clear all material statistics (accessible only for super admins).
+     */
+    public function clearStats()
+    {
+        $user = auth()->user();
+        if (!$user->is_super_admin) {
+            abort(403, 'Nur Server-Admins können die Statistiken zurücksetzen.');
+        }
+
+        // Delete all transactions to reset stats
+        MaterialTransaction::truncate();
+
+        // Optional: Do we want to reset stock counts to 0? Usually not, but if requested they could be. 
+        // For now, truncating transactions will clear the 'Most taken' and 'Recent Transactions' lists.
+
+        return redirect()->back()->with('success', 'Material Statistiken wurden erfolgreich zurückgesetzt.');
+    }
+
+    /**
      * Update global material settings.
      */
     public function updateSettings(Request $request)
@@ -222,6 +241,39 @@ class MaterialController extends Controller
         );
 
         return redirect()->back()->with('success', 'Einstellungen erfolgreich gespeichert.');
+    }
+
+    /**
+     * Send a test email for material settings.
+     */
+    public function sendTestEmail()
+    {
+        $user = auth()->user();
+        if (!$user->is_admin && !$user->is_chef) {
+            abort(403, 'Nur Chefs und Admins dürfen die Einstellungen bearbeiten.');
+        }
+
+        $targetEmail = Setting::where('key', 'low_stock_email_address')->value('value');
+
+        if (empty($targetEmail)) {
+            return redirect()->back()->with('error', 'Bitte zuerst eine E-Mail-Adresse eintragen und speichern, bevor du testest.');
+        }
+
+        try {
+            // Sende den Tagesbericht als Test
+            $transactions = \App\Models\MaterialTransaction::with(['user', 'material'])
+                ->orderByDesc('created_at')
+                ->limit(3)
+                ->get();
+
+            $todayStr = \Carbon\Carbon::today()->format('d.m.Y') . ' (TEST-E-MAIL)';
+            Mail::to($targetEmail)->send(new \App\Mail\DailyMaterialReportMail($transactions, $todayStr));
+
+            return redirect()->back()->with('success', 'Test-E-Mail (Tagesbericht-Format) wurde erfolgreich an ' . $targetEmail . ' versendet.');
+        }
+        catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Fehler beim Senden der Test-E-Mail: ' . $e->getMessage());
+        }
     }
 
     /**
