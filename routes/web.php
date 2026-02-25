@@ -55,7 +55,6 @@ Route::middleware('auth')->group(function () {
     // Admin Materials
     Route::get('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'index'])->name('admin.materials.index');
     Route::post('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'store'])->name('admin.materials.store');
-    Route::post('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'store'])->name('admin.materials.store');
     Route::delete('/admin/materials/{material}', [\App\Http\Controllers\AdminMaterialController::class , 'destroy'])->name('admin.materials.destroy');
 
     // Admin Construction Site Search
@@ -97,8 +96,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/materials/{material}/transaction', [\App\Http\Controllers\MaterialController::class , 'transaction'])->name('materials.transaction');
     Route::get('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'manage'])->name('materials.manage');
     Route::post('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'store'])->name('materials.store');
-    Route::put('/admin/materials/{material}', [\App\Http\Controllers\MaterialController::class , 'update'])->name('materials.update');
-    Route::delete('/admin/materials/{material}', [\App\Http\Controllers\MaterialController::class , 'destroy'])->name('materials.destroy');
+    Route::put('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'update'])->name('materials.update');
+    Route::delete('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'destroy'])->name('materials.destroy');
     Route::get('/admin/materials/stats', [\App\Http\Controllers\MaterialController::class , 'stats'])->name('materials.stats');
     Route::post('/admin/materials/settings', [\App\Http\Controllers\MaterialController::class , 'updateSettings'])->name('materials.settings.update');
 });

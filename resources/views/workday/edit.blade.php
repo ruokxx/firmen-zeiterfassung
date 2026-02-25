@@ -70,25 +70,26 @@
                     
                     <div class="space-y-4">
                         <template x-for="(entry, index) in entries" :key="index">
-                            <div class="flex items-center gap-4 bg-gray-900 p-4 rounded border border-gray-700">
-                                <div class="flex-grow">
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-gray-900 p-4 rounded border border-gray-700">
+                                <div class="flex-grow w-full">
                                     <label class="block text-sm font-medium text-gray-300 mb-1">Baustelle</label>
-                                    <input type="text" list="sites-list" :name="'entries['+index+'][construction_site_name]'" x-model="entry.construction_site_name" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full placeholder-gray-400" placeholder="Baustelle eingeben oder wählen...">
+                                    <textarea rows="2" list="sites-list" :name="'entries['+index+'][construction_site_name]'" x-model="entry.construction_site_name" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full placeholder-gray-400 resize-none" placeholder="Baustelle eingeben oder wählen..."></textarea>
                                     <datalist id="sites-list">
                                         @foreach($sites as $site)
                                             <option value="{{ $site->name }}">
                                         @endforeach
                                     </datalist>
                                 </div>
-                                <div class="w-32">
-                                    <label class="block text-sm font-medium text-gray-300 mb-1">Stunden</label>
-                                    <select :name="'entries['+index+'][hours]'" x-model="entry.hours" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full">
-                                        @for ($i = 0; $i <= 12; $i += 0.5)
-                                            <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }} h</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <div class="pt-6 flex items-center gap-2">
+                                <div class="w-full sm:w-32 flex justify-between sm:block items-end sm:items-start gap-4">
+                                    <div class="flex-grow sm:flex-none">
+                                        <label class="block text-sm font-medium text-gray-300 mb-1">Stunden</label>
+                                        <select :name="'entries['+index+'][hours]'" x-model="entry.hours" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full">
+                                            @for ($i = 0; $i <= 12; $i += 0.5)
+                                                <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }} h</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div class="sm:pt-6 pb-1 sm:pb-0 flex items-center gap-2">
                                     {{-- Requested Check/Done Button per row --}}
                                     <button type="button" @click="save()" class="text-green-500 hover:text-green-700 transition" title="Speichern">
                                         <template x-if="!saving && !saveSuccess">
