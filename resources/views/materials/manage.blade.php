@@ -111,17 +111,17 @@
                                 <div class="space-y-2 mt-4">
                                     <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Gespeicherte Kategorien</div>
                                     @foreach($categories as $category)
-                                        <div class="flex items-center gap-4 bg-gray-800 p-2 rounded border border-gray-700">
-                                            <form action="{{ route('material-categories.update', $category) }}" method="POST" class="flex-1 flex gap-2">
+                                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 bg-gray-800 p-2 rounded border border-gray-700">
+                                            <form action="{{ route('material-categories.update', $category) }}" method="POST" class="flex-1 flex gap-2 w-full">
                                                 @csrf
                                                 @method('PUT')
-                                                <input type="text" name="name" value="{{ $category->name }}" required class="flex-1 bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 text-sm py-1 px-2">
-                                                <button type="submit" class="text-blue-400 hover:text-blue-300 px-3 py-1 bg-gray-700 rounded text-sm transition font-medium">Speichern</button>
+                                                <input type="text" name="name" value="{{ $category->name }}" required class="flex-1 w-full bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 text-sm py-2 sm:py-1 px-2">
+                                                <button type="submit" class="text-blue-400 hover:text-blue-300 px-4 sm:px-3 py-2 sm:py-1 bg-gray-700 rounded text-sm transition font-medium whitespace-nowrap">Speichern</button>
                                             </form>
-                                            <form action="{{ route('material-categories.destroy', $category) }}" method="POST">
+                                            <form action="{{ route('material-categories.destroy', $category) }}" method="POST" class="w-full sm:w-auto">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Diese Kategorie wirklich löschen? Die Materialien bleiben erhalten, verlieren aber diese Kategorie.')" class="text-red-400 hover:text-red-300 px-3 py-1 bg-gray-700 rounded text-sm transition font-medium">Löschen</button>
+                                                <button type="submit" onclick="return confirm('Diese Kategorie wirklich löschen? Die Materialien bleiben erhalten, verlieren aber diese Kategorie.')" class="w-full sm:w-auto text-red-400 hover:text-red-300 px-4 sm:px-3 py-2 sm:py-1 bg-gray-700 rounded text-sm transition font-medium whitespace-nowrap text-center">Löschen</button>
                                             </form>
                                         </div>
                                     @endforeach
