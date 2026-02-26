@@ -19,9 +19,6 @@ class MonthlyReportMail extends Mailable
     public $year;
     protected $pdfContent;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct($user, $monthName, $year, $pdfContent)
     {
         $this->user = $user;
@@ -30,36 +27,42 @@ class MonthlyReportMail extends Mailable
         $this->pdfContent = $pdfContent;
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
+        $subject = \App\Models\Setting::where("key", "monthly_report_subject")->value("value") ?: "Monatsbericht {month} {year}";
+        $subject = str_replace(
+            ["{month}", "{year}", "{name}"], 
+            [$this->monthName, $this->year, $this->user->name ?? "Mitarbeiter"], 
+            $subject
+        );
+
         return new Envelope(
-            subject: 'Monatsbericht ' . $this->monthName . ' ' . $this->year,
+            subject: $subject,
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
+        $body = \App\Models\Setting::where("key", "monthly_report_body")->value("value") ?: "Hallo,\n\nanbei erhalten Sie den Monatsbericht von {name} fuer {month} {year}.\n\nMit freundlichen Gruessen,\n" . config("app.name");
+        
+        $body = str_replace(
+            ["{month}", "{year}", "{name}"], 
+            [$this->monthName, $this->year, $this->user->name ?? "Mitarbeiter"], 
+            $body
+        );
+
         return new Content(
-            view: 'emails.monthly_report',
+            view: "emails.monthly_report",
+            with: ["customBody" => $body],
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
+    public function attachments(): array 
     {
         return [
             Attachment::fromData(fn () => $this->pdfContent, "Monatsbericht_{$this->monthName}_{$this->year}.pdf")
-                ->withMime('application/pdf'),
+                ->withMime("application/pdf"),
         ];
     }
 }
+// Force git update

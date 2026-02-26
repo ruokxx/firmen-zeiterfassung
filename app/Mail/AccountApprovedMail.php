@@ -16,41 +16,45 @@ class AccountApprovedMail extends Mailable
 
     public $user;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(User $user)
     {
         $this->user = $user;
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
+        $subject = \App\Models\Setting::where("key", "email_template_account_approved_subject")->value("value") ?: "Dein Account wurde freigeschaltet";
+        $subject = str_replace(
+            ["{name}", "{app_name}"], 
+            [$this->user->name, config("app.name")], 
+            $subject
+        );
+
         return new Envelope(
-            subject: 'Dein Account wurde freigeschaltet',
+            subject: $subject,
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
+        $body = \App\Models\Setting::where("key", "email_template_account_approved_body")->value("value") ?: "Hallo {name},\n\nDein Account wurde erfolgreich freigeschaltet.\nDu kannst dich nun einloggen und deine Arbeitszeiten erfassen.\n\nZum Login: {login_url}\n\nMit freundlichen Gruessen,\n{app_name}";
+
+        $body = str_replace(
+            ["{name}", "{login_url}", "{app_name}"], 
+            [$this->user->name, route("login"), config("app.name")], 
+            $body
+        );
+
         return new Content(
-            view: 'emails.account_approved',
+            view: "emails.account_approved",
+            with: ["customBody" => $body],
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
+    public function attachments(): array 
     {
         return [];
     }
 }
+
+// Force git update
