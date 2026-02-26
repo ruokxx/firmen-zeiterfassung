@@ -9,7 +9,12 @@ class Material extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'stock_count', 'low_stock_threshold'];
+    protected $fillable = ['name', 'stock_count', 'low_stock_threshold', 'category_id'];
+
+    public function category()
+    {
+        return $this->belongsTo(MaterialCategory::class , 'category_id');
+    }
 
     public function transactions()
     {

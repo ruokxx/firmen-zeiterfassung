@@ -18,8 +18,11 @@ class MaterialController extends Controller
      */
     public function index()
     {
-        $materials = Material::orderBy('name')->get();
-        return view('materials.index', compact('materials'));
+        $categories = \App\Models\MaterialCategory::with('materials')->orderBy('name')->get();
+        // Get materials without a category
+        $uncategorizedMaterials = Material::whereNull('category_id')->orderBy('name')->get();
+
+        return view('materials.index', compact('categories', 'uncategorizedMaterials'));
     }
 
     /**
@@ -28,12 +31,14 @@ class MaterialController extends Controller
     public function manage()
     {
         $this->authorizeManagement();
-        $materials = Material::orderBy('name')->get();
+        $categories = \App\Models\MaterialCategory::with('materials')->orderBy('name')->get();
+        $uncategorizedMaterials = Material::whereNull('category_id')->orderBy('name')->get();
+
         // Get the target email
         $lowStockEmail = Setting::where('key', 'low_stock_email_address')->value('value') ?? '';
         $dailyReportEnabled = Setting::where('key', 'material_daily_report_enabled')->value('value') === '1';
         $dailyReportTime = Setting::where('key', 'material_daily_report_time')->value('value') ?? '18:00';
-        return view('materials.manage', compact('materials', 'lowStockEmail', 'dailyReportEnabled', 'dailyReportTime'));
+        return view('materials.manage', compact('categories', 'uncategorizedMaterials', 'lowStockEmail', 'dailyReportEnabled', 'dailyReportTime'));
     }
 
     /**
@@ -46,6 +51,7 @@ class MaterialController extends Controller
             'name' => 'required|string|max:255|unique:materials,name',
             'stock_count' => 'required|integer|min:0',
             'low_stock_threshold' => 'required|integer|min:0',
+            'category_id' => 'nullable|exists:material_categories,id',
         ]);
 
         Material::create($request->all());
@@ -63,6 +69,7 @@ class MaterialController extends Controller
             'name' => 'required|string|max:255|unique:materials,name,' . $material->id,
             'stock_count' => 'required|integer|min:0',
             'low_stock_threshold' => 'required|integer|min:0',
+            'category_id' => 'nullable|exists:material_categories,id',
         ]);
 
         $material->update($request->all());
