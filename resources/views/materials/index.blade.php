@@ -62,26 +62,31 @@
                     @endphp
 
                     @forelse($renderGroups as $group)
-                        <div class="mb-10">
-                            <h4 class="text-xl font-bold text-gray-200 mb-4 pb-2 border-b border-gray-700 flex items-center gap-3">
-                                {{ $group['title'] }}
-                                
-                                @if($group['is_complete'] === true)
-                                    <span title="Bestand vollständig" class="flex items-center justify-center bg-green-900/50 text-green-500 rounded-full p-1 border border-green-700 shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
-                                @elseif($group['is_complete'] === false)
-                                    <span title="Material fehlt (unter Warnschwelle)" class="flex items-center justify-center bg-red-900/50 text-red-500 rounded-full p-1 border border-red-700 shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
-                                @endif
+                        <div class="mb-10" x-data="{ open: false }">
+                            <h4 @click="open = !open" class="cursor-pointer text-xl font-bold text-gray-200 mb-4 pb-2 border-b border-gray-700 flex items-center justify-between select-none hover:text-orange-400 transition">
+                                <div class="flex items-center gap-3">
+                                    {{ $group['title'] }}
+                                    
+                                    @if($group['is_complete'] === true)
+                                        <span title="Bestand vollständig" class="flex items-center justify-center bg-green-900/50 text-green-500 rounded-full p-1 border border-green-700 shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                    @elseif($group['is_complete'] === false)
+                                        <span title="Material fehlt (unter Warnschwelle)" class="flex items-center justify-center bg-red-900/50 text-red-500 rounded-full p-1 border border-red-700 shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                    @endif
+                                </div>
+                                <svg :class="{'rotate-180': open}" class="w-6 h-6 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
                             </h4>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div x-show="open" x-transition.opacity style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($group['materials'] as $material)
                                     <div class="bg-gray-750 border {{ $material->stock_count <= $material->low_stock_threshold ? 'border-red-600' : 'border-gray-600' }} rounded-lg p-5 flex flex-col justify-between shadow-sm">
                                         <div>

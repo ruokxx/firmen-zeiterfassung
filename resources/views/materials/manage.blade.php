@@ -155,9 +155,14 @@
                                 @endphp
 
                                 @forelse($renderGroups as $group)
-                                    <div class="mb-6">
-                                        <h4 class="text-md font-bold text-gray-300 mb-3 bg-gray-900 px-3 py-2 rounded-t-lg border-b border-gray-700">{{ $group['title'] }}</h4>
-                                        <div class="space-y-4 px-1">
+                                    <div class="mb-6" x-data="{ open: false }">
+                                        <h4 @click="open = !open" class="cursor-pointer text-md font-bold text-gray-300 mb-3 bg-gray-900 px-3 py-2 rounded-t-lg border-b border-gray-700 flex justify-between items-center select-none hover:bg-gray-800 transition">
+                                            <span>{{ $group['title'] }} ({{ $group['materials']->count() }})</span>
+                                            <svg :class="{'rotate-180': open}" class="w-5 h-5 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </h4>
+                                        <div x-show="open" x-transition.opacity style="display: none;" class="space-y-4 px-1">
                                             <!-- Desktop Header -->
                                             <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-4 py-3 bg-gray-800 border border-gray-700 text-xs font-bold text-gray-400 uppercase tracking-wider rounded-lg mb-2">
                                                 <div class="col-span-4">Name</div>
@@ -190,18 +195,16 @@
                                                             </select>
                                                         </div>
 
-                                                        <div class="w-full grid grid-cols-2 gap-4 sm:col-span-4 sm:flex sm:gap-x-8 sm:w-auto">
-                                                            <!-- Bestand -->
-                                                            <div class="w-full sm:w-24">
-                                                                <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Bestand</label>
-                                                                <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
-                                                            </div>
+                                                        <!-- Bestand -->
+                                                        <div class="w-full sm:col-span-2">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Bestand</label>
+                                                            <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                        </div>
 
-                                                            <!-- Warnschwelle -->
-                                                            <div class="w-full sm:w-24">
-                                                                <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Warnschwelle</label>
-                                                                <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
-                                                            </div>
+                                                        <!-- Warnschwelle -->
+                                                        <div class="w-full sm:col-span-2">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Warnschwelle</label>
+                                                            <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
 
                                                         <!-- Actions -->
