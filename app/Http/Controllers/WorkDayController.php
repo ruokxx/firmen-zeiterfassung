@@ -50,12 +50,7 @@ class WorkDayController extends Controller
         $start = \Carbon\Carbon::parse($defaultStart);
         $end = \Carbon\Carbon::parse($defaultEnd);
         $diffMinutes = $start->diffInMinutes($end);
-
-        // For special statuses like Krank, Urlaub, Schule, Folgt nächsten Monat,
-        // there is no physical "break" taken out of the paid time.
-        // The user wants "Keine Pause" to be active (break_duration = 0) 
-        // and full hours paid.
-        $workMinutes = $diffMinutes;
+        $workMinutes = max(0, $diffMinutes - $defaultBreak);
         $defaultHours = round($workMinutes / 60, 2);
 
         // Find or create WorkDay with configured times
@@ -64,7 +59,7 @@ class WorkDayController extends Controller
         [
             'start_time' => $defaultStart,
             'end_time' => $defaultEnd,
-            'break_duration' => 0 // Always 0 (Keine Pause) for fast-entry statuses
+            'break_duration' => $defaultBreak
         ]
         );
 

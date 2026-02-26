@@ -76,12 +76,12 @@
                     $start = \Carbon\Carbon::parse($defaultStart);
                     $end = \Carbon\Carbon::parse($defaultEnd);
                     $diffMinutes = $start->diffInMinutes($end);
-                    $workMinutesFull = $diffMinutes; // No physical break is deducted for Krank/Urlaub/Schule etc.
-                    $defaultDailyHoursNoBreak = round($workMinutesFull / 60, 2);
+                    $workMinutes = max(0, $diffMinutes - $defaultBreak);
+                    $defaultDailyHours = round($workMinutes / 60, 2);
                 @endphp
                 <div class="flex items-center gap-2">
-                    <span class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">{{ rtrim(rtrim((string)$defaultDailyHoursNoBreak, '0'), '.') }}</span>
-                    <span>= Folgt nächsten Monat ({{ rtrim(rtrim((string)$defaultDailyHoursNoBreak, '0'), '.') }} Std)</span>
+                    <span class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">{{ rtrim(rtrim((string)$defaultDailyHours, '0'), '.') }}</span>
+                    <span>= Folgt nächsten Monat ({{ rtrim(rtrim((string)$defaultDailyHours, '0'), '.') }} Std)</span>
                 </div>
                 @if(auth()->user()->role === 'azubi')
                 <div class="flex items-center gap-2">
@@ -135,7 +135,7 @@
                                     <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
                                         @csrf
                                         <input type="hidden" name="status" value="Folgt nächsten Monat">
-                                        <button type="submit" class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-gray-500" title="Folgt nächsten Monat">{{ rtrim(rtrim((string)$defaultDailyHoursNoBreak, '0'), '.') }}</button>
+                                        <button type="submit" class="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded hover:bg-gray-500" title="Folgt nächsten Monat">{{ rtrim(rtrim((string)$defaultDailyHours, '0'), '.') }}</button>
                                     </form>
                                     @if(auth()->user()->role === 'azubi')
                                     <form method="POST" action="{{ route('workday.set-status', $currentDate->format('Y-m-d')) }}">
