@@ -172,7 +172,7 @@
                     
                     const noBreakCheckbox = document.getElementById('no_break');
                     if (noBreakCheckbox && noBreakCheckbox.checked) {
-                        noBreakCheckbox.click(); 
+                        noBreakCheckbox.click(); // This will uncheck it and trigger @change to update values
                     }
                     this.noBreak = false;
                 },
