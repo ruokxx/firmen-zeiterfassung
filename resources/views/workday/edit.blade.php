@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12" x-data='workDayForm({!! $workDay->timeEntries->load("constructionSite")->toJson() !!})'>
+    <div class="py-12" x-data='workDayForm({!! $workDay->timeEntries->load("constructionSite")->toJson() !!}, {!! json_encode($sites->pluck("name")) !!})'>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-700">
                 
@@ -71,14 +71,45 @@
                     <div class="space-y-4">
                         <template x-for="(entry, index) in entries" :key="index">
                             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-gray-900 p-4 rounded border border-gray-700">
-                                <div class="flex-grow w-full">
+                                <div class="flex-grow w-full relative" x-data="{ 
+                                    open: false,
+                                    activeIndex: -1,
+                                    get filteredSites() {
+                                        if (!entry.construction_site_name) return availableSites;
+                                        const query = entry.construction_site_name.toLowerCase();
+                                        return availableSites.filter(s => s.toLowerCase().includes(query));
+                                    },
+                                    selectSite(site) {
+                                        entry.construction_site_name = site;
+                                        this.open = false;
+                                        this.activeIndex = -1;
+                                    }
+                                }" @click.away="open = false; activeIndex = -1" @keydown.escape="open = false; activeIndex = -1">
                                     <label class="block text-sm font-medium text-gray-300 mb-1">Baustelle</label>
-                                    <textarea rows="2" list="sites-list" :name="'entries['+index+'][construction_site_name]'" x-model="entry.construction_site_name" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full placeholder-gray-400 resize-none" placeholder="Baustelle eingeben oder wählen..."></textarea>
-                                    <datalist id="sites-list">
-                                        @foreach($sites as $site)
-                                            <option value="{{ $site->name }}">
-                                        @endforeach
-                                    </datalist>
+                                    <input type="text" 
+                                           :name="'entries['+index+'][construction_site_name]'" 
+                                           x-model="entry.construction_site_name" 
+                                           @focus="open = true" 
+                                           @input="open = true; activeIndex = -1"
+                                           @keydown.arrow-down.prevent="if(open && activeIndex < filteredSites.length - 1) activeIndex++; else { open = true; activeIndex = 0; }"
+                                           @keydown.arrow-up.prevent="if(open && activeIndex > 0) activeIndex--; else activeIndex = -1;"
+                                           @keydown.enter.prevent="if(open && activeIndex >= 0) { selectSite(filteredSites[activeIndex]); } else if(open && filteredSites.length === 1) { selectSite(filteredSites[0]); }"
+                                           class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full placeholder-gray-400" 
+                                           placeholder="Baustelle eingeben oder wählen..." autocomplete="off">
+                                    
+                                    <ul x-show="open && filteredSites.length > 0" 
+                                        x-transition.opacity 
+                                        style="display: none;"
+                                        class="absolute z-50 w-full bg-gray-800 border border-gray-600 rounded-md shadow-xl mt-1 max-h-48 overflow-y-auto">
+                                        <template x-for="(site, i) in filteredSites" :key="site">
+                                            <li @click="selectSite(site)" 
+                                                @mouseenter="activeIndex = i"
+                                                :class="{'bg-orange-600 text-white': activeIndex === i, 'text-gray-200': activeIndex !== i}"
+                                                class="px-3 py-2 cursor-pointer transition select-none"
+                                                x-text="site">
+                                            </li>
+                                        </template>
+                                    </ul>
                                 </div>
                                 <div class="w-full sm:w-32 flex justify-between sm:block items-end sm:items-start gap-4">
                                     <div class="flex-grow sm:flex-none">
@@ -151,7 +182,8 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('workDayForm', (initialEntries) => ({
+            Alpine.data('workDayForm', (initialEntries, allSites) => ({
+                availableSites: allSites || [],
                 entries: initialEntries.length > 0 ? initialEntries.map(e => ({
                     ...e,
                     construction_site_name: e.construction_site ? e.construction_site.name : '',
