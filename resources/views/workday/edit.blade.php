@@ -52,7 +52,7 @@
                                     <label for="no_break" class="text-xs text-gray-400 cursor-pointer select-none">Keine Pause</label>
                                 </div>
                             </div>
-                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" :value="old('break_duration', $workDay->timeEntries->isEmpty() && is_null($workDay->start_time) ? $defaultBreak : $workDay->break_duration)" ::readonly="noBreak" ::class="noBreak ? 'bg-gray-700 text-gray-500' : ''" @input="calculateEndTime()" placeholder="0" />
+                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" x-model="breakDuration" ::readonly="noBreak" ::class="noBreak ? 'bg-gray-700 text-gray-500' : ''" @input="calculateEndTime()" placeholder="0" />
                         </div>
                     </div>
                     
@@ -200,13 +200,13 @@
                 saving: false,
                 saveSuccess: false,
                 noBreak: {{ ($workDay->timeEntries->isNotEmpty() || !is_null($workDay->start_time)) && ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }},
+                breakDuration: '{{ old('break_duration', $workDay->timeEntries->isEmpty() && is_null($workDay->start_time) ? $defaultBreak : $workDay->break_duration) }}',
                 
                 toggleNoBreak() {
-                    const el = document.getElementById('break_duration');
                     if (this.noBreak) {
-                        el.value = 0;
+                        this.breakDuration = 0;
                     } else {
-                        el.value = '{{ $defaultBreak }}';
+                        this.breakDuration = '{{ $defaultBreak }}';
                     }
                     this.calculateEndTime();
                 },
@@ -219,7 +219,7 @@
                 fillStandardHours() {
                     document.getElementById('start_time').value = '{{ $defaultStart }}';
                     document.getElementById('end_time').value = '{{ $defaultEnd }}';
-                    document.getElementById('break_duration').value = '{{ $defaultBreak }}';
+                    this.breakDuration = '{{ $defaultBreak }}';
                     
                     this.noBreak = false;
                 },
@@ -227,7 +227,7 @@
                 clearHours() {
                     document.getElementById('start_time').value = '';
                     document.getElementById('end_time').value = '';
-                    document.getElementById('break_duration').value = '';
+                    this.breakDuration = '';
                     
                     this.noBreak = false;
                 },
@@ -258,7 +258,7 @@
                     let workMinutes = this.entries.reduce((sum, entry) => sum + parseFloat(entry.hours || 0), 0) * 60;
                     
                     // Add Break
-                    let breakVal = parseInt(document.getElementById('break_duration').value) || 0;
+                    let breakVal = parseInt(this.breakDuration) || 0;
                     if (this.noBreak) breakVal = 0;
 
                     let totalMinutes = startMinutes + workMinutes + breakVal;
