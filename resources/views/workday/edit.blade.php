@@ -44,11 +44,11 @@
                             <x-input-label for="end_time" :value="__('Endzeit')" />
                             <x-text-input id="end_time" class="block mt-1 w-full" type="time" name="end_time" :value="old('end_time', $workDay->end_time)" />
                         </div>
-                        <div x-init="$watch('noBreak', value => { if(value) { document.getElementById('break_duration').value = 0; } else { document.getElementById('break_duration').value = '{{ $defaultBreak }}'; } setTimeout(() => calculateEndTime(), 50); })">
+                        <div>
                             <div class="flex justify-between items-center mb-1">
                                 <x-input-label for="break_duration" :value="__('Pause (Minuten)')" />
                                 <div class="flex items-center">
-                                    <input id="no_break" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2" x-model="noBreak">
+                                    <input id="no_break" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2" x-model="noBreak" @change="toggleNoBreak()">
                                     <label for="no_break" class="text-xs text-gray-400 cursor-pointer select-none">Keine Pause</label>
                                 </div>
                             </div>
@@ -200,6 +200,16 @@
                 saving: false,
                 saveSuccess: false,
                 noBreak: {{ ($workDay->timeEntries->isNotEmpty() || !is_null($workDay->start_time)) && ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }},
+                
+                toggleNoBreak() {
+                    const el = document.getElementById('break_duration');
+                    if (this.noBreak) {
+                        el.value = 0;
+                    } else {
+                        el.value = '{{ $defaultBreak }}';
+                    }
+                    this.calculateEndTime();
+                },
                 
                 addEntry() {
                     this.entries.push({ construction_site_name: '', hours: '0.0' });
