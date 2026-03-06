@@ -1,8 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Arbeitszeit erfassen: ') }} {{ \Carbon\Carbon::parse($workDay->date)->locale('de')->isoFormat('dddd, D. MMMM YYYY') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Arbeitszeit erfassen: ') }} {{ \Carbon\Carbon::parse($workDay->date)->locale('de')->isoFormat('dddd, D. MMMM YYYY') }}
+            </h2>
+            <a href="{{ route('month.show', ['year' => \Carbon\Carbon::parse($workDay->date)->format('Y'), 'month' => \Carbon\Carbon::parse($workDay->date)->format('n')]) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Zurück zum Monat
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12" x-data='workDayForm({!! $workDay->timeEntries->load("constructionSite")->toJson() !!}, {!! json_encode($sites->pluck("name")) !!})'>
@@ -36,15 +44,15 @@
                             <x-input-label for="end_time" :value="__('Endzeit')" />
                             <x-text-input id="end_time" class="block mt-1 w-full" type="time" name="end_time" :value="old('end_time', $workDay->end_time)" />
                         </div>
-                        <div x-data="{ noBreak: false }" x-init="if('{{ $workDay->break_duration }}' === '0') { noBreak = true; }">
+                        <div x-data="{ noBreak: {{ ($workDay->timeEntries->isNotEmpty() || !is_null($workDay->start_time)) && ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }} }" x-init="$watch('noBreak', value => { if(value) { document.getElementById('break_duration').value = 0; } else { document.getElementById('break_duration').value = '{{ $defaultBreak }}'; } $dispatch('input'); calculateEndTime(); })">
                             <div class="flex justify-between items-center mb-1">
                                 <x-input-label for="break_duration" :value="__('Pause (Minuten)')" />
                                 <div class="flex items-center">
-                                    <input id="no_break" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2" x-model="noBreak" @change="if(noBreak) { document.getElementById('break_duration').value = 0; $dispatch('input'); calculateEndTime(); } else { document.getElementById('break_duration').value = ''; $dispatch('input'); calculateEndTime(); }">
+                                    <input id="no_break" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2" x-model="noBreak">
                                     <label for="no_break" class="text-xs text-gray-400 cursor-pointer select-none">Keine Pause</label>
                                 </div>
                             </div>
-                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" :value="old('break_duration', $workDay->break_duration)" ::readonly="noBreak" ::class="noBreak ? 'bg-gray-700 text-gray-500' : ''" @input="calculateEndTime()" placeholder="0" />
+                            <x-text-input id="break_duration" class="block mt-1 w-full" type="number" name="break_duration" :value="old('break_duration', $workDay->timeEntries->isEmpty() && is_null($workDay->start_time) ? $defaultBreak : $workDay->break_duration)" ::readonly="noBreak" ::class="noBreak ? 'bg-gray-700 text-gray-500' : ''" @input="calculateEndTime()" placeholder="0" />
                         </div>
                     </div>
                     
@@ -191,6 +199,7 @@
                 })) : [{ construction_site_name: '', hours: '0.0' }],
                 saving: false,
                 saveSuccess: false,
+                noBreak: {{ ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }},
                 
                 addEntry() {
                     this.entries.push({ construction_site_name: '', hours: '0.0' });
@@ -202,10 +211,6 @@
                     document.getElementById('end_time').value = '{{ $defaultEnd }}';
                     document.getElementById('break_duration').value = '{{ $defaultBreak }}';
                     
-                    const noBreakCheckbox = document.getElementById('no_break');
-                    if (noBreakCheckbox && noBreakCheckbox.checked) {
-                        noBreakCheckbox.click(); 
-                    }
                     this.noBreak = false;
                 },
 
@@ -214,11 +219,7 @@
                     document.getElementById('end_time').value = '';
                     document.getElementById('break_duration').value = '';
                     
-                    const noBreakCheckbox = document.getElementById('no_break');
-                    if (noBreakCheckbox && noBreakCheckbox.checked) {
-                        noBreakCheckbox.click(); 
-                    }
-                     this.noBreak = false;
+                    this.noBreak = false;
                 },
 
                 removeEntry(index) {

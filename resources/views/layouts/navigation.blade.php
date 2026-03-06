@@ -112,41 +112,41 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-gray-900 border-t border-gray-800">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('help')" :active="request()->routeIs('help')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+            <x-responsive-nav-link :href="route('help')" :active="request()->routeIs('help')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                 {{ __('Hilfe & FAQ') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+            <x-responsive-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                 {{ __('Material Bestellungen') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+            <x-responsive-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                 {{ __('Lager') }}
             </x-responsive-nav-link>
 
             @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
-                <x-responsive-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                <x-responsive-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                     {{ __('Materialverwaltung') }}
                 </x-responsive-nav-link>
             @endif
 
             @if(auth()->user()->is_admin)
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                     {{ __('Chef Bereich') }}
                 </x-responsive-nav-link>
 
                 @if(auth()->user()->is_super_admin)
-                    <x-responsive-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" class="text-gray-300 hover:text-white hover:bg-gray-800"
+                    <x-responsive-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')" class="text-white hover:text-orange-400 hover:bg-gray-800"
                         onclick="return confirm('ACHTUNG: Sie sind dabei, gravierende Server-Einstellungen zu verändern. Möchten Sie wirklich fortfahren?');">
                         {{ __('Einstellungen') }}
                     </x-responsive-nav-link>
                 @endif
 
-                <x-responsive-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                <x-responsive-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                     {{ __('Dokument an alle senden') }}
                 </x-responsive-nav-link>
             @endif
@@ -160,7 +160,7 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')" class="text-gray-300 hover:text-white hover:bg-gray-800">
+                <x-responsive-nav-link :href="route('profile.edit')" class="text-white hover:text-orange-400 hover:bg-gray-800">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
@@ -168,7 +168,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
-                    <x-responsive-nav-link :href="route('logout')" class="text-gray-300 hover:text-white hover:bg-gray-800"
+                    <x-responsive-nav-link :href="route('logout')" class="text-white hover:text-orange-400 hover:bg-gray-800"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
