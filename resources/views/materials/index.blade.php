@@ -94,22 +94,57 @@
 
                             <div x-show="open" x-transition.opacity style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($group['materials'] as $material)
-                                    <div class="bg-gray-750 border {{ $material->stock_count <= $material->low_stock_threshold ? 'border-red-600' : 'border-gray-600' }} rounded-lg p-5 flex flex-col justify-between shadow-sm">
+                                    <div x-data="{ stock: {{ $material->stock_count }} }" class="bg-gray-750 border rounded-lg p-5 flex flex-col justify-between shadow-sm" :class="stock <= {{ $material->low_stock_threshold }} ? 'border-red-600' : 'border-gray-600'">
                                         <div>
                                             <div class="flex justify-between items-start mb-2">
                                                 <h4 class="text-lg font-semibold text-gray-200">{{ $material->name }}</h4>
-                                                <span class="text-2xl font-bold {{ $material->stock_count <= $material->low_stock_threshold ? 'text-red-500' : 'text-orange-500' }}">
+                                                <span class="text-2xl font-bold" :class="stock <= {{ $material->low_stock_threshold }} ? 'text-red-500' : 'text-orange-500'" x-text="stock">
                                                     {{ $material->stock_count }}
                                                 </span>
                                             </div>
-                                            @if($material->stock_count <= $material->low_stock_threshold)
+                                            <template x-if="stock <= {{ $material->low_stock_threshold }}">
                                                 <p class="text-xs text-red-400 mb-4">Geringer Bestand! (Warnschwelle: {{ $material->low_stock_threshold }})</p>
-                                            @else
+                                            </template>
+                                            <template x-if="stock > {{ $material->low_stock_threshold }}">
                                                 <p class="text-xs text-gray-400 mb-4">Ausreichend auf Lager.</p>
-                                            @endif
+                                            </template>
                                         </div>
 
-                                        <form action="{{ route('materials.transaction', $material) }}" method="POST" class="mt-auto">
+                                        <form action="{{ route('materials.transaction', $material) }}" method="POST" class="mt-auto" x-data="{
+                                            submitting: false,
+                                            stock: {{ $material->stock_count }},
+                                            submitForm(event) {
+                                                if(this.submitting) return;
+                                                this.submitting = true;
+                                                
+                                                const formData = new FormData(event.target);
+                                                
+                                                fetch(event.target.action, {
+                                                    method: 'POST',
+                                                    body: formData,
+                                                    headers: {
+                                                        'X-Requested-With': 'XMLHttpRequest',
+                                                        'Accept': 'application/json'
+                                                    }
+                                                })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if(data.success) {
+                                                        this.stock = data.new_stock;
+                                                        // Show a brief success pulse on the card or similar (optional)
+                                                    } else {
+                                                        alert(data.message || 'Fehler beim Speichern');
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                    alert('Netzwerkfehler beim Speichern der Aktion.');
+                                                })
+                                                .finally(() => {
+                                                    this.submitting = false;
+                                                });
+                                            }
+                                        }" @submit.prevent="submitForm($event)">
                                             @csrf
                                             <div class="flex items-center gap-2">
                                                 <input type="number" name="quantity" min="1" value="1" required class="w-20 bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
@@ -120,13 +155,13 @@
                                                         Entnehmen
                                                     </button>
                                                 @else
-                                                    <button type="submit" onclick="document.getElementById('type_{{ $material->id }}').value='taken'" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded text-sm transition text-center shadow">
+                                                    <button type="submit" onclick="document.getElementById('type_{{ $material->id }}').value='taken'" :disabled="submitting" :class="submitting ? 'opacity-50 cursor-wait' : ''" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded text-sm transition text-center shadow">
                                                         Entnehmen
                                                     </button>
                                                 @endif
 
                                                 @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
-                                                    <button type="submit" onclick="document.getElementById('type_{{ $material->id }}').value='added'" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded text-sm transition text-center shadow">
+                                                    <button type="submit" onclick="document.getElementById('type_{{ $material->id }}').value='added'" :disabled="submitting" :class="submitting ? 'opacity-50 cursor-wait' : ''" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded text-sm transition text-center shadow">
                                                         Auffüllen
                                                     </button>
                                                 @else

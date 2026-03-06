@@ -101,10 +101,16 @@ class MaterialController extends Controller
 
         // Check Roles for Action
         if ($request->type === 'taken' && auth()->user()->role === 'azubi') {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Azubis dürfen selbst keine Materialien entnehmen.'], 403);
+            }
             return redirect()->back()->with('error', 'Azubis dürfen selbst keine Materialien entnehmen.');
         }
 
         if ($request->type === 'added' && !(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Nur Chefs und Materialwarte dürfen Materialien auffüllen.'], 403);
+            }
             return redirect()->back()->with('error', 'Nur Chefs und Materialwarte dürfen Materialien auffüllen.');
         }
 
@@ -114,6 +120,9 @@ class MaterialController extends Controller
 
             if ($request->type === 'taken') {
                 if ($numQuantity > $oldStock) {
+                    if ($request->ajax()) {
+                        return response()->json(['success' => false, 'message' => 'Nicht genügend Bestand für Material: ' . $material->name], 400);
+                    }
                     return redirect()->back()->with('error', 'Nicht genügend Bestand für Material: ' . $material->name);
                 }
                 $material->stock_count -= $numQuantity;
@@ -154,11 +163,23 @@ class MaterialController extends Controller
             }
 
             $action = $request->type === 'taken' ? 'entnommen' : 'hinzugefügt';
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Erfolgreich $numQuantity Stück $action.",
+                    'new_stock' => $material->stock_count
+                ]);
+            }
+
             return redirect()->back()->with('success', "Erfolgreich $numQuantity Stück $action.");
 
         }
         catch (\Exception $e) {
             DB::rollBack();
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Fehler bei der Buchung: ' . $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', 'Fehler bei der Buchung: ' . $e->getMessage());
         }
     }
