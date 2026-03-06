@@ -68,12 +68,24 @@
                                     </select>
                                 </div>
                                 <div class="mb-4">
+                                    <label for="unit" class="block text-sm font-medium text-gray-300">Einheit</label>
+                                    <select name="unit" id="unit" required class="mt-1 block w-full bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
+                                        <option value="Stück">Stück</option>
+                                        <option value="Meter">Meter</option>
+                                        <option value="Karton">Karton</option>
+                                        <option value="Rolle">Rolle</option>
+                                        <option value="Bund">Bund</option>
+                                        <option value="kg">Kilogramm (kg)</option>
+                                        <option value="Liter">Liter</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
                                     <label for="stock_count" class="block text-sm font-medium text-gray-300">Startbestand</label>
-                                    <input type="number" name="stock_count" id="stock_count" min="0" value="0" required class="mt-1 block w-full bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
+                                    <input type="number" name="stock_count" id="stock_count" min="0" step="any" value="0" required class="mt-1 block w-full bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
                                 </div>
                                 <div class="mb-4">
                                     <label for="low_stock_threshold" class="block text-sm font-medium text-gray-300">Warnschwelle (E-Mail)</label>
-                                    <input type="number" name="low_stock_threshold" id="low_stock_threshold" min="0" value="2" required class="mt-1 block w-full bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
+                                    <input type="number" name="low_stock_threshold" id="low_stock_threshold" min="0" step="any" value="2" required class="mt-1 block w-full bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
                                 </div>
                                 <div class="mt-6 flex justify-end">
                                     <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded shadow transition">
@@ -165,10 +177,11 @@
                                         <div x-show="open" x-transition.opacity style="display: none;" class="space-y-4 px-1">
                                             <!-- Desktop Header -->
                                             <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-4 py-3 bg-gray-800 border border-gray-700 text-xs font-bold text-gray-400 uppercase tracking-wider rounded-lg mb-2">
-                                                <div class="col-span-4">Name</div>
+                                                <div class="col-span-3">Name</div>
                                                 <div class="col-span-2">Kategorie</div>
+                                                <div class="col-span-2">Einheit</div>
                                                 <div class="col-span-2">Bestand</div>
-                                                <div class="col-span-2">Warnschwelle</div>
+                                                <div class="col-span-1">Warnung</div>
                                                 <div class="col-span-2 text-right">Aktionen</div>
                                             </div>
 
@@ -179,7 +192,7 @@
                                                         @method('PUT')
                                                         
                                                         <!-- Name -->
-                                                        <div class="w-full sm:col-span-4">
+                                                        <div class="w-full sm:col-span-3">
                                                             <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Name</label>
                                                             <input type="text" name="name" value="{{ $material->name }}" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
@@ -195,16 +208,30 @@
                                                             </select>
                                                         </div>
 
+                                                        <!-- Unit -->
+                                                        <div class="w-full sm:col-span-2">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Einheit</label>
+                                                            <select name="unit" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                                <option value="Stück" {{ $material->unit == 'Stück' ? 'selected' : '' }}>Stück</option>
+                                                                <option value="Meter" {{ $material->unit == 'Meter' ? 'selected' : '' }}>Meter</option>
+                                                                <option value="Karton" {{ $material->unit == 'Karton' ? 'selected' : '' }}>Karton</option>
+                                                                <option value="Rolle" {{ $material->unit == 'Rolle' ? 'selected' : '' }}>Rolle</option>
+                                                                <option value="Bund" {{ $material->unit == 'Bund' ? 'selected' : '' }}>Bund</option>
+                                                                <option value="kg" {{ $material->unit == 'kg' ? 'selected' : '' }}>kg</option>
+                                                                <option value="Liter" {{ $material->unit == 'Liter' ? 'selected' : '' }}>Liter</option>
+                                                            </select>
+                                                        </div>
+
                                                         <!-- Bestand -->
                                                         <div class="w-full sm:col-span-2">
                                                             <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Bestand</label>
-                                                            <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                            <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" step="any" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
 
                                                         <!-- Warnschwelle -->
-                                                        <div class="w-full sm:col-span-2">
+                                                        <div class="w-full sm:col-span-1">
                                                             <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Warnschwelle</label>
-                                                            <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                            <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" step="any" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
 
                                                         <!-- Actions -->

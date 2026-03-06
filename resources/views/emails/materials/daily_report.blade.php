@@ -52,7 +52,7 @@
                             <td style="color: #6b7280; font-size: 14px;">{{ $transaction->created_at->format('H:i') }}</td>
                             <td>{{ $transaction->user ? $transaction->user->name : 'Gelöschter Nutzer' }}</td>
                             <td style="font-weight: bold;">{{ $transaction->material ? $transaction->material->name : 'Gelöschtes Material' }}</td>
-                            <td style="color: #ea580c; font-weight: bold;">-{{ $transaction->quantity }}</td>
+                            <td style="color: #ea580c; font-weight: bold;">-{{ $transaction->quantity }} {{ $transaction->material ? $transaction->material->unit : 'Stück' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

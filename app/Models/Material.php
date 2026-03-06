@@ -9,7 +9,12 @@ class Material extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'stock_count', 'low_stock_threshold', 'category_id'];
+    protected $fillable = ['name', 'unit', 'stock_count', 'low_stock_threshold', 'category_id'];
+
+    protected $casts = [
+        'stock_count' => 'float',
+        'low_stock_threshold' => 'float',
+    ];
 
     public function category()
     {

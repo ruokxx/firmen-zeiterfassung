@@ -11,6 +11,10 @@ class MaterialTransaction extends Model
 
     protected $fillable = ['material_id', 'user_id', 'type', 'quantity'];
 
+    protected $casts = [
+        'quantity' => 'float',
+    ];
+
     public function material()
     {
         return $this->belongsTo(Material::class);

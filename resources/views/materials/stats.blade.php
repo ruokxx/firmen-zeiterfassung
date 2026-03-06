@@ -70,7 +70,7 @@
                                     <li class="py-3 flex justify-between items-center">
                                         <span class="font-medium text-gray-200">{{ $stat->material ? $stat->material->name : 'Gelöschtes Material' }}</span>
                                         <span class="bg-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-sm">
-                                            {{ $stat->total_taken }} Stück
+                                            {{ $stat->total_taken }} {{ $stat->material ? $stat->material->unit : 'Stück' }}
                                         </span>
                                     </li>
                                 @endforeach
@@ -105,7 +105,7 @@
                                                 </div>
                                             </div>
                                             <div class="font-bold text-sm {{ $transaction->type === 'added' ? 'text-green-500' : 'text-red-500' }}">
-                                                {{ $transaction->type === 'added' ? '+' : '-' }}{{ $transaction->quantity }}
+                                                {{ $transaction->type === 'added' ? '+' : '-' }}{{ $transaction->quantity }} {{ $transaction->material ? $transaction->material->unit : 'Stück' }}
                                             </div>
                                         </li>
                                     @endforeach

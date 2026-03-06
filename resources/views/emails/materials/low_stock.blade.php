@@ -25,12 +25,12 @@
             <tr>
                 <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Aktueller Bestand:</strong></td>
                 <td style="padding: 10px; border-bottom: 1px solid #eee;">
-                    <span style="color: #d9534f; font-weight: bold;">{{ $material->stock_count }}</span>
+                    <span style="color: #d9534f; font-weight: bold;">{{ $material->stock_count }} {{ $material->unit }}</span>
                 </td>
             </tr>
             <tr>
                 <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Warnschwelle:</strong></td>
-                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ $material->low_stock_threshold }}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ $material->low_stock_threshold }} {{ $material->unit }}</td>
             </tr>
         </table>
         

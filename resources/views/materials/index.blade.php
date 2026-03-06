@@ -98,8 +98,9 @@
                                         <div>
                                             <div class="flex justify-between items-start mb-2">
                                                 <h4 class="text-lg font-semibold text-gray-200">{{ $material->name }}</h4>
-                                                <span class="text-2xl font-bold" :class="stock <= {{ $material->low_stock_threshold }} ? 'text-red-500' : 'text-orange-500'" x-text="stock">
-                                                    {{ $material->stock_count }}
+                                                <span class="text-2xl font-bold" :class="stock <= {{ $material->low_stock_threshold }} ? 'text-red-500' : 'text-orange-500'">
+                                                    <span x-text="stock">{{ $material->stock_count }}</span> 
+                                                    <span class="text-sm font-normal text-gray-400">{{ $material->unit }}</span>
                                                 </span>
                                             </div>
                                             <template x-if="stock <= {{ $material->low_stock_threshold }}">
@@ -146,7 +147,7 @@
                                         }" @submit.prevent="submitForm($event)">
                                             @csrf
                                             <div class="flex items-center gap-2">
-                                                <input type="number" name="quantity" min="1" value="1" required class="w-20 bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
+                                                <input type="number" name="quantity" min="0" step="any" value="1" required class="w-20 bg-gray-900 border border-gray-600 text-gray-200 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
                                                 <input type="hidden" name="type" id="type_{{ $material->id }}" value="taken">
                                                 
                                                 @if(auth()->user()->role === 'azubi')
