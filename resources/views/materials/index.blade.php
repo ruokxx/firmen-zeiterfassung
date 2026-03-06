@@ -112,7 +112,6 @@
 
                                         <form action="{{ route('materials.transaction', $material) }}" method="POST" class="mt-auto" x-data="{
                                             submitting: false,
-                                            stock: {{ $material->stock_count }},
                                             submitForm(event) {
                                                 if(this.submitting) return;
                                                 this.submitting = true;
