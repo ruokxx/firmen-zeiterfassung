@@ -18,9 +18,9 @@ class WorkDayController extends Controller
         $workDay = $user->workDays()->firstOrCreate(
         ['date' => $date],
         [
-            'start_time' => $defaultStart,
-            'end_time' => $defaultEnd,
-            'break_duration' => $defaultBreak
+            'start_time' => null,
+            'end_time' => null,
+            'break_duration' => null
         ]
         );
 

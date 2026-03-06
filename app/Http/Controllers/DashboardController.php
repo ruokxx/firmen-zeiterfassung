@@ -81,8 +81,10 @@ class DashboardController extends Controller
                 }
             }
 
-            // Get days with entries
-            $workedDays = $monthWorkDays->map(function ($day) {
+            // Get days with entries (only count if they actually have time entries, not just an empty WorkDay record)
+            $workedDays = $monthWorkDays->filter(function ($day) {
+                return $day->timeEntries->count() > 0;
+            })->map(function ($day) {
                 return (int)\Carbon\Carbon::parse($day->date)->day;
             })->toArray();
 
