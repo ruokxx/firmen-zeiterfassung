@@ -175,32 +175,24 @@
                                             </svg>
                                         </h4>
                                         <div x-show="open" x-transition.opacity style="display: none;" class="space-y-4 px-1">
-                                            <!-- Desktop Header -->
-                                            <div class="hidden sm:grid sm:grid-cols-13 gap-4 px-4 py-3 bg-gray-800 border border-gray-700 text-xs font-bold text-gray-400 uppercase tracking-wider rounded-lg mb-2">
-                                                <div class="col-span-4">Name</div>
-                                                <div class="col-span-2">Kategorie</div>
-                                                <div class="col-span-2">Einheit</div>
-                                                <div class="col-span-2">Bestand</div>
-                                                <div class="col-span-1">Warnung</div>
-                                                <div class="col-span-2 text-right">Aktionen</div>
-                                            </div>
+                                            <!-- Desktop Header removed, using card layout everywhere -->
 
                                             @foreach($group['materials'] as $material)
-                                                <div class="bg-gray-900 sm:bg-transparent border border-gray-700 sm:border-b sm:border-t-0 sm:border-l-0 sm:border-r-0 rounded-lg sm:rounded-none p-4 sm:p-0 sm:pb-3 mb-4 sm:mb-0 relative shadow-sm sm:shadow-none">
-                                                    <form action="{{ route('materials.update', $material) }}" method="POST" class="flex flex-col sm:grid sm:grid-cols-13 gap-4 items-start sm:items-center">
+                                                <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-4 relative shadow-sm">
+                                                    <form action="{{ route('materials.update', $material) }}" method="POST" class="flex flex-col gap-4">
                                                         @csrf
                                                         @method('PUT')
                                                         
                                                         <!-- Name -->
-                                                        <div class="w-full sm:col-span-4">
-                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Name</label>
-                                                            <input type="text" name="name" value="{{ $material->name }}" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                        <div class="w-full">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Name</label>
+                                                            <input type="text" name="name" value="{{ $material->name }}" required class="w-full bg-gray-800 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
 
                                                         <!-- Category -->
-                                                        <div class="w-full sm:col-span-2">
-                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Kategorie</label>
-                                                            <select name="category_id" class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                        <div class="w-full">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Kategorie</label>
+                                                            <select name="category_id" class="w-full bg-gray-800 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                                 <option value="">-- Keine --</option>
                                                                 @foreach($categories as $category)
                                                                     <option value="{{ $category->id }}" {{ $material->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -209,9 +201,9 @@
                                                         </div>
 
                                                         <!-- Unit -->
-                                                        <div class="w-full sm:col-span-2">
-                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Einheit</label>
-                                                            <select name="unit" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                        <div class="w-full">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Einheit</label>
+                                                            <select name="unit" required class="w-full bg-gray-800 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                                 <option value="Stück" {{ $material->unit == 'Stück' ? 'selected' : '' }}>Stück</option>
                                                                 <option value="Meter" {{ $material->unit == 'Meter' ? 'selected' : '' }}>Meter</option>
                                                                 <option value="Karton" {{ $material->unit == 'Karton' ? 'selected' : '' }}>Karton</option>
@@ -223,21 +215,21 @@
                                                         </div>
 
                                                         <!-- Bestand -->
-                                                        <div class="w-full sm:col-span-2">
-                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Bestand</label>
-                                                            <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" step="any" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                        <div class="w-full">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Bestand</label>
+                                                            <input type="number" name="stock_count" value="{{ $material->stock_count }}" min="0" step="any" required class="w-full bg-gray-800 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
 
                                                         <!-- Warnschwelle -->
-                                                        <div class="w-full sm:col-span-1">
-                                                            <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Warnschwelle</label>
-                                                            <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" step="any" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
+                                                        <div class="w-full">
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Warnschwelle</label>
+                                                            <input type="number" name="low_stock_threshold" value="{{ $material->low_stock_threshold }}" min="0" step="any" required class="w-full bg-gray-800 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
 
                                                         <!-- Actions -->
-                                                        <div class="w-full sm:col-span-2 flex flex-row justify-end items-center gap-2 mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-gray-700 sm:border-0">
-                                                            <button type="submit" class="text-blue-100 bg-blue-700 hover:bg-blue-600 border border-blue-600 sm:border-0 sm:bg-gray-700 sm:text-blue-400 sm:hover:text-blue-300 px-4 py-2 sm:px-3 sm:py-1 rounded text-sm font-medium transition flex-1 sm:flex-none text-center shadow sm:shadow-none">Speichern</button>
-                                                            <button type="button" onclick="if(confirm('Möchtest du dieses Material wirklich löschen? Historie bleibt bei den Transaktionen ggf. erhalten (ohne Material Name), besser ist es Bestand auf 0 zu setzen.')) { document.getElementById('delete-form-{{ $material->id }}').submit(); }" class="text-red-100 bg-red-900 hover:bg-red-800 border border-red-700 sm:border-0 sm:bg-gray-700 sm:text-red-400 sm:hover:text-red-300 px-4 py-2 sm:px-3 sm:py-1 rounded text-sm font-medium transition flex-1 sm:flex-none text-center shadow sm:shadow-none">Löschen</button>
+                                                        <div class="w-full flex flex-row justify-end items-center gap-2 mt-2 pt-3 border-t border-gray-700">
+                                                            <button type="submit" class="text-blue-100 bg-blue-700 hover:bg-blue-600 border border-blue-600 px-4 py-2 rounded text-sm font-medium transition flex-1 text-center shadow">Speichern</button>
+                                                            <button type="button" onclick="if(confirm('Möchtest du dieses Material wirklich löschen? Historie bleibt bei den Transaktionen ggf. erhalten (ohne Material Name), besser ist es Bestand auf 0 zu setzen.')) { document.getElementById('delete-form-{{ $material->id }}').submit(); }" class="text-red-100 bg-red-900 hover:bg-red-800 border border-red-700 px-4 py-2 rounded text-sm font-medium transition flex-1 text-center shadow">Löschen</button>
                                                         </div>
                                                     </form>
                                                     
