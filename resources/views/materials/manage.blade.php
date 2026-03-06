@@ -176,8 +176,8 @@
                                         </h4>
                                         <div x-show="open" x-transition.opacity style="display: none;" class="space-y-4 px-1">
                                             <!-- Desktop Header -->
-                                            <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-4 py-3 bg-gray-800 border border-gray-700 text-xs font-bold text-gray-400 uppercase tracking-wider rounded-lg mb-2">
-                                                <div class="col-span-3">Name</div>
+                                            <div class="hidden sm:grid sm:grid-cols-13 gap-4 px-4 py-3 bg-gray-800 border border-gray-700 text-xs font-bold text-gray-400 uppercase tracking-wider rounded-lg mb-2">
+                                                <div class="col-span-4">Name</div>
                                                 <div class="col-span-2">Kategorie</div>
                                                 <div class="col-span-2">Einheit</div>
                                                 <div class="col-span-2">Bestand</div>
@@ -187,12 +187,12 @@
 
                                             @foreach($group['materials'] as $material)
                                                 <div class="bg-gray-900 sm:bg-transparent border border-gray-700 sm:border-b sm:border-t-0 sm:border-l-0 sm:border-r-0 rounded-lg sm:rounded-none p-4 sm:p-0 sm:pb-3 mb-4 sm:mb-0 relative shadow-sm sm:shadow-none">
-                                                    <form action="{{ route('materials.update', $material) }}" method="POST" class="flex flex-col sm:grid sm:grid-cols-12 gap-4 items-start sm:items-center">
+                                                    <form action="{{ route('materials.update', $material) }}" method="POST" class="flex flex-col sm:grid sm:grid-cols-13 gap-4 items-start sm:items-center">
                                                         @csrf
                                                         @method('PUT')
                                                         
                                                         <!-- Name -->
-                                                        <div class="w-full sm:col-span-3">
+                                                        <div class="w-full sm:col-span-4">
                                                             <label class="block text-xs font-bold text-gray-500 mb-1 sm:hidden uppercase">Name</label>
                                                             <input type="text" name="name" value="{{ $material->name }}" required class="w-full bg-gray-800 sm:bg-gray-900 border border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm">
                                                         </div>
