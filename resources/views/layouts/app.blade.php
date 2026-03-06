@@ -78,5 +78,6 @@
             </footer>
             <x-reminder-popup />
         </div>
+        @stack('scripts')
     </body>
 </html>
