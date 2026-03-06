@@ -62,8 +62,14 @@
                     @endphp
 
                     @forelse($renderGroups as $group)
-                        <div class="mb-10" x-data="{ open: false }">
-                            <h4 @click="open = !open" class="cursor-pointer text-xl font-bold text-gray-200 mb-4 pb-2 border-b border-gray-700 flex items-center justify-between select-none hover:text-orange-400 transition">
+                        <div class="mb-10" x-data="{ 
+                            open: sessionStorage.getItem('materialCategoryOpen_{{ Str::slug($group['title']) }}') === 'true',
+                            toggle() {
+                                this.open = !this.open;
+                                sessionStorage.setItem('materialCategoryOpen_{{ Str::slug($group['title']) }}', this.open);
+                            }
+                        }">
+                            <h4 @click="toggle()" class="cursor-pointer text-xl font-bold text-gray-200 mb-4 pb-2 border-b border-gray-700 flex items-center justify-between select-none hover:text-orange-400 transition">
                                 <div class="flex items-center gap-3">
                                     {{ $group['title'] }}
                                     
@@ -153,4 +159,28 @@
 
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Restore scroll position if it exists in sessionStorage
+            const scrollPosition = sessionStorage.getItem('materialScrollPosition');
+            if (scrollPosition !== null) {
+                window.scrollTo(0, parseInt(scrollPosition, 10));
+                sessionStorage.removeItem('materialScrollPosition');
+            }
+
+            // Save scroll position when any form is submitted
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    sessionStorage.setItem('materialScrollPosition', window.scrollY);
+                    
+                    // Also pass a parameter to keep the accordion open if possible (requires backend/view support, 
+                    // but for now scrolling to the exact pixel is the main goal)
+                });
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>

@@ -150,6 +150,21 @@ class DashboardController extends Controller
             ];
         }
 
+        // Monate so sortieren, dass der aktuelle Monat zuerst kommt, dann der Folgemonat usw.
+        $currentMonth = (int)date('n');
+        $sortedMonths = [];
+
+        // Aktueller Monat bis Dezember
+        for ($m = $currentMonth; $m <= 12; $m++) {
+            $sortedMonths[$m] = $months[$m];
+        }
+
+        // Januar bis Vormonat
+        for ($m = 1; $m < $currentMonth; $m++) {
+            $sortedMonths[$m] = $months[$m];
+        }
+
+        $months = $sortedMonths;
 
         $yearlyTotal = collect($months)->sum('total_hours');
 
