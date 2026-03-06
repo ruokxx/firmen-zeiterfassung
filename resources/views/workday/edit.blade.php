@@ -44,7 +44,7 @@
                             <x-input-label for="end_time" :value="__('Endzeit')" />
                             <x-text-input id="end_time" class="block mt-1 w-full" type="time" name="end_time" :value="old('end_time', $workDay->end_time)" />
                         </div>
-                        <div x-data="{ noBreak: {{ ($workDay->timeEntries->isNotEmpty() || !is_null($workDay->start_time)) && ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }} }" x-init="$watch('noBreak', value => { if(value) { document.getElementById('break_duration').value = 0; } else { document.getElementById('break_duration').value = '{{ $defaultBreak }}'; } $dispatch('input'); calculateEndTime(); })">
+                        <div x-init="$watch('noBreak', value => { if(value) { document.getElementById('break_duration').value = 0; } else { document.getElementById('break_duration').value = '{{ $defaultBreak }}'; } setTimeout(() => calculateEndTime(), 50); })">
                             <div class="flex justify-between items-center mb-1">
                                 <x-input-label for="break_duration" :value="__('Pause (Minuten)')" />
                                 <div class="flex items-center">
@@ -199,7 +199,7 @@
                 })) : [{ construction_site_name: '', hours: '0.0' }],
                 saving: false,
                 saveSuccess: false,
-                noBreak: {{ ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }},
+                noBreak: {{ ($workDay->timeEntries->isNotEmpty() || !is_null($workDay->start_time)) && ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }},
                 
                 addEntry() {
                     this.entries.push({ construction_site_name: '', hours: '0.0' });
