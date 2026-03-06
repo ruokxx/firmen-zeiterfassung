@@ -200,7 +200,7 @@
                 saving: false,
                 saveSuccess: false,
                 noBreak: {{ ($workDay->timeEntries->isNotEmpty() || !is_null($workDay->start_time)) && ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }},
-                breakDuration: '{{ old('break_duration', $workDay->timeEntries->isEmpty() && is_null($workDay->start_time) ? $defaultBreak : $workDay->break_duration) }}',
+                breakDuration: @json(old('break_duration', $workDay->timeEntries->isEmpty() && is_null($workDay->start_time) ? $defaultBreak : $workDay->break_duration)),
                 
                 toggleNoBreak() {
                     if (this.noBreak) {
