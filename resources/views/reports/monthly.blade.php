@@ -103,6 +103,50 @@
     </div>
     @endif
 
+    @if(isset($appendPrevMonth) && $appendPrevMonth && isset($prevWorkDays) && $prevWorkDays->count() > 0)
+    <div style="page-break-before: always;"></div>
+    <h2>Anhang: Vormonat ({{ $startOfMonth->copy()->subMonth()->locale('de')->isoFormat('MMMM YYYY') }})</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Start/Ende</th>
+                <th>Pause</th>
+                <th>Gesamt</th>
+                <th>Details (Baustellen)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $totalPrevHoursMonth = 0;
+            @endphp
+            @foreach($prevWorkDays as $day)
+                @php
+                    $hours = $day->total_hours;
+                    $totalPrevHoursMonth += $hours;
+                @endphp
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($day->date)->format('d.m.Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($day->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($day->end_time)->format('H:i') }}</td>
+                    <td>{{ $day->break_duration }} Min</td>
+                    <td>{{ number_format($hours, 1) }} h</td>
+                    <td>
+                        @foreach($day->timeEntries as $entry)
+                            <div>{{ $entry->constructionSite->name }}: {{ number_format($entry->hours, 1) }} h</div>
+                        @endforeach
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" style="text-align: right; font-weight: bold;">Gesamtstunden (Vormonat):</td>
+                <td colspan="2" style="font-weight: bold;">{{ number_format($totalPrevHoursMonth, 1) }} h</td>
+            </tr>
+        </tfoot>
+    </table>
+    @endif
+
     <div class="footer">
         Seite 1 von 1
     </div>

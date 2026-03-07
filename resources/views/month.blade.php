@@ -19,7 +19,7 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 gap-4" x-data="{ includeCarryover: false }">
+            <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 gap-4" x-data="{ includeCarryover: false, appendPrevMonth: false }">
                 <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-orange-400 transition flex items-center gap-1">
                     <span>&larr;</span> Zurück zur Übersicht
                 </a>
@@ -39,8 +39,13 @@
                         <input type="checkbox" x-model="includeCarryover" class="rounded border-gray-600 bg-gray-700 text-orange-500 shadow-sm focus:ring-orange-500 focus:ring-offset-gray-800">
                         <span class="ml-2 text-sm text-gray-300">Übertrag Vormonat</span>
                     </label>
+
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" x-model="appendPrevMonth" class="rounded border-gray-600 bg-gray-700 text-blue-500 shadow-sm focus:ring-blue-500 focus:ring-offset-gray-800">
+                        <span class="ml-2 text-sm text-gray-300">Vormonat anhängen</span>
+                    </label>
                     
-                    <a :href="'{{ route('report.download', ['year' => $startOfMonth->year, 'month' => $startOfMonth->month]) }}' + '&include_carryover=' + (includeCarryover ? '1' : '0')" 
+                    <a :href="'{{ route('report.download', ['year' => $startOfMonth->year, 'month' => $startOfMonth->month]) }}' + '&include_carryover=' + (includeCarryover ? '1' : '0') + '&append_prev_month=' + (appendPrevMonth ? '1' : '0')" 
                        class="bg-gray-700 text-gray-200 px-3 py-1.5 rounded text-sm hover:bg-gray-600 transition shadow-sm border border-gray-600 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

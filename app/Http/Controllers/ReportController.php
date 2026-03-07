@@ -125,7 +125,20 @@ class ReportController extends Controller
             ->where('month', $month)
             ->first();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays', 'remark'));
+        $appendPrevMonth = filter_var($request->input('append_prev_month', 'false'), FILTER_VALIDATE_BOOLEAN);
+        $prevWorkDays = collect();
+
+        if ($appendPrevMonth) {
+            $prevMonthDate = $startOfMonth->copy()->subMonth();
+            $prevWorkDays = $user->workDays()
+                ->whereYear('date', $prevMonthDate->year)
+                ->whereMonth('date', $prevMonthDate->month)
+                ->with(['timeEntries.constructionSite'])
+                ->orderBy('date')
+                ->get();
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays', 'remark', 'appendPrevMonth', 'prevWorkDays'));
 
         return $pdf->download("Monatsbericht_{$user->name}_{$month}_{$year}.pdf");
     }
@@ -239,7 +252,20 @@ class ReportController extends Controller
             ->where('month', $month)
             ->first();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays', 'remark'));
+        $appendPrevMonth = $request->boolean('append_prev_month');
+        $prevWorkDays = collect();
+
+        if ($appendPrevMonth) {
+            $prevMonthDate = $startOfMonth->copy()->subMonth();
+            $prevWorkDays = $user->workDays()
+                ->whereYear('date', $prevMonthDate->year)
+                ->whereMonth('date', $prevMonthDate->month)
+                ->with(['timeEntries.constructionSite'])
+                ->orderBy('date')
+                ->get();
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.monthly', compact('user', 'workDays', 'startOfMonth', 'year', 'month', 'previousMonthBalance', 'includeCarryover', 'vacationDaysPerYear', 'yearlyVacationDaysTaken', 'remainingVacationDays', 'remark', 'appendPrevMonth', 'prevWorkDays'));
         $pdfContent = $pdf->output();
 
         try {

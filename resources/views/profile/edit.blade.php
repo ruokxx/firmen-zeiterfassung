@@ -44,14 +44,17 @@
                                             <input type="checkbox" name="include_carryover" value="1" class="rounded border-gray-600 bg-gray-700 text-blue-600 shadow-sm focus:ring-blue-500 focus:ring-offset-gray-800 h-4 w-4">
                                             <span class="ml-1 text-xs text-gray-400">Mit Übertrag</span>
                                         </label>
+                                        <label class="inline-flex items-center cursor-pointer mr-2">
+                                            <input type="checkbox" name="append_prev_month" value="1" class="rounded border-gray-600 bg-gray-700 text-orange-500 shadow-sm focus:ring-orange-500 focus:ring-offset-gray-800 h-4 w-4">
+                                            <span class="ml-1 text-xs text-gray-400">Vormonat anhängen</span>
+                                        </label>
                                         <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 transition">
                                             An Chef senden
                                         </button>
+                                        <button type="submit" formaction="{{ route('report.download') }}" formmethod="GET" class="inline-flex items-center px-3 py-1.5 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-500 transition ml-2">
+                                            Download PDF
+                                        </button>
                                     </form>
-                                    <a href="{{ route('report.download', ['year' => $report['year'], 'month' => $report['month']]) }}" 
-                                       class="inline-flex items-center px-3 py-1.5 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-500 transition">
-                                        Download PDF
-                                    </a>
                                 </div>
                             </div>
                         @empty
