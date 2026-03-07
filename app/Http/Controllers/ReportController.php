@@ -40,7 +40,7 @@ class ReportController extends Controller
         $startTimeParse = \Carbon\Carbon::parse($defaultStart);
         $endTimeParse = \Carbon\Carbon::parse($defaultEnd);
         $diffMinutes = $startTimeParse->diffInMinutes($endTimeParse);
-        $workMinutes = max(0, $diffMinutes - $defaultBreak);
+        $workMinutes = $diffMinutes; // Ignore break duration for target calculations
         $defaultDailyHours = round($workMinutes / 60, 2);
 
         $targetHoursMonth = 0;
@@ -162,7 +162,7 @@ class ReportController extends Controller
         $startTimeParse = \Carbon\Carbon::parse($defaultStart);
         $endTimeParse = \Carbon\Carbon::parse($defaultEnd);
         $diffMinutes = $startTimeParse->diffInMinutes($endTimeParse);
-        $workMinutes = max(0, $diffMinutes - $defaultBreak);
+        $workMinutes = $diffMinutes; // Ignore break duration for target calculations
         $defaultDailyHours = round($workMinutes / 60, 2);
 
         // Check if carryover should be included (default: false if unchecked, true if checked - assuming checkbox sends 1)

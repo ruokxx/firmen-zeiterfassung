@@ -50,7 +50,7 @@ class WorkDayController extends Controller
         $start = \Carbon\Carbon::parse($defaultStart);
         $end = \Carbon\Carbon::parse($defaultEnd);
         $diffMinutes = $start->diffInMinutes($end);
-        $workMinutes = max(0, $diffMinutes - $defaultBreak);
+        $workMinutes = $diffMinutes; // Ignore break duration for full day statuses
         $defaultHours = round($workMinutes / 60, 2);
 
         // Find or create WorkDay with configured times

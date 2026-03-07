@@ -76,7 +76,7 @@
                     $start = \Carbon\Carbon::parse($defaultStart);
                     $end = \Carbon\Carbon::parse($defaultEnd);
                     $diffMinutes = $start->diffInMinutes($end);
-                    $workMinutes = max(0, $diffMinutes - $defaultBreak);
+                    $workMinutes = $diffMinutes; // Ignore break duration for full day statuses
                     $defaultDailyHours = round($workMinutes / 60, 2);
                 @endphp
                 <div class="flex items-center gap-2">
