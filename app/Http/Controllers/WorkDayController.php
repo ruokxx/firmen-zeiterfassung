@@ -54,11 +54,12 @@ class WorkDayController extends Controller
         $defaultHours = round($workMinutes / 60, 2);
 
         // Find or create WorkDay with configured times
+        $calculatedEnd = $start->copy()->addMinutes($workMinutes + $defaultBreak)->format('H:i');
         $workDay = $user->workDays()->updateOrCreate(
         ['date' => $date],
         [
             'start_time' => $defaultStart,
-            'end_time' => $defaultEnd,
+            'end_time' => $calculatedEnd,
             'break_duration' => $defaultBreak
         ]
         );
