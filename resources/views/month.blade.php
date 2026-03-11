@@ -24,30 +24,30 @@
                     <span>&larr;</span> Zurück zur Übersicht
                 </a>
                 
-                <div class="flex items-center gap-4 bg-gray-800 p-2 rounded-lg border border-gray-700">
+                <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 bg-gray-800 p-3 sm:p-2 rounded-lg border border-gray-700 w-full sm:w-auto">
                     {{-- Holiday Import --}}
-                    <form action="{{ route('month.import-holidays') }}" method="POST" class="flex items-center" onsubmit="return confirm('Möchten Sie wirklich Feiertage (NI) für {{ $startOfMonth->year }} importieren? Bereits existierende Einträge werden nicht überschrieben.');">
+                    <form action="{{ route('month.import-holidays') }}" method="POST" class="flex flex-col sm:flex-row items-stretch sm:items-center w-full sm:w-auto" onsubmit="return confirm('Möchten Sie wirklich Feiertage (NI) für {{ $startOfMonth->year }} importieren? Bereits existierende Einträge werden nicht überschrieben.');">
                         @csrf
                         <input type="hidden" name="year" value="{{ $startOfMonth->year }}">
                         <input type="hidden" name="month" value="{{ $startOfMonth->month }}">
-                        <button type="submit" class="text-xs bg-indigo-700 text-indigo-100 px-2 py-1.5 rounded hover:bg-indigo-600 transition border border-indigo-600 mr-4" title="Feiertage für Niedersachsen importieren">
+                        <button type="submit" class="w-full sm:w-auto flex justify-center text-sm sm:text-xs bg-indigo-700 text-indigo-100 px-3 py-2 sm:px-2 sm:py-1.5 rounded hover:bg-indigo-600 transition border border-indigo-600 sm:mr-2 lg:mr-4" title="Feiertage für Niedersachsen importieren">
                             Feiertage (NI)
                         </button>
                     </form>
 
                     <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" x-model="includeCarryover" class="rounded border-gray-600 bg-gray-700 text-orange-500 shadow-sm focus:ring-orange-500 focus:ring-offset-gray-800">
-                        <span class="ml-2 text-sm text-gray-300">Übertrag Vormonat</span>
+                        <input type="checkbox" x-model="includeCarryover" class="rounded border-gray-600 bg-gray-700 text-orange-500 shadow-sm focus:ring-orange-500 focus:ring-offset-gray-800 h-5 w-5 sm:h-4 sm:w-4">
+                        <span class="ml-3 sm:ml-2 text-base sm:text-sm text-gray-300">Übertrag Vormonat</span>
                     </label>
 
                     <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" x-model="appendPrevMonth" class="rounded border-gray-600 bg-gray-700 text-blue-500 shadow-sm focus:ring-blue-500 focus:ring-offset-gray-800">
-                        <span class="ml-2 text-sm text-gray-300">Vormonat anhängen</span>
+                        <input type="checkbox" x-model="appendPrevMonth" class="rounded border-gray-600 bg-gray-700 text-blue-500 shadow-sm focus:ring-blue-500 focus:ring-offset-gray-800 h-5 w-5 sm:h-4 sm:w-4">
+                        <span class="ml-3 sm:ml-2 text-base sm:text-sm text-gray-300">Vormonat anhängen</span>
                     </label>
                     
                     <a :href="'{{ route('report.download', ['year' => $startOfMonth->year, 'month' => $startOfMonth->month]) }}' + '&include_carryover=' + (includeCarryover ? '1' : '0') + '&append_prev_month=' + (appendPrevMonth ? '1' : '0')" 
-                       class="bg-gray-700 text-gray-200 px-3 py-1.5 rounded text-sm hover:bg-gray-600 transition shadow-sm border border-gray-600 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       class="w-full sm:w-auto justify-center bg-gray-700 text-gray-200 px-3 py-2 sm:py-1.5 rounded text-base sm:text-sm hover:bg-gray-600 transition shadow-sm border border-gray-600 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         PDF Export
