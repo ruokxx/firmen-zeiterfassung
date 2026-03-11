@@ -212,4 +212,23 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Restore scroll position if saved
+            let scrollpos = sessionStorage.getItem('scrollpos_month');
+            if (scrollpos) {
+                window.scrollTo(0, parseInt(scrollpos));
+                sessionStorage.removeItem('scrollpos_month');
+            }
+
+            // Save scroll position when submitting any form (e.g. Quick Actions or Delete)
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    sessionStorage.setItem('scrollpos_month', window.scrollY);
+                });
+            });
+        });
+    </script>
 </x-app-layout>
