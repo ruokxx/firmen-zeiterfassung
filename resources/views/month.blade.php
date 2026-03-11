@@ -215,19 +215,57 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Restore scroll position if saved
-            let scrollpos = sessionStorage.getItem('scrollpos_month');
-            if (scrollpos) {
-                window.scrollTo(0, parseInt(scrollpos));
-                sessionStorage.removeItem('scrollpos_month');
-            }
+            const gridContainer = document.querySelector('.grid');
+            if (!gridContainer) return;
 
-            // Save scroll position when submitting any form (e.g. Quick Actions or Delete)
-            const forms = document.querySelectorAll('form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function() {
-                    sessionStorage.setItem('scrollpos_month', window.scrollY);
-                });
+            gridContainer.addEventListener('submit', function(e) {
+                if (e.target.tagName.toLowerCase() === 'form') {
+                    e.preventDefault();
+                    
+                    const form = e.target;
+                    const url = form.getAttribute('action');
+                    const formData = new FormData(form);
+                    const btn = form.querySelector('button[type="submit"]');
+                    
+                    const originalOpacity = btn.style.opacity;
+                    btn.style.opacity = '0.5';
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Fetch updated HTML silently and just replace the grid container's inner HTML
+                            fetch(window.location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                            .then(res => res.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const newGrid = doc.querySelector('.grid');
+                                
+                                if (newGrid) {
+                                    gridContainer.innerHTML = newGrid.innerHTML;
+                                } else {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            alert(data.message || 'Fehler beim Speichern.');
+                            btn.style.opacity = originalOpacity;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Systemfehler aufgetreten.');
+                        if (btn) btn.style.opacity = originalOpacity;
+                    });
+                }
             });
         });
     </script>

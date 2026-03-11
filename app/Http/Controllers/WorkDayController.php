@@ -79,6 +79,10 @@ class WorkDayController extends Controller
             'hours' => $defaultHours
         ]);
 
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => "$status für $date wurde eingetragen."]);
+        }
+
         return back()->with('success', "$status für $date wurde eingetragen.");
     }
 
@@ -247,9 +251,15 @@ class WorkDayController extends Controller
         if ($workDay) {
             $workDay->timeEntries()->delete();
             $workDay->delete();
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Einträge für ' . $date . ' wurden zurückgesetzt.']);
+            }
             return back()->with('success', 'Einträge für ' . $date . ' wurden zurückgesetzt.');
         }
 
+        if ($request->wantsJson()) {
+            return response()->json(['success' => false, 'message' => 'Keine Einträge gefunden.'], 404);
+        }
         return back()->with('error', 'Keine Einträge gefunden.');
     }
 
