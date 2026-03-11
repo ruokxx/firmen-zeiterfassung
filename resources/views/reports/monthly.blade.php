@@ -62,7 +62,10 @@
                     $totalHoursMonth += $hours;
                 @endphp
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($day->date)->format('d.m.Y') }}</td>
+                    <td>
+                        {{ \Carbon\Carbon::parse($day->date)->format('d.m.Y') }}<br>
+                        <span style="font-size: 10px; color: #666;">{{ \Carbon\Carbon::parse($day->date)->locale('de')->isoFormat('dddd') }}</span>
+                    </td>
                     <td>{{ \Carbon\Carbon::parse($day->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($day->end_time)->format('H:i') }}</td>
                     <td>{{ $day->break_duration }} Min</td>
                     <td>{{ number_format($hours, 1) }} h</td>
@@ -126,7 +129,10 @@
                     $totalPrevHoursMonth += $hours;
                 @endphp
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($day->date)->format('d.m.Y') }}</td>
+                    <td>
+                        {{ \Carbon\Carbon::parse($day->date)->format('d.m.Y') }}<br>
+                        <span style="font-size: 10px; color: #666;">{{ \Carbon\Carbon::parse($day->date)->locale('de')->isoFormat('dddd') }}</span>
+                    </td>
                     <td>{{ \Carbon\Carbon::parse($day->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($day->end_time)->format('H:i') }}</td>
                     <td>{{ $day->break_duration }} Min</td>
                     <td>{{ number_format($hours, 1) }} h</td>
