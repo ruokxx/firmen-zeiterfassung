@@ -32,6 +32,13 @@ class SendDailyMaterialReminderCommand extends Command
      */
     public function handle()
     {
+        // Check if materials feature is enabled system-wide
+        $materialsEnabled = Setting::where('key', 'materials_enabled')->value('value') !== '0';
+        if (!$materialsEnabled) {
+            $this->info('Materials feature is system-wide disabled. Aborting.');
+            return 0;
+        }
+
         // First check if today is a weekday (Monday to Friday)
         if (Carbon::now()->isWeekend()) {
             $this->info('Today is weekend. No material reminders will be sent.');

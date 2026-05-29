@@ -38,6 +38,25 @@
     <div class="py-2">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> <!-- Standard width for margins -->
 
+            {{-- Baustellen Suche --}}
+            <div class="mb-6 bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-sm">
+                <form method="GET" action="{{ route('admin.construction-sites.index') }}" class="flex flex-col sm:flex-row gap-3 items-center">
+                    <div class="flex-grow w-full">
+                        <div class="relative">
+                            <input type="text" name="search" placeholder="Baustelle suchen (z.B. Straße oder Kunde)..." class="w-full pl-10 bg-gray-900 border-gray-600 text-gray-200 rounded-md focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 text-sm py-2">
+                            <div class="absolute left-3 top-2.5 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full sm:w-auto bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-6 rounded text-sm transition whitespace-nowrap">
+                        Baustelle suchen
+                    </button>
+                </form>
+            </div>
+
             @if(auth()->user()->is_materialwart)
                 <div class="mb-6 bg-orange-900 border border-orange-700 text-orange-100 px-4 py-3 rounded relative shadow-md flex items-center gap-3" role="alert">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,23 +133,25 @@
             </div>
 
             {{-- Small Lager Status Alert --}}
-            <a href="{{ route('materials.index') }}" class="block mb-4 overflow-hidden rounded-lg shadow-sm transition hover:scale-[1.01] focus:outline-none w-full">
-                @if(isset($hasLowStock) && $hasLowStock)
-                    <div class="flex items-center justify-center p-4 bg-red-900/80 border border-red-600 animate-pulse text-red-100 font-bold uppercase tracking-wider text-xs sm:text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        Lagerbestand prüfen !
-                    </div>
-                @else
-                    <div class="flex items-center justify-center p-4 bg-gray-800 border border-green-600 text-green-400 font-bold uppercase tracking-wider text-xs sm:text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span class="animate-pulse">Lagerbestand Okay</span>
-                    </div>
-                @endif
-            </a>
+            @if($materialsEnabled)
+                <a href="{{ route('materials.index') }}" class="block mb-4 overflow-hidden rounded-lg shadow-sm transition hover:scale-[1.01] focus:outline-none w-full">
+                    @if(isset($hasLowStock) && $hasLowStock)
+                        <div class="flex items-center justify-center p-4 bg-red-900/80 border border-red-600 animate-pulse text-red-100 font-bold uppercase tracking-wider text-xs sm:text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Lagerbestand prüfen !
+                        </div>
+                    @else
+                        <div class="flex items-center justify-center p-4 bg-gray-800 border border-green-600 text-green-400 font-bold uppercase tracking-wider text-xs sm:text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="animate-pulse">Lagerbestand Okay</span>
+                        </div>
+                    @endif
+                </a>
+            @endif
 
             <div class="mb-6 flex flex-wrap gap-4 justify-center sm:justify-start bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-sm">
                 <span class="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2 self-center">Legende:</span>

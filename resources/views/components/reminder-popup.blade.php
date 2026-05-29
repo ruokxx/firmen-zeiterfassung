@@ -1,12 +1,85 @@
+@php
+    $settings = \App\Models\Setting::all()->pluck('value', 'key');
+    $isEnabled = $settings->get('hours_reminder_enabled', '1') == '1';
+    $showReminder = false;
+    $reminderMessage = 'Bitte denke daran, deine Stunden rechtzeitig abzugeben.';
+
+    if ($isEnabled) {
+        $type = $settings->get('hours_reminder_type', 'vorletzter_werktag');
+        $today = \Carbon\Carbon::today();
+        $year = $today->year;
+        $month = $today->month;
+
+        if ($type === 'vorletzter_werktag') {
+            // Calculate next-to-last working day
+            $date = \Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth();
+            $workingDaysFound = 0;
+            $reminderDay = null;
+            while ($workingDaysFound < 2) {
+                if (!$date->isWeekend()) {
+                    $workingDaysFound++;
+                    if ($workingDaysFound === 2) {
+                        $reminderDay = $date->day;
+                        break;
+                    }
+                }
+                $date->subDay();
+            }
+            if ($today->day === $reminderDay) {
+                $showReminder = true;
+            }
+            $reminderMessage .= ' Dies ist eine Erinnerung für den vorletzten Werktag des Monats.';
+        } elseif ($type === 'letzter_werktag') {
+            // Calculate last working day
+            $date = \Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth();
+            $reminderDay = null;
+            while (true) {
+                if (!$date->isWeekend()) {
+                    $reminderDay = $date->day;
+                    break;
+                }
+                $date->subDay();
+            }
+            if ($today->day === $reminderDay) {
+                $showReminder = true;
+            }
+            $reminderMessage .= ' Dies ist eine Erinnerung für den letzten Werktag des Monats.';
+        } elseif ($type === 'letzten_3_werktage') {
+            // Calculate last 3 working days
+            $date = \Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth();
+            $workingDays = [];
+            while (count($workingDays) < 3) {
+                if (!$date->isWeekend()) {
+                    $workingDays[] = $date->day;
+                }
+                $date->subDay();
+            }
+            if (in_array($today->day, $workingDays)) {
+                $showReminder = true;
+            }
+            $reminderMessage .= ' Dies ist eine Erinnerung für die letzten 3 Werktage des Monats.';
+        } elseif ($type === 'feste_tage') {
+            $daysString = $settings->get('hours_reminder_fixed_days', '15,20');
+            $days = array_map('intval', explode(',', $daysString));
+            if (in_array($today->day, $days)) {
+                $showReminder = true;
+            }
+            $reminderMessage .= ' Dies ist eine Erinnerung für den ' . implode('. und ', array_map('trim', explode(',', $daysString))) . '. des Monats.';
+        }
+    }
+@endphp
+
 <div x-data="{ show: false }" 
      x-init="
-        const date = new Date();
-        const day = date.getDate();
-        const key = 'reminder_dismissed_' + date.getFullYear() + '_' + (date.getMonth() + 1) + '_' + day;
-        
-        if ((day === 15 || day === 20) && !localStorage.getItem(key)) {
-            setTimeout(() => show = true, 1000);
-        }
+        @if($showReminder)
+            const date = new Date();
+            const day = date.getDate();
+            const key = 'reminder_dismissed_' + date.getFullYear() + '_' + (date.getMonth() + 1) + '_' + day;
+            
+            if (!localStorage.getItem(key)) {
+                setTimeout(() => show = true, 1000);
+            }
+        @endif
      "
      x-show="show" 
      x-transition:enter="transition ease-out duration-300"
@@ -39,7 +112,7 @@
                     </h3>
                     <div class="mt-2">
                         <p class="text-sm text-gray-500">
-                            Bitte denke daran, deine Stunden rechtzeitig abzugeben. Dies ist eine Erinnerung für den 15. und 20. des Monats.
+                            {{ $reminderMessage }}
                         </p>
                     </div>
                 </div>

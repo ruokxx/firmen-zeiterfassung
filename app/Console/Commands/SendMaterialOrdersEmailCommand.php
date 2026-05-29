@@ -30,6 +30,13 @@ class SendMaterialOrdersEmailCommand extends Command
      */
     public function handle()
     {
+        // Check if materials feature is enabled system-wide
+        $materialsEnabled = Setting::where('key', 'materials_enabled')->value('value') !== '0';
+        if (!$materialsEnabled) {
+            $this->info('Materials feature is system-wide disabled. Aborting.');
+            return 0;
+        }
+
         // 1. Check if the feature is enabled
         $isEnabled = Setting::where('key', 'material_email_enabled')->value('value') === '1';
         if (!$isEnabled) {

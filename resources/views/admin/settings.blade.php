@@ -109,26 +109,37 @@
                             </div>
                         </div>
 
-                        <!-- Material Order Email Settings -->
-                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2">
-                            <h4 class="text-md font-medium text-gray-200 mb-4">Materialbestellungen Erinnerung</h4>
+                        <!-- Material & Lager-Funktionen -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2" x-data="{ materialsEnabled: {{ ($settings->get('materials_enabled', '1') == '1') ? 'true' : 'false' }} }">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Lager- & Material-Funktionen</h4>
                             <div class="grid grid-cols-1 gap-6">
                                 <div class="flex items-center">
-                                    <input type="checkbox" name="material_email_enabled" id="material_email_enabled" value="1" {{ ($settings->get('material_email_enabled', '0') == '1') ? 'checked' : '' }} class="rounded bg-gray-900 border-gray-600 text-blue-600 shadow-sm focus:ring-blue-500">
-                                    <label for="material_email_enabled" class="ml-2 block text-sm font-medium text-gray-300">Tägliche E-Mail für offene Materialbestellungen aktivieren</label>
-                                </div>
-
-                                <div>
-                                    <x-input-label for="material_email_time" :value="__('Uhrzeit für E-Mail Versand')" />
-                                    <x-text-input id="material_email_time" class="block mt-1 md:w-1/4 w-full" type="time" name="material_email_time" :value="old('material_email_time', $settings->get('material_email_time', '08:00'))" />
-                                    <p class="text-sm text-gray-400 mt-1">Die E-Mail wird täglich zu dieser Uhrzeit an den Berichtsempfänger (Chef) gesendet.</p>
+                                    <input type="checkbox" name="materials_enabled" id="materials_enabled" value="1" x-model="materialsEnabled" class="rounded bg-gray-900 border-gray-600 text-blue-600 shadow-sm focus:ring-blue-500">
+                                    <label for="materials_enabled" class="ml-2 block text-sm font-medium text-gray-300">Material- und Lager-Funktionen systemweit aktivieren</label>
                                 </div>
                             </div>
 
-                            <div class="mt-6 flex">
-                                <button type="submit" form="test-material-email-form" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded text-sm transition shadow-md">
-                                    Test-E-Mail jetzt manuell auslösen
-                                </button>
+                            <!-- Material Order Email Settings -->
+                            <div class="border-t border-gray-700 pt-6 mt-6" x-show="materialsEnabled" x-transition>
+                                <h4 class="text-md font-medium text-gray-200 mb-4">Materialbestellungen Erinnerung</h4>
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="material_email_enabled" id="material_email_enabled" value="1" {{ ($settings->get('material_email_enabled', '0') == '1') ? 'checked' : '' }} class="rounded bg-gray-900 border-gray-600 text-blue-600 shadow-sm focus:ring-blue-500">
+                                        <label for="material_email_enabled" class="ml-2 block text-sm font-medium text-gray-300">Tägliche E-Mail für offene Materialbestellungen aktivieren</label>
+                                    </div>
+
+                                    <div>
+                                        <x-input-label for="material_email_time" :value="__('Uhrzeit für E-Mail Versand')" />
+                                        <x-text-input id="material_email_time" class="block mt-1 md:w-1/4 w-full" type="time" name="material_email_time" :value="old('material_email_time', $settings->get('material_email_time', '08:00'))" />
+                                        <p class="text-sm text-gray-400 mt-1">Die E-Mail wird täglich zu dieser Uhrzeit an den Berichtsempfänger (Chef) gesendet.</p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 flex">
+                                    <button type="submit" form="test-material-email-form" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded text-sm transition shadow-md">
+                                        Test-E-Mail jetzt manuell auslösen
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -228,6 +239,35 @@
                                 <div>
                                     <x-input-label for="default_break_duration" :value="__('Standard Pause (Minuten)')" />
                                     <x-text-input id="default_break_duration" class="block mt-1 w-full" type="number" name="default_break_duration" :value="old('default_break_duration', $settings->get('default_break_duration', '0'))" min="0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hours Reminder Settings -->
+                        <div class="col-span-1 md:col-span-2 border-t border-gray-700 pt-6 mt-2" x-data="{ reminderEnabled: {{ ($settings->get('hours_reminder_enabled', '1') == '1') ? 'true' : 'false' }}, reminderType: '{{ $settings->get('hours_reminder_type', 'vorletzter_werktag') }}' }">
+                            <h4 class="text-md font-medium text-gray-200 mb-4">Erinnerung für Stundenabgabe</h4>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="hours_reminder_enabled" id="hours_reminder_enabled" value="1" x-model="reminderEnabled" class="rounded bg-gray-900 border-gray-600 text-blue-600 shadow-sm focus:ring-blue-500">
+                                    <label for="hours_reminder_enabled" class="ml-2 block text-sm font-medium text-gray-300">Erinnerung für Stundenabgabe beim Login anzeigen</label>
+                                </div>
+
+                                <div x-show="reminderEnabled" x-transition class="space-y-4">
+                                    <div>
+                                        <x-input-label for="hours_reminder_type" :value="__('Erinnerungs-Zeitpunkt')" />
+                                        <select id="hours_reminder_type" name="hours_reminder_type" x-model="reminderType" class="block mt-1 w-full md:w-1/2 border-gray-700 bg-gray-900 text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                            <option value="vorletzter_werktag">Am vorletzten Werktag des Monats (Standard)</option>
+                                            <option value="letzter_werktag">Am letzten Werktag des Monats</option>
+                                            <option value="letzten_3_werktage">An den letzten 3 Werktagen des Monats</option>
+                                            <option value="feste_tage">An bestimmten Tagen des Monats</option>
+                                        </select>
+                                    </div>
+
+                                    <div x-show="reminderType === 'feste_tage'" x-transition>
+                                        <x-input-label for="hours_reminder_fixed_days" :value="__('Tage des Monats (kommagetrennt)')" />
+                                        <x-text-input id="hours_reminder_fixed_days" class="block mt-1 w-full md:w-1/2" type="text" name="hours_reminder_fixed_days" :value="old('hours_reminder_fixed_days', $settings->get('hours_reminder_fixed_days', '15,20'))" placeholder="z.B. 15,20" />
+                                        <p class="text-sm text-gray-400 mt-1">Geben Sie die Tage des Monats an, an denen die Erinnerung erscheinen soll (z.B. 15,20).</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $materialsEnabled = true;
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
                 $settings = \App\Models\Setting::all()->pluck('value', 'key');
@@ -60,11 +61,14 @@ class AppServiceProvider extends ServiceProvider
                     }
 
                     config($config);
+
+                    $materialsEnabled = $settings->get('materials_enabled', '1') !== '0';
                 }
             }
         }
         catch (\Exception $e) {
         // Failsafe if DB not ready
         }
+        view()->share('materialsEnabled', $materialsEnabled);
     }
 }

@@ -8,10 +8,6 @@ class AdminConstructionSiteController extends Controller
 {
     public function index(Request $request)
     {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $search = $request->input('search'); // Baustelle
         $userSearch = $request->input('user_search'); // Mitarbeiter
         $dateFrom = $request->input('date_from');

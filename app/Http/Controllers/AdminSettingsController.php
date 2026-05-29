@@ -82,6 +82,10 @@ class AdminSettingsController extends Controller
             'role_color_azubi' => 'nullable|string',
             'role_color_geselle' => 'nullable|string',
             'role_color_employee' => 'nullable|string',
+            'materials_enabled' => 'nullable|boolean',
+            'hours_reminder_enabled' => 'nullable|boolean',
+            'hours_reminder_type' => 'nullable|string|in:vorletzter_werktag,letzter_werktag,letzten_3_werktage,feste_tage',
+            'hours_reminder_fixed_days' => 'nullable|string',
         ]);
 
         // Handle checkbox (if unchecked, it's missing from request, so we must set it to false if not present? 
@@ -96,6 +100,12 @@ class AdminSettingsController extends Controller
         }
         if (!$request->has('material_email_enabled')) {
             $data['material_email_enabled'] = '0';
+        }
+        if (!$request->has('materials_enabled')) {
+            $data['materials_enabled'] = '0';
+        }
+        if (!$request->has('hours_reminder_enabled')) {
+            $data['hours_reminder_enabled'] = '0';
         }
 
         if ($request->hasFile('app_logo')) {

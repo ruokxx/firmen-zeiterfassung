@@ -40,7 +40,7 @@ class ReportController extends Controller
         $startTimeParse = \Carbon\Carbon::parse($defaultStart);
         $endTimeParse = \Carbon\Carbon::parse($defaultEnd);
         $diffMinutes = $startTimeParse->diffInMinutes($endTimeParse);
-        $workMinutes = $diffMinutes; // Ignore break duration for target calculations
+        $workMinutes = $diffMinutes - $defaultBreak; // Subtract break duration
         $defaultDailyHours = round($workMinutes / 60, 2);
 
         $targetHoursMonth = 0;
@@ -63,46 +63,8 @@ class ReportController extends Controller
         // Checks show blade uses $totalHoursMonth + $previousMonthBalance. 
         // It doesn't display "Target Current" in footer, but for correctness of "Overtime" calculation if added later.
 
-        // Check if carryover should be included (default: false)
-        // Explicitly cast to boolean to be safe (though '0' is false, filter_var is clearer)
-        $includeCarryover = filter_var($request->input('include_carryover', 'false'), FILTER_VALIDATE_BOOLEAN);
+        $includeCarryover = false;
         $previousMonthBalance = 0;
-
-        if ($includeCarryover) {
-            $previousMonthDate = $startOfMonth->copy()->subMonth();
-            $prevYear = $previousMonthDate->year;
-            $prevMonth = $previousMonthDate->month;
-
-            // Calculate Previous Month Balance
-            // 1. Get Actual Hours
-            $prevMonthWorkDays = $user->workDays()
-                ->whereYear('date', $prevYear)
-                ->whereMonth('date', $prevMonth)
-                ->with('timeEntries')
-                ->get();
-
-            $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
-                return $day->timeEntries->sum('hours');
-            });
-
-            // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
-            $prevTargetHours = 0;
-            $daysInPrevMonth = $previousMonthDate->daysInMonth;
-            for ($d = 1; $d <= $daysInPrevMonth; $d++) {
-                $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
-                $dateString = $date->format('Y-m-d');
-
-                $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
-                    return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
-                });
-
-                if (!$date->isWeekend()) {
-                    $prevTargetHours += $defaultDailyHours;
-                }
-            }
-
-            $previousMonthBalance = $prevActualHours - $prevTargetHours;
-        }
 
 
 
@@ -175,61 +137,10 @@ class ReportController extends Controller
         $startTimeParse = \Carbon\Carbon::parse($defaultStart);
         $endTimeParse = \Carbon\Carbon::parse($defaultEnd);
         $diffMinutes = $startTimeParse->diffInMinutes($endTimeParse);
-        $workMinutes = $diffMinutes; // Ignore break duration for target calculations
+        $workMinutes = $diffMinutes - $defaultBreak; // Subtract break duration
         $defaultDailyHours = round($workMinutes / 60, 2);
-
-        // Check if carryover should be included (default: false if unchecked, true if checked - assuming checkbox sends 1)
-        // Checkboxes only send value if checked. We set value="1".
-        // If not present, input() returns null. We want default true? 
-        // In the view I put `checked`, so it sends '1'. If user unchecks, it sends nothing.
-        // So default should be false if key is missing? Or I use `has`.
-        // Actually for checkboxes: if unchecked, strictly nothing is sent.
-        // So $request->input('include_carryover', 0) would work if I rely on the fact that if it's sending, it's '1'.
-        // But wait, the user request "mit oder ohne". 
-        // Let's use boolean validation.
-        $includeCarryover = $request->boolean('include_carryover');
-        // Note: boolean() returns true for "1", "true", "on", "yes". False otherwise.
-        // If unchecked, it's missing, so boolean() returns false? Laravel docs say 'missing' is false.
-        // But I want it checked by default in UI. If user unchecks, sending nothing -> false. Correct.
-
-        $prevActualHours = 0;
-        $prevTargetHours = 0;
+        $includeCarryover = false;
         $previousMonthBalance = 0;
-
-        if ($includeCarryover) {
-            $previousMonthDate = $startOfMonth->copy()->subMonth();
-            $prevYear = $previousMonthDate->year;
-            $prevMonth = $previousMonthDate->month;
-
-            // Calculate Previous Month Balance
-            // 1. Get Actual Hours
-            $prevMonthWorkDays = $user->workDays()
-                ->whereYear('date', $prevYear)
-                ->whereMonth('date', $prevMonth)
-                ->with('timeEntries')
-                ->get();
-
-            $prevActualHours = $prevMonthWorkDays->sum(function ($day) {
-                return $day->timeEntries->sum('hours');
-            });
-
-            // 2. Calculate Target Hours (8h / weekday, dynamic adjustment)
-            $daysInPrevMonth = $previousMonthDate->daysInMonth;
-            for ($d = 1; $d <= $daysInPrevMonth; $d++) {
-                $date = \Carbon\Carbon::createFromDate($prevYear, $prevMonth, $d);
-                $dateString = $date->format('Y-m-d');
-
-                $dayEntry = $prevMonthWorkDays->first(function ($day) use ($dateString) {
-                    return \Carbon\Carbon::parse($day->date)->format('Y-m-d') === $dateString;
-                });
-
-                if (!$date->isWeekend()) {
-                    $prevTargetHours += $defaultDailyHours;
-                }
-            }
-
-            $previousMonthBalance = $prevActualHours - $prevTargetHours;
-        }
 
         // Vacation Calculation
         $vacationDaysPerYear = $user->vacation_days_per_year !== null

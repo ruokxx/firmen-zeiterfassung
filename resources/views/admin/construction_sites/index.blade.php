@@ -90,8 +90,8 @@
             @endif
 
             <div class="flex justify-start">
-                <a href="{{ route('admin.dashboard') }}" class="text-gray-400 hover:text-orange-400 transition flex items-center gap-1">
-                    <span>&larr;</span> Zurück zum Dashboard
+                <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-orange-400 transition flex items-center gap-1">
+                    <span>&larr;</span> Zurück zur Übersicht
                 </a>
             </div>
 

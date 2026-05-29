@@ -41,10 +41,6 @@
                                         <input type="hidden" name="year" value="{{ $report['year'] }}">
                                         <input type="hidden" name="month" value="{{ $report['month'] }}">
                                         <label class="inline-flex items-center cursor-pointer mr-2">
-                                            <input type="checkbox" name="include_carryover" value="1" class="rounded border-gray-600 bg-gray-700 text-blue-600 shadow-sm focus:ring-blue-500 focus:ring-offset-gray-800 h-4 w-4">
-                                            <span class="ml-1 text-xs text-gray-400">Mit Übertrag</span>
-                                        </label>
-                                        <label class="inline-flex items-center cursor-pointer mr-2">
                                             <input type="checkbox" name="append_prev_month" value="1" class="rounded border-gray-600 bg-gray-700 text-orange-500 shadow-sm focus:ring-orange-500 focus:ring-offset-gray-800 h-4 w-4">
                                             <span class="ml-1 text-xs text-gray-400">Vormonat anhängen</span>
                                         </label>

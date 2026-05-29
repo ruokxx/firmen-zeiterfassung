@@ -54,9 +54,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/documents', [\App\Http\Controllers\AdminDocumentController::class , 'store'])->name('admin.documents.store');
 
     // Admin Materials
-    Route::get('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'index'])->name('admin.materials.index');
-    Route::post('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'store'])->name('admin.materials.store');
-    Route::delete('/admin/materials/{material}', [\App\Http\Controllers\AdminMaterialController::class , 'destroy'])->name('admin.materials.destroy');
+    Route::middleware('materials.enabled')->group(function () {
+        Route::get('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'index'])->name('admin.materials.index');
+        Route::post('/admin/materials', [\App\Http\Controllers\AdminMaterialController::class , 'store'])->name('admin.materials.store');
+        Route::delete('/admin/materials/{material}', [\App\Http\Controllers\AdminMaterialController::class , 'destroy'])->name('admin.materials.destroy');
+    });
 
     // Admin Construction Site Search
     Route::get('/admin/construction-sites', [\App\Http\Controllers\AdminConstructionSiteController::class , 'index'])->name('admin.construction-sites.index');
@@ -86,28 +88,30 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/month', [ProfileController::class , 'clearMonth'])->name('profile.clear-month');
 
     // Material Orders
-    Route::get('/material-orders', [\App\Http\Controllers\MaterialOrderController::class , 'index'])->name('material-orders.index');
-    Route::post('/material-orders', [\App\Http\Controllers\MaterialOrderController::class , 'store'])->name('material-orders.store');
-    Route::patch('/material-orders/{order}/toggle', [\App\Http\Controllers\MaterialOrderController::class , 'toggle'])->name('material-orders.toggle');
-    Route::patch('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'update'])->name('material-orders.update');
-    Route::delete('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'destroy'])->name('material-orders.destroy');
+    Route::middleware('materials.enabled')->group(function () {
+        Route::get('/material-orders', [\App\Http\Controllers\MaterialOrderController::class , 'index'])->name('material-orders.index');
+        Route::post('/material-orders', [\App\Http\Controllers\MaterialOrderController::class , 'store'])->name('material-orders.store');
+        Route::patch('/material-orders/{order}/toggle', [\App\Http\Controllers\MaterialOrderController::class , 'toggle'])->name('material-orders.toggle');
+        Route::patch('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'update'])->name('material-orders.update');
+        Route::delete('/material-orders/{order}', [\App\Http\Controllers\MaterialOrderController::class , 'destroy'])->name('material-orders.destroy');
 
-    // Materials (Lager & Verwaltung)
-    Route::get('/materials', [\App\Http\Controllers\MaterialController::class , 'index'])->name('materials.index');
-    Route::post('/materials/{material}/transaction', [\App\Http\Controllers\MaterialController::class , 'transaction'])->name('materials.transaction');
-    Route::get('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'manage'])->name('materials.manage');
-    Route::post('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'store'])->name('materials.store');
-    Route::put('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'update'])->name('materials.update');
-    Route::delete('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'destroy'])->name('materials.destroy');
+        // Materials (Lager & Verwaltung)
+        Route::get('/materials', [\App\Http\Controllers\MaterialController::class , 'index'])->name('materials.index');
+        Route::post('/materials/{material}/transaction', [\App\Http\Controllers\MaterialController::class , 'transaction'])->name('materials.transaction');
+        Route::get('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'manage'])->name('materials.manage');
+        Route::post('/admin/materials/manage', [\App\Http\Controllers\MaterialController::class , 'store'])->name('materials.store');
+        Route::put('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'update'])->name('materials.update');
+        Route::delete('/admin/materials/manage/{material}', [\App\Http\Controllers\MaterialController::class , 'destroy'])->name('materials.destroy');
 
-    // Material Categories
-    Route::post('/admin/material-categories', [\App\Http\Controllers\MaterialCategoryController::class , 'store'])->name('material-categories.store');
-    Route::put('/admin/material-categories/{category}', [\App\Http\Controllers\MaterialCategoryController::class , 'update'])->name('material-categories.update');
-    Route::delete('/admin/material-categories/{category}', [\App\Http\Controllers\MaterialCategoryController::class , 'destroy'])->name('material-categories.destroy');
-    Route::get('/admin/materials/stats', [\App\Http\Controllers\MaterialController::class , 'stats'])->name('materials.stats');
-    Route::delete('/admin/materials/stats/clear', [\App\Http\Controllers\MaterialController::class , 'clearStats'])->name('materials.stats.clear');
-    Route::post('/admin/materials/settings', [\App\Http\Controllers\MaterialController::class , 'updateSettings'])->name('materials.settings.update');
-    Route::get('/admin/materials/settings/test-email', [\App\Http\Controllers\MaterialController::class , 'sendTestEmail'])->name('materials.settings.test-email');
+        // Material Categories
+        Route::post('/admin/material-categories', [\App\Http\Controllers\MaterialCategoryController::class , 'store'])->name('material-categories.store');
+        Route::put('/admin/material-categories/{category}', [\App\Http\Controllers\MaterialCategoryController::class , 'update'])->name('material-categories.update');
+        Route::delete('/admin/material-categories/{category}', [\App\Http\Controllers\MaterialCategoryController::class , 'destroy'])->name('material-categories.destroy');
+        Route::get('/admin/materials/stats', [\App\Http\Controllers\MaterialController::class , 'stats'])->name('materials.stats');
+        Route::delete('/admin/materials/stats/clear', [\App\Http\Controllers\MaterialController::class , 'clearStats'])->name('materials.stats.clear');
+        Route::post('/admin/materials/settings', [\App\Http\Controllers\MaterialController::class , 'updateSettings'])->name('materials.settings.update');
+        Route::get('/admin/materials/settings/test-email', [\App\Http\Controllers\MaterialController::class , 'sendTestEmail'])->name('materials.settings.test-email');
+    });
 });
 
 require __DIR__ . '/auth.php';

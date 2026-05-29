@@ -240,7 +240,7 @@
                                                     <div class="text-center text-sm font-bold mt-1" style="color: #22c55e;">{{ number_format($vacationDays, 1) }} Urlaubstage</div>
                                                 @endif
                                                 <div class="text-center mt-2">
-                                                    <a href="{{ route('report.download', ['year' => $dateObj->year, 'month' => $dateObj->month, 'user_id' => $user->id, 'include_carryover' => 0]) }}" 
+                                                    <a href="{{ route('report.download', ['year' => $dateObj->year, 'month' => $dateObj->month, 'user_id' => $user->id]) }}" 
                                                        class="text-xs bg-gray-700 text-white px-2 py-1 rounded hover:bg-gray-600 border border-gray-600">
                                                         PDF Download
                                                     </a>

@@ -26,13 +26,6 @@
         <p><strong>E-Mail:</strong> {{ $user->email }}</p>
         <p><strong>Adresse:</strong> {{ $user->address }}</p>
         <p><strong>Monat:</strong> {{ $startOfMonth->locale('de')->isoFormat('MMMM YYYY') }}</p>
-        @if($includeCarryover)
-        <p><strong>Übertrag aus Vormonat:</strong> 
-            <span style="{{ $previousMonthBalance < 0 ? 'color: red;' : ($previousMonthBalance > 0 ? 'color: green;' : '') }}">
-                {{ number_format($previousMonthBalance, 1) }} h
-            </span>
-        </p>
-        @endif
         <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">
             <p><strong>Urlaubstage (Jahr):</strong> {{ $vacationDaysPerYear }} Tage</p>
             <p><strong>Genommen (Jahr):</strong> {{ number_format($yearlyVacationDaysTaken, 1) }} Tage</p>
@@ -79,23 +72,9 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="3" style="text-align: right; font-weight: bold;">Gesamtstunden (Aktuell):</td>
+                <td colspan="3" style="text-align: right; font-weight: bold;">Gesamtstunden:</td>
                 <td colspan="2" style="font-weight: bold;">{{ number_format($totalHoursMonth, 1) }} h</td>
             </tr>
-            @if($includeCarryover)
-            <tr>
-                <td colspan="3" style="text-align: right; font-weight: bold;">Übertrag Vormonat:</td>
-                <td colspan="2" style="font-weight: bold; {{ $previousMonthBalance < 0 ? 'color: red;' : ($previousMonthBalance > 0 ? 'color: green;' : '') }}">
-                    {{ number_format($previousMonthBalance, 1) }} h
-                </td>
-            </tr>
-            <tr style="background-color: #f2f2f2;">
-                <td colspan="3" style="text-align: right; font-weight: bold;">Gesamt (inkl. Übertrag):</td>
-                <td colspan="2" style="font-weight: bold;">
-                    {{ number_format($totalHoursMonth + $previousMonthBalance, 1) }} h
-                </td>
-            </tr>
-            @endif
         </tfoot>
     </table>
 

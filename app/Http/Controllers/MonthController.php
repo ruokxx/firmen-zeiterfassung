@@ -41,24 +41,24 @@ class MonthController extends Controller
         });
 
         // Calculate Target Hours
-        $targetHours = 0;
-        $holidays = $this->getHolidaysNI($year);
+        $defaultStart = \App\Models\Setting::where('key', 'default_start_time')->value('value') ?: '08:00';
+        $defaultEnd = \App\Models\Setting::where('key', 'default_end_time')->value('value') ?: '16:00';
+        $defaultBreak = \App\Models\Setting::where('key', 'default_break_duration')->value('value') !== null
+            ? (int)\App\Models\Setting::where('key', 'default_break_duration')->value('value')
+            : 0;
 
+        $start = \Carbon\Carbon::parse($defaultStart);
+        $end = \Carbon\Carbon::parse($defaultEnd);
+        $diffMinutes = $start->diffInMinutes($end);
+        $workMinutes = $diffMinutes - $defaultBreak;
+        $defaultDailyHours = round($workMinutes / 60, 2);
+
+        $targetHours = 0;
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = $startOfMonth->copy()->day($day);
 
-            if ($date->isWeekday()) {
-                $isHoliday = false;
-                foreach ($holidays as $h) {
-                    if ($h->isSameDay($date)) {
-                        $isHoliday = true;
-                        break;
-                    }
-                }
-
-                if (!$isHoliday) {
-                    $targetHours += 8;
-                }
+            if (!$date->isWeekend()) {
+                $targetHours += $defaultDailyHours;
             }
         }
 

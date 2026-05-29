@@ -24,21 +24,23 @@
                         {{ __('Hilfe & FAQ') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" 
-                        class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('material-orders.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
-                        {{ __('Material Bestellungen') }}
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')" 
-                        class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('materials.index') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
-                        {{ __('Lager') }}
-                    </x-nav-link>
-
-                    @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
-                        <x-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')" 
-                            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('materials.manage') || request()->routeIs('materials.stats') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
-                            {{ __('Materialverwaltung') }}
+                    @if($materialsEnabled)
+                        <x-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')" 
+                            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('material-orders.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            {{ __('Material Bestellungen') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')" 
+                            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('materials.index') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            {{ __('Lager') }}
+                        </x-nav-link>
+
+                        @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
+                            <x-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')" 
+                                class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('materials.manage') || request()->routeIs('materials.stats') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                                {{ __('Materialverwaltung') }}
+                            </x-nav-link>
+                        @endif
                     @endif
 
                     @if(auth()->user()->is_admin)
@@ -120,18 +122,20 @@
                 {{ __('Hilfe & FAQ') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')">
-                {{ __('Material Bestellungen') }}
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')">
-                {{ __('Lager') }}
-            </x-responsive-nav-link>
-
-            @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
-                <x-responsive-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')">
-                    {{ __('Materialverwaltung') }}
+            @if($materialsEnabled)
+                <x-responsive-nav-link :href="route('material-orders.index')" :active="request()->routeIs('material-orders.*')">
+                    {{ __('Material Bestellungen') }}
                 </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('materials.index')" :active="request()->routeIs('materials.index')">
+                    {{ __('Lager') }}
+                </x-responsive-nav-link>
+
+                @if(auth()->user()->is_admin || auth()->user()->is_chef || auth()->user()->is_materialwart)
+                    <x-responsive-nav-link :href="route('materials.manage')" :active="request()->routeIs('materials.manage') || request()->routeIs('materials.stats')">
+                        {{ __('Materialverwaltung') }}
+                    </x-responsive-nav-link>
+                @endif
             @endif
 
             @if(auth()->user()->is_admin)
