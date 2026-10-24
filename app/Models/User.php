@@ -91,4 +91,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserDocument::class);
     }
+
+    public function newsPopupReads()
+    {
+        return $this->hasMany(NewsPopupRead::class);
+    }
 }

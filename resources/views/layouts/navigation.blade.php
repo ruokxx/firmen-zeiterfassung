@@ -61,6 +61,11 @@
                             class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('admin.documents.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
                             {{ __('Dokument an alle senden') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.news-popups.index')" :active="request()->routeIs('admin.news-popups.*')" 
+                            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ request()->routeIs('admin.news-popups.*') ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-orange-400' }}">
+                            {{ __('News Popups') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -152,6 +157,10 @@
 
                 <x-responsive-nav-link :href="route('admin.documents.index')" :active="request()->routeIs('admin.documents.*')">
                     {{ __('Dokument an alle senden') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.news-popups.index')" :active="request()->routeIs('admin.news-popups.*')">
+                    {{ __('News Popups') }}
                 </x-responsive-nav-link>
             @endif
         </div>

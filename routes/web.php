@@ -73,6 +73,16 @@ Route::middleware('auth')->group(function () {
     // Admin FAQs
     Route::resource('admin/faqs', \App\Http\Controllers\AdminFaqController::class)->names('admin.faqs')->except(['show']);
 
+    // Admin News Popups
+    Route::resource('admin/news-popups', \App\Http\Controllers\AdminNewsPopupController::class)
+        ->parameters(['news-popups' => 'newsPopup'])
+        ->names('admin.news-popups')
+        ->except(['show']);
+    Route::patch('/admin/news-popups/{newsPopup}/toggle', [\App\Http\Controllers\AdminNewsPopupController::class, 'toggle'])->name('admin.news-popups.toggle');
+
+    // News Popups User Dismiss
+    Route::post('/news-popups/{newsPopup}/dismiss', [\App\Http\Controllers\NewsPopupController::class, 'dismiss'])->name('news-popups.dismiss');
+
     // Trello OAuth
     Route::get('/auth/trello/redirect', [\App\Http\Controllers\TrelloController::class , 'redirect'])->name('auth.trello.redirect');
     Route::get('/auth/trello/callback', [\App\Http\Controllers\TrelloController::class , 'callback'])->name('auth.trello.callback');

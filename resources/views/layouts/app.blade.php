@@ -77,6 +77,7 @@
                 <p class="text-sm">Copyright Sebastian Thielke 2026</p>
             </footer>
             <x-reminder-popup />
+            <x-news-popup />
         </div>
         @stack('scripts')
     </body>
