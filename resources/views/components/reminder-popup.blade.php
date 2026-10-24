@@ -69,18 +69,20 @@
     }
 @endphp
 
-<div x-data="{ show: false }" 
-     x-init="
-        @if($showReminder)
-            const date = new Date();
-            const day = date.getDate();
-            const key = 'reminder_dismissed_' + date.getFullYear() + '_' + (date.getMonth() + 1) + '_' + day;
-            
-            if (!localStorage.getItem(key)) {
-                setTimeout(() => show = true, 1000);
-            }
-        @endif
-     "
+<div x-data="{ 
+        show: false,
+        init() {
+            @if($showReminder)
+                const date = new Date();
+                const day = date.getDate();
+                const key = 'reminder_dismissed_' + date.getFullYear() + '_' + (date.getMonth() + 1) + '_' + day;
+                
+                if (!localStorage.getItem(key)) {
+                    setTimeout(() => { this.show = true; }, 1000);
+                }
+            @endif
+        }
+     }"
      x-show="show" 
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"

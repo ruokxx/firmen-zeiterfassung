@@ -16,13 +16,29 @@
 @if($activePopup)
 <div x-data="{ 
         show: false,
-        popupId: {{ $activePopup->id }},
-        userId: {{ $user->id }},
+        init() {
+            // Server already validated that $activePopup is active and unread for $user
+            // We set this.show = true after a short delay for a smooth animation
+            const key = 'news_popup_dismissed_{{ $activePopup->id }}_{{ $user->id }}';
+            @if($activePopup->display_type === 'once_per_day')
+                const lastDismissed = localStorage.getItem(key);
+                const isToday = lastDismissed && new Date(lastDismissed).toDateString() === new Date().toDateString();
+                if (!isToday) {
+                    setTimeout(() => { this.show = true; }, 350);
+                }
+            @elseif($activePopup->display_type === 'always')
+                setTimeout(() => { this.show = true; }, 350);
+            @else
+                if (!localStorage.getItem(key)) {
+                    setTimeout(() => { this.show = true; }, 350);
+                }
+            @endif
+        },
         async dismiss() {
             this.show = false;
             try {
                 // Immediate client storage
-                const key = 'news_popup_dismissed_' + this.popupId + '_' + this.userId;
+                const key = 'news_popup_dismissed_{{ $activePopup->id }}_{{ $user->id }}';
                 localStorage.setItem(key, new Date().toISOString());
 
                 // Server-side registration
@@ -39,20 +55,6 @@
             }
         }
      }" 
-     x-init="
-        const key = 'news_popup_dismissed_' + popupId + '_' + userId;
-        @if($activePopup->display_type === 'once_per_day')
-            const lastDismissed = localStorage.getItem(key);
-            const isToday = lastDismissed && new Date(lastDismissed).toDateString() === new Date().toDateString();
-            if (!isToday) {
-                setTimeout(() => show = true, 600);
-            }
-        @else
-            if (!localStorage.getItem(key)) {
-                setTimeout(() => show = true, 600);
-            }
-        @endif
-     "
      x-show="show" 
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
