@@ -16,7 +16,7 @@ class WorkDay extends Model
 
     public function timeEntries()
     {
-        return $this->hasMany(TimeEntry::class);
+        return $this->hasMany(TimeEntry::class)->orderBy('id', 'asc');
     }
 
     public function getTotalHoursAttribute()

@@ -77,86 +77,113 @@
                     <h3 class="text-lg font-medium text-gray-100 mb-4">Baustellen & Zeiten</h3>
                     
                     <div class="space-y-4">
-                        <template x-for="(entry, index) in entries" :key="index">
-                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-gray-900 p-4 rounded border border-gray-700">
-                                <div class="flex-grow w-full relative" x-data="{ 
-                                    open: false,
-                                    activeIndex: -1,
-                                    get filteredSites() {
-                                        if (!entry.construction_site_name) return availableSites;
-                                        const query = entry.construction_site_name.toLowerCase();
-                                        return availableSites.filter(s => s.toLowerCase().includes(query));
-                                    },
-                                    selectSite(site) {
-                                        entry.construction_site_name = site;
-                                        this.open = false;
-                                        this.activeIndex = -1;
-                                    }
-                                }" @click.away="open = false; activeIndex = -1" @keydown.escape="open = false; activeIndex = -1">
-                                    <label class="block text-sm font-medium text-gray-300 mb-1">Baustelle</label>
-                                    <input type="text" 
-                                           :name="'entries['+index+'][construction_site_name]'" 
-                                           x-model="entry.construction_site_name" 
-                                           @focus="open = true" 
-                                           @input="open = true; activeIndex = -1"
-                                           @keydown.arrow-down.prevent="if(open && activeIndex < filteredSites.length - 1) activeIndex++; else { open = true; activeIndex = 0; }"
-                                           @keydown.arrow-up.prevent="if(open && activeIndex > 0) activeIndex--; else activeIndex = -1;"
-                                           @keydown.enter.prevent="if(open && activeIndex >= 0) { selectSite(filteredSites[activeIndex]); } else if(open && filteredSites.length === 1) { selectSite(filteredSites[0]); }"
-                                           class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full placeholder-gray-400" 
-                                           placeholder="Baustelle eingeben oder wählen..." autocomplete="off">
-                                    
-                                    <ul x-show="open && filteredSites.length > 0" 
-                                        x-transition.opacity 
-                                        style="display: none;"
-                                        class="absolute z-50 w-full bg-gray-800 border border-gray-600 rounded-md shadow-xl mt-1 max-h-48 overflow-y-auto">
-                                        <template x-for="(site, i) in filteredSites" :key="site">
-                                            <li @click="selectSite(site)" 
-                                                @mouseenter="activeIndex = i"
-                                                :class="{'bg-orange-600 text-white': activeIndex === i, 'text-gray-200': activeIndex !== i}"
-                                                class="px-3 py-2 cursor-pointer transition select-none"
-                                                x-text="site">
-                                            </li>
-                                        </template>
-                                    </ul>
+                        <template x-for="(entry, index) in entries" :key="entry._id">
+                            <div class="flex items-center gap-2 sm:gap-4 bg-gray-900 p-3 sm:p-4 rounded border border-gray-700">
+                                <!-- Pfeile zum Verschieben der Reihenfolge -->
+                                <div class="flex flex-col items-center justify-center gap-0.5 flex-shrink-0">
+                                    <button type="button" 
+                                            @click="moveUp(index)" 
+                                            :disabled="index === 0" 
+                                            :class="index === 0 ? 'text-gray-600 opacity-25 cursor-not-allowed' : 'text-gray-400 hover:text-white hover:bg-gray-800 active:bg-gray-700 cursor-pointer'" 
+                                            class="p-1 rounded transition focus:outline-none" 
+                                            title="Nach oben verschieben">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" 
+                                            @click="moveDown(index)" 
+                                            :disabled="index === entries.length - 1" 
+                                            :class="index === entries.length - 1 ? 'text-gray-600 opacity-25 cursor-not-allowed' : 'text-gray-400 hover:text-white hover:bg-gray-800 active:bg-gray-700 cursor-pointer'" 
+                                            class="p-1 rounded transition focus:outline-none" 
+                                            title="Nach unten verschieben">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <div class="w-full sm:w-32 flex justify-between sm:block items-end sm:items-start gap-4">
-                                    <div class="flex-grow sm:flex-none">
-                                        <label class="block text-sm font-medium text-gray-300 mb-1">Stunden</label>
-                                        <select :name="'entries['+index+'][hours]'" x-model="entry.hours" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full">
-                                            @for ($i = 0; $i <= 12; $i += 0.5)
-                                                <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }} h</option>
-                                            @endfor
-                                        </select>
+
+                                <div class="flex-grow flex flex-col sm:flex-row items-stretch sm:items-center gap-4 min-w-0">
+                                    <div class="flex-grow w-full relative" x-data="{ 
+                                        open: false,
+                                        activeIndex: -1,
+                                        get filteredSites() {
+                                            if (!entry.construction_site_name) return availableSites;
+                                            const query = entry.construction_site_name.toLowerCase();
+                                            return availableSites.filter(s => s.toLowerCase().includes(query));
+                                        },
+                                        selectSite(site) {
+                                            entry.construction_site_name = site;
+                                            this.open = false;
+                                            this.activeIndex = -1;
+                                        }
+                                    }" @click.away="open = false; activeIndex = -1" @keydown.escape="open = false; activeIndex = -1">
+                                        <label class="block text-sm font-medium text-gray-300 mb-1">Baustelle</label>
+                                        <input type="text" 
+                                               :name="'entries['+index+'][construction_site_name]'" 
+                                               x-model="entry.construction_site_name" 
+                                               @focus="open = true" 
+                                               @input="open = true; activeIndex = -1"
+                                               @keydown.arrow-down.prevent="if(open && activeIndex < filteredSites.length - 1) activeIndex++; else { open = true; activeIndex = 0; }"
+                                               @keydown.arrow-up.prevent="if(open && activeIndex > 0) activeIndex--; else activeIndex = -1;"
+                                               @keydown.enter.prevent="if(open && activeIndex >= 0) { selectSite(filteredSites[activeIndex]); } else if(open && filteredSites.length === 1) { selectSite(filteredSites[0]); }"
+                                               class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full placeholder-gray-400" 
+                                               placeholder="Baustelle eingeben oder wählen..." autocomplete="off">
+                                        
+                                        <ul x-show="open && filteredSites.length > 0" 
+                                            x-transition.opacity 
+                                            style="display: none;"
+                                            class="absolute z-50 w-full bg-gray-800 border border-gray-600 rounded-md shadow-xl mt-1 max-h-48 overflow-y-auto">
+                                            <template x-for="(site, i) in filteredSites" :key="site">
+                                                <li @click="selectSite(site)" 
+                                                    @mouseenter="activeIndex = i"
+                                                    :class="{'bg-orange-600 text-white': activeIndex === i, 'text-gray-200': activeIndex !== i}"
+                                                    class="px-3 py-2 cursor-pointer transition select-none"
+                                                    x-text="site">
+                                                </li>
+                                            </template>
+                                        </ul>
                                     </div>
-                                    <div class="sm:pt-6 pb-1 sm:pb-0 flex items-center gap-2">
-                                    {{-- Requested Check/Done Button per row --}}
-                                    <button type="button" @click="save()" class="text-green-500 hover:text-green-700 transition" title="Speichern">
-                                        <template x-if="!saving && !saveSuccess">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </template>
-                                        <template x-if="saving">
-                                            <svg class="animate-spin h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                        </template>
-                                        <template x-if="saveSuccess">
-                                            <div class="flex items-center text-green-600">
-                                                <span class="text-xs font-bold mr-1">Gespeichert</span>
+                                    <div class="w-full sm:w-32 flex justify-between sm:block items-end sm:items-start gap-4 flex-shrink-0">
+                                        <div class="flex-grow sm:flex-none">
+                                            <label class="block text-sm font-medium text-gray-300 mb-1">Stunden</label>
+                                            <select :name="'entries['+index+'][hours]'" x-model="entry.hours" class="bg-gray-700 border-gray-600 text-white focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm block w-full">
+                                                @for ($i = 0; $i <= 12; $i += 0.5)
+                                                    <option value="{{ number_format($i, 1) }}">{{ number_format($i, 1) }} h</option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <div class="sm:pt-6 pb-1 sm:pb-0 flex items-center gap-2">
+                                        {{-- Requested Check/Done Button per row --}}
+                                        <button type="button" @click="save()" class="text-green-500 hover:text-green-700 transition" title="Speichern">
+                                            <template x-if="!saving && !saveSuccess">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                 </svg>
-                                            </div>
-                                        </template>
-                                    </button>
+                                            </template>
+                                            <template x-if="saving">
+                                                <svg class="animate-spin h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            </template>
+                                            <template x-if="saveSuccess">
+                                                <div class="flex items-center text-green-600">
+                                                    <span class="text-xs font-bold mr-1">Gespeichert</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                        </button>
 
-                                    <button type="button" @click="removeEntry(index)" class="text-red-500 hover:text-red-700" title="Löschen">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
+                                        <button type="button" @click="removeEntry(index)" class="text-red-500 hover:text-red-700" title="Löschen">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -192,11 +219,12 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('workDayForm', (initialEntries, allSites) => ({
                 availableSites: allSites || [],
-                entries: initialEntries.length > 0 ? initialEntries.map(e => ({
+                entries: initialEntries.length > 0 ? initialEntries.map((e, idx) => ({
                     ...e,
+                    _id: e.id ? 'entry-' + e.id : ('entry-init-' + idx + '-' + Date.now()),
                     construction_site_name: e.construction_site ? e.construction_site.name : '',
                     hours: parseFloat(e.hours).toFixed(1)
-                })) : [{ construction_site_name: '', hours: '0.0' }],
+                })) : [{ _id: 'entry-default-' + Date.now(), construction_site_name: '', hours: '0.0' }],
                 saving: false,
                 saveSuccess: false,
                 noBreak: {{ ($workDay->timeEntries->isNotEmpty() || !is_null($workDay->start_time)) && ($workDay->break_duration === '0' || $workDay->break_duration === 0) ? 'true' : 'false' }},
@@ -212,8 +240,24 @@
                 },
                 
                 addEntry() {
-                    this.entries.push({ construction_site_name: '', hours: '0.0' });
+                    this.entries.push({ _id: 'entry-add-' + Date.now() + '-' + Math.random(), construction_site_name: '', hours: '0.0' });
                     this.calculateEndTime();
+                },
+
+                moveUp(index) {
+                    if (index > 0) {
+                        const item = this.entries.splice(index, 1)[0];
+                        this.entries.splice(index - 1, 0, item);
+                        this.calculateEndTime();
+                    }
+                },
+
+                moveDown(index) {
+                    if (index < this.entries.length - 1) {
+                        const item = this.entries.splice(index, 1)[0];
+                        this.entries.splice(index + 1, 0, item);
+                        this.calculateEndTime();
+                    }
                 },
                 
                 fillStandardHours() {
