@@ -12,6 +12,8 @@ class NewsPopupController extends Controller
     {
         $user = auth()->user();
 
+        session()->put('news_popup_dismissed_' . $newsPopup->id, true);
+
         if ($user) {
             NewsPopupRead::updateOrCreate(
                 [

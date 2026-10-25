@@ -59,6 +59,10 @@ class NewsPopup extends Model
             return false;
         }
 
+        if (session('news_popup_dismissed_' . $this->id)) {
+            return true;
+        }
+
         $read = $this->reads()->where('user_id', $user->id)->first();
         if (!$read) {
             return false;

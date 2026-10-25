@@ -15,33 +15,10 @@
 
 @if($activePopup)
 <div x-data="{ 
-        show: false,
-        init() {
-            // Server already validated that $activePopup is active and unread for $user
-            // We set this.show = true after a short delay for a smooth animation
-            const key = 'news_popup_dismissed_{{ $activePopup->id }}_{{ $user->id }}';
-            @if($activePopup->display_type === 'once_per_day')
-                const lastDismissed = localStorage.getItem(key);
-                const isToday = lastDismissed && new Date(lastDismissed).toDateString() === new Date().toDateString();
-                if (!isToday) {
-                    setTimeout(() => { this.show = true; }, 350);
-                }
-            @elseif($activePopup->display_type === 'always')
-                setTimeout(() => { this.show = true; }, 350);
-            @else
-                if (!localStorage.getItem(key)) {
-                    setTimeout(() => { this.show = true; }, 350);
-                }
-            @endif
-        },
+        show: true,
         async dismiss() {
             this.show = false;
             try {
-                // Immediate client storage
-                const key = 'news_popup_dismissed_{{ $activePopup->id }}_{{ $user->id }}';
-                localStorage.setItem(key, new Date().toISOString());
-
-                // Server-side registration
                 await fetch('{{ route('news-popups.dismiss', $activePopup->id) }}', {
                     method: 'POST',
                     headers: {
@@ -65,8 +42,7 @@
      class="fixed z-50 inset-0 overflow-y-auto" 
      aria-labelledby="news-popup-title" 
      role="dialog" 
-     aria-modal="true"
-     style="display: none;">
+     aria-modal="true">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         
         <!-- Backdrop -->
